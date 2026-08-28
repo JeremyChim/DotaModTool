@@ -28,12 +28,16 @@ class Ui_MainWindow(object):
         MainWindow.resize(1112, 838)
         self.action = QAction(MainWindow)
         self.action.setObjectName(u"action")
+        self.load_file_action = QAction(MainWindow)
+        self.load_file_action.setObjectName(u"load_file_action")
+        self.save_file_action = QAction(MainWindow)
+        self.save_file_action.setObjectName(u"save_file_action")
+        self.reload_file_action = QAction(MainWindow)
+        self.reload_file_action.setObjectName(u"reload_file_action")
         self.action_2 = QAction(MainWindow)
         self.action_2.setObjectName(u"action_2")
         self.action_3 = QAction(MainWindow)
         self.action_3.setObjectName(u"action_3")
-        self.action_4 = QAction(MainWindow)
-        self.action_4.setObjectName(u"action_4")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_5 = QHBoxLayout(self.centralwidget)
@@ -48,6 +52,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.frame = QFrame(self.frame_3)
         self.frame.setObjectName(u"frame")
+        self.frame.setMaximumSize(QSize(255, 16777215))
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.frame)
@@ -104,8 +109,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_4.addWidget(self.frame_2)
 
-        self.horizontalLayout_4.setStretch(0, 1)
-        self.horizontalLayout_4.setStretch(1, 5)
 
         self.horizontalLayout_5.addWidget(self.frame_3)
 
@@ -133,14 +136,16 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_4.menuAction())
         self.menubar.addAction(self.menu_5.menuAction())
         self.menubar.addAction(self.menu_2.menuAction())
-        self.menu.addAction(self.action_2)
-        self.menu.addAction(self.action_3)
-        self.menu.addAction(self.action_4)
+        self.menu.addAction(self.load_file_action)
+        self.menu.addAction(self.save_file_action)
+        self.menu.addAction(self.reload_file_action)
+        self.menu_2.addAction(self.action_2)
+        self.menu_2.addAction(self.action_3)
         self.menu_4.addAction(self.action)
 
         self.retranslateUi(MainWindow)
 
-        self.view_tabWidget.setCurrentIndex(1)
+        self.view_tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -149,15 +154,17 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.action.setText(QCoreApplication.translate("MainWindow", u"\u7f6e\u9876", None))
-        self.action_2.setText(QCoreApplication.translate("MainWindow", u"\u8f7d\u5165", None))
-        self.action_3.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
-        self.action_4.setText(QCoreApplication.translate("MainWindow", u"\u91cd\u8f7d", None))
+        self.load_file_action.setText(QCoreApplication.translate("MainWindow", u"\u8f7d\u5165", None))
+        self.save_file_action.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
+        self.reload_file_action.setText(QCoreApplication.translate("MainWindow", u"\u91cd\u8f7d", None))
+        self.action_2.setText(QCoreApplication.translate("MainWindow", u"\u83b7\u53d6\u9009\u4e2d\u884c", None))
+        self.action_3.setText(QCoreApplication.translate("MainWindow", u"\u5199\u5165\u9009\u4e2d\u884c", None))
         self.search_lineEdit.setText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22\u680f", None))
 
         __sortingEnabled = self.heroFiles_listWidget.isSortingEnabled()
         self.heroFiles_listWidget.setSortingEnabled(False)
         ___qlistwidgetitem = self.heroFiles_listWidget.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"npc", None));
+        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6\u540d.txt", None));
         self.heroFiles_listWidget.setSortingEnabled(__sortingEnabled)
 
 

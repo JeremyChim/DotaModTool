@@ -23,7 +23,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,5">
+      <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -41,6 +41,12 @@
        </property>
        <item>
         <widget class="QFrame" name="frame">
+         <property name="maximumSize">
+          <size>
+           <width>255</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -149,14 +155,16 @@
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="action_2"/>
-    <addaction name="action_3"/>
-    <addaction name="action_4"/>
+    <addaction name="load_file_action"/>
+    <addaction name="save_file_action"/>
+    <addaction name="reload_file_action"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>操作</string>
     </property>
+    <addaction name="write_selected_item_action"/>
+    <addaction name="get_selected_item_action"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -186,19 +194,29 @@
     <string>置顶</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="load_file_action">
    <property name="text">
     <string>载入</string>
    </property>
   </action>
-  <action name="action_3">
+  <action name="save_file_action">
    <property name="text">
     <string>保存</string>
    </property>
   </action>
-  <action name="action_4">
+  <action name="reload_file_action">
    <property name="text">
     <string>重载</string>
+   </property>
+  </action>
+  <action name="write_selected_item_action">
+   <property name="text">
+    <string>获取选中行</string>
+   </property>
+  </action>
+  <action name="get_selected_item_action">
+   <property name="text">
+    <string>写入选中行</string>
    </property>
   </action>
  </widget>
