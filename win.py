@@ -8,6 +8,14 @@ from ui.ui import *
 
 NPC_DIR = os.path.join(os.path.dirname(__file__), "npc", "heroes")
 VPK_DIR = os.path.join(os.path.dirname(__file__), "vpk", "pak01_dir", "scripts", "npc", "heroes")
+MOD = '''
+[TAB]"[AB_NAME]"
+[TAB]{
+[TAB]\t\t"value"\t\t"[AB_VALUE]"
+[TAB]\t\t"special_bonus_shard"\t\t"[SA_VALUE]"
+[TAB]\t\t"special_bonus_scepter"\t\t"[SP_VALUE]"
+[TAB]}
+'''
 
 
 class Win(QMainWindow, Ui_MainWindow):
@@ -29,6 +37,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.search_lineEdit.textChanged.connect(self.search)
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.save_file_action.triggered.connect(self.save_file)
+        self.change_selected_item_action.triggered.connect(self.change_selected_item)
 
         # 启动时恢复上次打开的文件
         self._read_config()
@@ -77,28 +86,34 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def change_selected_item(self):
         """获取content_listWidget的选中行，然后修改好后，再写回该行"""
-        text = self.get_selected_item()
-        new_text = self._change_text(text)
-        self._write_selected_item(new_text)
-
+        try:
+            text = self._get_selected_item()
+            new_text = self._change_text(text)
+            self._write_selected_item(new_text)
+        except Exception as e:
+            print(e)
 
     def _change_text(self, text):
         """暂时加个一行hahaha就行"""
-        new_text = str(text) + '123\n'
-        return new_text
-
+        tab, ab_name, _, ab_value, _  = str(text).split('"')
+        print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}')
+        self._read_config()
+        sa_value, sp_value  = self.config.get("sa_value"), self.config.get("sp_value")
+        new_text = MOD.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
+        print(f'new_text=\n{new_text}')
+        return str(new_text)
 
     def _get_selected_item(self):
         """获取content_listWidget的选中行"""
-        # todo
-        # todo:打印
-        pass
+        item = self.content_listWidget.currentItem()
+        text = item.text() if item else ""
+        return text
 
     def _write_selected_item(self, text):
         """写入content_listWidget的选中行"""
-        # todo
-        # todo:打印
-        pass
+        item = self.content_listWidget.currentItem()
+        if item:
+            item.setText(text)
 
     def _change_title(self, title):
         """修改窗口标题"""

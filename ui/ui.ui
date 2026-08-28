@@ -163,8 +163,7 @@
     <property name="title">
      <string>操作</string>
     </property>
-    <addaction name="write_selected_item_action"/>
-    <addaction name="get_selected_item_action"/>
+    <addaction name="change_selected_item_action"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -209,9 +208,12 @@
     <string>重载</string>
    </property>
   </action>
-  <action name="write_selected_item_action">
+  <action name="change_selected_item_action">
    <property name="text">
-    <string>获取选中行</string>
+    <string>修改选中行</string>
+   </property>
+   <property name="shortcut">
+    <string>Space</string>
    </property>
   </action>
   <action name="get_selected_item_action">
