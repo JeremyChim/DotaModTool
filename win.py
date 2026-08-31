@@ -76,14 +76,25 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_font_and_size_when_start()
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
+        self.set_sidebar_when_start()
+
+    def set_sidebar_when_start(self):
+        """启动时，展开或收起侧栏"""
+        sidebar_expand = self.config.get('sidebar_expand')
+        if sidebar_expand is True:
+            self.expand_sidebar()
+        else:
+            self.collapse_sidebar()
 
     def expand_sidebar(self):
         """侧栏宽度设置为255"""
         self.sidebar_frame.setFixedWidth(255)
+        self.config['sidebar_expand'] = True
 
     def collapse_sidebar(self):
         """侧栏宽度设置为5"""
         self.sidebar_frame.setFixedWidth(5)
+        self.config['sidebar_expand'] = False
 
     def undo(self):
         """撤回"""
