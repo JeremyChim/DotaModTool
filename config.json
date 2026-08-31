@@ -1,9 +1,10 @@
 {
   "last_path": "c:\\Users\\zhanqingming\\Desktop\\DotaModTool\\vpk\\pak01_dir\\scripts\\npc\\heroes\\npc_dota_hero_antimage.txt",
+  "current_file": "npc_dota_hero_jakiro.txt",
   "sa_value": "+50%",
   "sp_value": "+50%",
   "sa_value2": "-25%",
   "sp_value2": "-25%",
-  "font": "Consolas",
-  "font_size": 8
+  "font": "JetBrains Mono",
+  "font_size": 9
 }
