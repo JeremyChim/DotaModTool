@@ -193,8 +193,8 @@
      <addaction name="top_action"/>
      <addaction name="top_cancel_action"/>
      <addaction name="separator"/>
-     <addaction name="set_win_size_1200x600_action"/>
      <addaction name="set_win_size_1600x800_action"/>
+     <addaction name="set_win_size_1800x900_action"/>
     </widget>
     <addaction name="menu_4"/>
     <addaction name="menu_5"/>
@@ -311,9 +311,9 @@
     <string>1600x800</string>
    </property>
   </action>
-  <action name="set_win_size_1200x600_action">
+  <action name="set_win_size_1800x900_action">
    <property name="text">
-    <string>1200x600</string>
+    <string>1800x900</string>
    </property>
   </action>
  </widget>

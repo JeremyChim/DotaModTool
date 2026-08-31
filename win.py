@@ -58,21 +58,43 @@ class Win(QMainWindow, Ui_MainWindow):
         self.top_action.triggered.connect(self.top)
         self.top_cancel_action.triggered.connect(self.top_cancel)
         self.set_win_size_1600x800_action.triggered.connect(self.set_win_size_1600x800)
-        self.set_win_size_1200x600_action.triggered.connect(self.set_win_size_1200x600)
+        self.set_win_size_1800x900_action.triggered.connect(self.set_win_size_1800x900)
 
         # 启动项
         self._read_config()
         self.show_content_when_start()
         self.set_font_and_size_when_start()
         self.set_theme_when_start()
+        self.set_win_size_and_position_when_start()
 
+    def closeEvent(self, event):
+        """重写窗口关闭事件"""
+        self._save_win_size_and_position_when_win_close()
+
+    def set_win_size_and_position_when_start(self):
+        try:
+            win_size, win_position = self.config.get('win_size'), self.config.get('win_position')
+            w, h = win_size.split('x')
+            x, y = win_position.split(',')
+            x, y, w, h = int(x), int(y), int(w), int(h)
+            self.setGeometry(x, y, w, h)
+            self._print(f'设置窗口位置：{x, y}，窗口尺寸：{h, w}', show_in_bar=False)
+        except Exception as e:
+            self._print(f'异常：{str(e)}', show_in_bar=False)
+        
     def set_win_size_1600x800(self):
-        """设置窗口尺寸1600x800"""
-        # todo
+        """设置窗口尺寸800x1600"""
+        geo = self.geometry()
+        x, y, w, h = int(geo.x()), int(geo.y()), 1600, 800
+        self.setGeometry(x, y, w, h)
+        self._print('设置窗口尺寸 800x1600')
 
-    def set_win_size_1200x600(self):
-        """设置窗口尺寸1200x600"""
-        # todo
+    def set_win_size_1800x900(self):
+        """设置窗口尺寸900x1800"""
+        geo = self.geometry()
+        x, y, w, h = int(geo.x()), int(geo.y()), 1800, 900
+        self.setGeometry(x, y, w, h)
+        self._print('设置窗口尺寸 900x1800')
 
     def top(self):
         """置顶窗口"""
@@ -123,7 +145,6 @@ class Win(QMainWindow, Ui_MainWindow):
         path = os.path.join(VPK_DIR, self.current_file)
         if not os.path.exists(path):
             return
-        # dst = os.path.join(VPK_DIR, f"{self.current_file}_{time.strftime('%Y%m%d_%H%M%S')}")
         dst = os.path.join(VPK_DIR, f"{self.current_file}1")
         if os.path.exists(dst):
             os.remove(dst)
@@ -241,11 +262,13 @@ class Win(QMainWindow, Ui_MainWindow):
             "QListWidget::item:hover:!selected { background-color: #3a3a3a; }"
         )
 
-    def _save_win_size_and_position(self):
+    def _save_win_size_and_position_when_win_close(self):
         """窗口关闭时，把尺寸和位置保存"""
-        # todo
-        self.config['win_size'] = '1600x800'
-        self.config['win_position'] = '0,0'
+        geo = self.geometry()
+        x, y, w, h = int(geo.x()), int(geo.y()), int(geo.width()), int(geo.height())
+        self.config['win_position'] = f'{x},{y}'
+        self.config['win_size'] = f'{w}x{h}'
+        self._print(f'保存窗口位置：{x, y}，窗口尺寸：{w, h}', show_in_bar=False)
         self._save_config()
 
     def _refresh_files(self):
