@@ -3,7 +3,7 @@ import os
 import subprocess
 import time
 
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QUrl, Qt
 from PySide6.QtGui import QColor, QDesktopServices, QFont
 from PySide6.QtWidgets import QListWidgetItem
 
@@ -55,12 +55,34 @@ class Win(QMainWindow, Ui_MainWindow):
         self.reduce_font_size_action.triggered.connect(self.reduce_font_size)
         self.set_light_theme_action.triggered.connect(self.set_light_theme)
         self.set_dark_theme_action.triggered.connect(self.set_dark_theme)
+        self.top_action.triggered.connect(self.top)
+        self.top_cancel_action.triggered.connect(self.top_cancel)
+        self.set_win_size_1600x800_action.triggered.connect(self.set_win_size_1600x800)
+        self.set_win_size_1200x600_action.triggered.connect(self.set_win_size_1200x600)
 
         # 启动项
         self._read_config()
         self.show_content_when_start()
         self.set_font_and_size_when_start()
         self.set_theme_when_start()
+
+    def set_win_size_1600x800(self):
+        """设置窗口尺寸1600x800"""
+        # todo
+
+    def set_win_size_1200x600(self):
+        """设置窗口尺寸1200x600"""
+        # todo
+
+    def top(self):
+        """置顶窗口"""
+        self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
+        self.show()
+
+    def top_cancel(self):
+        """取消置顶"""
+        self.setWindowFlag(Qt.WindowStaysOnTopHint, False)
+        self.show()
 
     def show_files(self, files):
         """展示文件列表"""
@@ -97,14 +119,18 @@ class Win(QMainWindow, Ui_MainWindow):
             self._print(f'异常：{str(e)}')
 
     def reset_file(self):
-        """重置文件，把VPK_DIR目录里的文件名改成文件名_时间戳"""
+        """重置文件，把VPK_DIR目录里的文件名改成文件名1"""
         path = os.path.join(VPK_DIR, self.current_file)
         if not os.path.exists(path):
             return
-        dst = os.path.join(VPK_DIR, f"{self.current_file}_{time.strftime('%Y%m%d_%H%M%S')}")
+        # dst = os.path.join(VPK_DIR, f"{self.current_file}_{time.strftime('%Y%m%d_%H%M%S')}")
+        dst = os.path.join(VPK_DIR, f"{self.current_file}1")
+        if os.path.exists(dst):
+            os.remove(dst)
         os.rename(path, dst)
         self._refresh_files()
-        self._print(f'已重置：{dst}')
+        self._change_title(os.path.join(NPC_DIR, self.current_file))
+        self._print(f'重置文件：{dst}')
 
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
@@ -116,6 +142,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._change_title(path)
         self.config['current_file'] = self.current_file
         self._save_config()
+        self._print(f'加载文件：{path}')
 
     def show_content_when_start(self):
         """启动时，加载展示最近一次的文件内容"""
@@ -213,6 +240,13 @@ class Win(QMainWindow, Ui_MainWindow):
             "QListWidget::item:selected { background-color: #375a7f; color: #e6eef5; }"
             "QListWidget::item:hover:!selected { background-color: #3a3a3a; }"
         )
+
+    def _save_win_size_and_position(self):
+        """窗口关闭时，把尺寸和位置保存"""
+        # todo
+        self.config['win_size'] = '1600x800'
+        self.config['win_position'] = '0,0'
+        self._save_config()
 
     def _refresh_files(self):
         """刷新文件列表"""
