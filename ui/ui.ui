@@ -40,7 +40,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QFrame" name="frame">
+        <widget class="QFrame" name="sidebar_frame">
          <property name="maximumSize">
           <size>
            <width>255</width>
@@ -187,10 +187,10 @@
     <widget class="QMenu" name="menu_6">
      <property name="geometry">
       <rect>
-       <x>468</x>
-       <y>180</y>
+       <x>464</x>
+       <y>176</y>
        <width>120</width>
-       <height>147</height>
+       <height>200</height>
       </rect>
      </property>
      <property name="title">
@@ -198,6 +198,9 @@
      </property>
      <addaction name="top_action"/>
      <addaction name="top_cancel_action"/>
+     <addaction name="separator"/>
+     <addaction name="expand_sidebar_action"/>
+     <addaction name="collapse_sidebar_action"/>
      <addaction name="separator"/>
      <addaction name="set_win_size_1600x800_action"/>
      <addaction name="set_win_size_1800x900_action"/>
@@ -360,6 +363,22 @@
    </property>
    <property name="shortcut">
     <string>Z</string>
+   </property>
+  </action>
+  <action name="expand_sidebar_action">
+   <property name="text">
+    <string>侧栏展开</string>
+   </property>
+   <property name="shortcut">
+    <string>`</string>
+   </property>
+  </action>
+  <action name="collapse_sidebar_action">
+   <property name="text">
+    <string>侧栏收起</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+`</string>
    </property>
   </action>
  </widget>

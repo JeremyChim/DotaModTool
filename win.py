@@ -66,6 +66,8 @@ class Win(QMainWindow, Ui_MainWindow):
         self.cut_action.triggered.connect(self.cut)
         self.paste_action.triggered.connect(self.paste)
         self.undo_action.triggered.connect(self.undo)
+        self.expand_sidebar_action.triggered.connect(self.expand_sidebar)
+        self.collapse_sidebar_action.triggered.connect(self.collapse_sidebar)
 
         # 启动项
         self._read_config()
@@ -73,6 +75,14 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_font_and_size_when_start()
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
+
+    def expand_sidebar(self):
+        """侧栏宽度设置为255"""
+        self.sidebar_frame # TODO:宽度设置为255
+
+    def collapse_sidebar(self):
+        """侧栏宽度设置为5"""
+        self.sidebar_frame # TODO:宽度设置为5
 
     def undo(self):
         """撤回"""
