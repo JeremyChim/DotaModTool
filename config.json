@@ -1,10 +1,10 @@
 {
-  "current_file": "npc_dota_hero_death_prophet.txt",
+  "current_file": "npc_dota_hero_winter_wyvern.txt",
   "font": "JetBrains Mono",
   "font_size": 10,
   "theme": "dark",
   "win_size": "1600x800",
-  "win_position": "271,145",
+  "win_position": "236,129",
   "sa_value": "+50%",
   "sp_value": "+50%",
   "sa_value2": "-25%",

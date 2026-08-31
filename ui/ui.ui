@@ -277,10 +277,16 @@
    <property name="text">
     <string>置顶</string>
    </property>
+   <property name="shortcut">
+    <string>T</string>
+   </property>
   </action>
   <action name="top_cancel_action">
    <property name="text">
     <string>取消置顶</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
   <action name="enlarge_font_size_action">
