@@ -5,7 +5,7 @@ import time
 
 from PySide6.QtCore import QUrl, Qt
 from PySide6.QtGui import QColor, QDesktopServices, QFont
-from PySide6.QtWidgets import QListWidgetItem
+from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 from ui.ui import *
 
@@ -68,6 +68,8 @@ class Win(QMainWindow, Ui_MainWindow):
         self.undo_action.triggered.connect(self.undo)
         self.expand_sidebar_action.triggered.connect(self.expand_sidebar)
         self.collapse_sidebar_action.triggered.connect(self.collapse_sidebar)
+
+        self.content_listWidget.setEditTriggers(QListWidget.DoubleClicked)
 
         # 启动项
         self._read_config()
@@ -338,7 +340,6 @@ class Win(QMainWindow, Ui_MainWindow):
         tab_text = '\n'.join(texts)
         return tab_text
 
-
     def _save_win_size_and_position_when_win_close(self):
         """窗口关闭时，把尺寸和位置保存"""
         geo = self.geometry()
@@ -408,7 +409,10 @@ class Win(QMainWindow, Ui_MainWindow):
         with open(path, encoding="utf-8", errors="ignore") as fh:
             lines = fh.read().splitlines()
         self.content_listWidget.clear()
-        self.content_listWidget.addItems(lines)
+        for line in lines:
+            item = QListWidgetItem(line)
+            item.setFlags(item.flags() | Qt.ItemIsEditable)
+            self.content_listWidget.addItem(item)
         self.content_plainTextEdit.setPlainText("\n".join(lines))
 
     def _read_config(self):
