@@ -1,8 +1,10 @@
 {
-  "current_file": "npc_dota_hero_leshrac.txt",
+  "current_file": "npc_dota_hero_disruptor.txt",
   "font": "JetBrains Mono",
-  "font_size": 9,
+  "font_size": 10,
   "theme": "dark",
+  "win_size":"1600x800",
+  "win_position":"0,0",
   "sa_value": "+50%",
   "sp_value": "+50%",
   "sa_value2": "-25%",

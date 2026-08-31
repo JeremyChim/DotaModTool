@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>720</height>
+    <width>1600</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -138,7 +138,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1280</width>
+     <width>1600</width>
      <height>23</height>
     </rect>
    </property>
@@ -181,18 +181,20 @@
     <widget class="QMenu" name="menu_6">
      <property name="geometry">
       <rect>
-       <x>400</x>
-       <y>200</y>
+       <x>468</x>
+       <y>180</y>
        <width>120</width>
-       <height>103</height>
+       <height>147</height>
       </rect>
      </property>
      <property name="title">
       <string>窗口</string>
      </property>
-     <addaction name="action_8"/>
-     <addaction name="action_9"/>
+     <addaction name="top_action"/>
+     <addaction name="top_cancel_action"/>
      <addaction name="separator"/>
+     <addaction name="set_win_size_1200x600_action"/>
+     <addaction name="set_win_size_1600x800_action"/>
     </widget>
     <addaction name="menu_4"/>
     <addaction name="menu_5"/>
@@ -262,12 +264,12 @@
     <string>暗色</string>
    </property>
   </action>
-  <action name="action_8">
+  <action name="top_action">
    <property name="text">
     <string>置顶</string>
    </property>
   </action>
-  <action name="action_9">
+  <action name="top_cancel_action">
    <property name="text">
     <string>取消置顶</string>
    </property>
@@ -302,6 +304,16 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="set_win_size_1600x800_action">
+   <property name="text">
+    <string>1600x800</string>
+   </property>
+  </action>
+  <action name="set_win_size_1200x600_action">
+   <property name="text">
+    <string>1200x600</string>
    </property>
   </action>
  </widget>
