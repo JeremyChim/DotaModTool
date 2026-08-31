@@ -76,6 +76,13 @@ class Win(QMainWindow, Ui_MainWindow):
             self._show_content(path)
             self._change_title(path)
 
+    def set_font_and_size_when_start(self):
+        font, font_size = self.config.get("font"), self.config.get("font_size")
+        if font is not None:
+            self._set_font(font)
+        if font_size is not None:
+            self._set_font_size(font_size)
+
     def save_file(self):
         """把文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
         if not getattr(self, "current_file", None):
@@ -102,20 +109,24 @@ class Win(QMainWindow, Ui_MainWindow):
         font = self.content_listWidget.font()
         size = font.pointSize() + 1
         self._set_font_size(size)
+        # TODO self.statusbar显示：'设置字体大小为 size'
 
     def reduce_font_size(self):
         """缩小 content_listWidget 和 content_plainTextEdit 的字体"""
         font = self.content_listWidget.font()
         size = font.pointSize() - 1
         self._set_font_size(size)
+        # TODO self.statusbar显示：'设置字体大小为 size'
 
     def set_font_to_JetBrains_Mono(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：JetBrains Mono"""
         self._set_font('JetBrains Mono')
+        # TODO self.statusbar显示：'设置字体为 JetBrains Mono'
 
     def set_font_to_Consolas(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：Consolas"""
         self._set_font('Consolas')
+        # TODO self.statusbar显示：'设置字体为 Consolas'
 
     def _set_font_size(self, font_size):
         font_size = int(font_size)
@@ -140,7 +151,7 @@ class Win(QMainWindow, Ui_MainWindow):
         tab, ab_name, _, ab_value, _  = str(text).split('"')
         print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}')
         self._read_config()
-        sa_value, sp_value  = self.config.get("sa_value"), self.config.get("sp_value")
+        sa_value, sp_value, sa_value2, sp_value2  = self.config.get("sa_value"), self.config.get("sp_value"), self.config.get("sa_value2"), self.config.get("sp_value2")
         new_text = MOD.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
         print(f'new_text=\n{new_text}')
         return str(new_text)
