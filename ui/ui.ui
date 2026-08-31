@@ -57,7 +57,10 @@
           <item>
            <widget class="QLineEdit" name="search_lineEdit">
             <property name="text">
-             <string>搜索栏</string>
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>搜索...</string>
             </property>
            </widget>
           </item>
@@ -65,7 +68,7 @@
            <widget class="QListWidget" name="heroFiles_listWidget">
             <item>
              <property name="text">
-              <string>文件名.txt</string>
+              <string>未找到文件列表...</string>
              </property>
             </item>
            </widget>
@@ -85,7 +88,7 @@
           <item>
            <widget class="QTabWidget" name="view_tabWidget">
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="line_tab">
              <property name="enabled">
@@ -99,17 +102,7 @@
                <widget class="QListWidget" name="content_listWidget">
                 <item>
                  <property name="text">
-                  <string>文本第1行</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>文本第2行</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>文本第3行</string>
+                  <string>未加载文件...</string>
                  </property>
                 </item>
                </widget>
@@ -124,9 +117,7 @@
               <item>
                <widget class="QPlainTextEdit" name="content_plainTextEdit">
                 <property name="plainText">
-                 <string>文本第1行
-文本第2行
-文本第3行</string>
+                 <string>未加载文件...</string>
                 </property>
                </widget>
               </item>
@@ -161,31 +152,46 @@
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
-     <string>操作</string>
+     <string>编辑</string>
     </property>
     <addaction name="change_selected_item_action"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
-     <string>编辑</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menu_4">
-    <property name="title">
-     <string>窗口</string>
-    </property>
-    <addaction name="action"/>
-   </widget>
-   <widget class="QMenu" name="menu_5">
-    <property name="title">
      <string>设置</string>
     </property>
+    <widget class="QMenu" name="menu_4">
+     <property name="title">
+      <string>字体</string>
+     </property>
+     <addaction name="enlarge_font_size_action"/>
+     <addaction name="reduce_font_size_action"/>
+     <addaction name="separator"/>
+     <addaction name="set_font_to_JetBrains_Mono_action"/>
+     <addaction name="set_font_to_Consolas_action"/>
+    </widget>
+    <widget class="QMenu" name="menu_5">
+     <property name="title">
+      <string>主题</string>
+     </property>
+     <addaction name="action_6"/>
+     <addaction name="action_7"/>
+    </widget>
+    <widget class="QMenu" name="menu_6">
+     <property name="title">
+      <string>窗口</string>
+     </property>
+     <addaction name="action_8"/>
+     <addaction name="action_9"/>
+     <addaction name="separator"/>
+    </widget>
+    <addaction name="menu_4"/>
+    <addaction name="menu_5"/>
+    <addaction name="menu_6"/>
    </widget>
    <addaction name="menu"/>
-   <addaction name="menu_3"/>
-   <addaction name="menu_4"/>
-   <addaction name="menu_5"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action">
@@ -219,6 +225,46 @@
   <action name="get_selected_item_action">
    <property name="text">
     <string>写入选中行</string>
+   </property>
+  </action>
+  <action name="set_font_to_Consolas_action">
+   <property name="text">
+    <string>Consolas</string>
+   </property>
+  </action>
+  <action name="set_font_to_JetBrains_Mono_action">
+   <property name="text">
+    <string>JetBrains Mono</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>亮色</string>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="text">
+    <string>暗色</string>
+   </property>
+  </action>
+  <action name="action_8">
+   <property name="text">
+    <string>置顶</string>
+   </property>
+  </action>
+  <action name="action_9">
+   <property name="text">
+    <string>取消置顶</string>
+   </property>
+  </action>
+  <action name="enlarge_font_size_action">
+   <property name="text">
+    <string>放大字体</string>
+   </property>
+  </action>
+  <action name="reduce_font_size_action">
+   <property name="text">
+    <string>缩小字体</string>
    </property>
   </action>
  </widget>

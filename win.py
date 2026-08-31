@@ -8,8 +8,7 @@ from ui.ui import *
 
 NPC_DIR = os.path.join(os.path.dirname(__file__), "npc", "heroes")
 VPK_DIR = os.path.join(os.path.dirname(__file__), "vpk", "pak01_dir", "scripts", "npc", "heroes")
-MOD = '''
-[TAB]"[AB_NAME]"
+MOD = '''[TAB]"[AB_NAME]"
 [TAB]{
 [TAB]\t\t"value"\t\t"[AB_VALUE]"
 [TAB]\t\t"special_bonus_shard"\t\t"[SA_VALUE]"
@@ -38,6 +37,10 @@ class Win(QMainWindow, Ui_MainWindow):
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.save_file_action.triggered.connect(self.save_file)
         self.change_selected_item_action.triggered.connect(self.change_selected_item)
+        self.set_font_to_Consolas_action.triggered.connect(self.set_font_to_Consolas)
+        self.set_font_to_JetBrains_Mono_action.triggered.connect(self.set_font_to_JetBrains_Mono)
+        self.enlarge_font_size_action.triggered.connect(self.enlarge_font_size)
+        self.reduce_font_size_action.triggered.connect(self.reduce_font_size)
 
         # 启动时恢复上次打开的文件
         self._read_config()
@@ -92,6 +95,23 @@ class Win(QMainWindow, Ui_MainWindow):
             self._write_selected_item(new_text)
         except Exception as e:
             print(e)
+
+    def enlarge_font_size(self):
+        """放大 content_listWidget 和 content_plainTextEdit 的字体"""
+        # TODO
+
+    def reduce_font_size(self):
+        """缩小 content_listWidget 和 content_plainTextEdit 的字体"""
+        # TODO
+
+    def set_font_to_JetBrains_Mono(self):
+        """设置 content_listWidget 和 content_plainTextEdit 的字体为：JetBrains Mono"""
+        # TODO
+
+    def set_font_to_Consolas(self):
+        """设置 content_listWidget 和 content_plainTextEdit 的字体为：Consolas"""
+        # TODO
+
 
     def _change_text(self, text):
         """暂时加个一行hahaha就行"""
