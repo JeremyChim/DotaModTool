@@ -46,6 +46,7 @@ class Win(QMainWindow, Ui_MainWindow):
         # 启动时恢复上次打开的文件
         self._read_config()
         self.show_content_when_start()
+        self.set_font_and_size_when_start()
 
     def show_files(self, files):
         """展示文件列表"""
@@ -70,13 +71,22 @@ class Win(QMainWindow, Ui_MainWindow):
             path = os.path.join(NPC_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
+        self.config['current_file'] = self.current_file
+        self._save_config()
 
     def show_content_when_start(self):
         """启动时，加载展示最近一次的文件内容"""
-        path = self.config.get("last_path")
-        if path and path != ""  and os.path.exists(path):
-            self._show_content(path)
-            self._change_title(path)
+        # path = self.config.get("last_path")
+        # if path and path != ""  and os.path.exists(path):
+        #     self._show_content(path)
+        #     self._change_title(path)
+        #     self.current_file = os.path.basename(path)
+        self.current_file = self.config.get("current_file")
+        path = os.path.join(VPK_DIR, self.current_file)
+        if not os.path.exists(path):
+            path = os.path.join(NPC_DIR, self.current_file)
+        self._show_content(path)
+        self._change_title(path)
 
     def set_font_and_size_when_start(self):
         """启动时，设置字体和大小"""
@@ -96,7 +106,8 @@ class Win(QMainWindow, Ui_MainWindow):
             lines = [self.content_listWidget.item(i).text() for i in range(self.content_listWidget.count())]
             fh.write("\n".join(lines))
         self._change_title(path)
-        self.config['last_path'] = path
+        # self.config['last_path'] = path
+        self.config['current_file'] = self.current_file
         self._save_config()
         self._refresh_files()
         self.statusbar.showMessage(f'保存文件：{path}')
@@ -108,6 +119,7 @@ class Win(QMainWindow, Ui_MainWindow):
             path = os.path.join(NPC_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
+        self.statusbar.showMessage(f'重载文件：{path}')
 
     def change_selected_item(self):
         """获取content_listWidget的选中行，然后修改好后，再写回该行"""
