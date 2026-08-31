@@ -19,9 +19,9 @@ MOD1 = '''[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"
 [TAB]"special_bonus_scepter"\t\t"[SP_VALUE]"'''
 MOD2 = '''[TAB]"[AB_NAME]"
 [TAB]{
-[TAB]\t\t"value"\t\t"[AB_VALUE]"
-[TAB]\t\t"special_bonus_shard"\t\t"[SA_VALUE]"
-[TAB]\t\t"special_bonus_scepter"\t\t"[SP_VALUE]"
+[TAB]\t"value"\t\t"[AB_VALUE]"
+[TAB]\t"special_bonus_shard"\t\t"[SA_VALUE]"
+[TAB]\t"special_bonus_scepter"\t\t"[SP_VALUE]"
 [TAB]}'''
 
 
@@ -29,6 +29,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.cuts = []
         self.files = []  # 全部文件名缓存
         self.config = {}
         self.current_file = 'npc_dota_hero_abaddon.txt'
@@ -59,6 +60,10 @@ class Win(QMainWindow, Ui_MainWindow):
         self.top_cancel_action.triggered.connect(self.top_cancel)
         self.set_win_size_1600x800_action.triggered.connect(self.set_win_size_1600x800)
         self.set_win_size_1800x900_action.triggered.connect(self.set_win_size_1800x900)
+        self.tab_action.triggered.connect(self.tab)
+        self.back_action.triggered.connect(self.back)
+        self.cut_action.triggered.connect(self.cut)
+        self.paste_action.triggered.connect(self.paste)
 
         # 启动项
         self._read_config()
@@ -66,6 +71,47 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_font_and_size_when_start()
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
+
+    def cut(self):
+        """剪切"""
+        text = self._get_selected_item()
+        self.cuts.append(text)
+        self._write_selected_item('')
+        self._print(f'剪切：{len(self.cuts)}')
+
+    def paste(self):
+        """粘贴"""
+        if self.cuts == []:
+            return
+        text = self._get_selected_item()
+        new_text = text + '\n' + '\n'.join(self.cuts)
+        self._write_selected_item(new_text)
+        self._print(f'粘贴：{len(self.cuts)}')
+        self.cuts = []
+
+    def tab(self):
+        """缩进"""
+        try:
+            text = self._get_selected_item()
+            texts = ['\t'+ i  for i in text.split('\n')]
+            tab_text = '\n'.join(texts)
+            self._write_selected_item(tab_text)
+        except Exception as e:
+            self._print(f'异常：{str(e)}', show_in_bar=False)
+
+    def back(self):
+        """退格"""
+        try:
+            text = self._get_selected_item()
+            texts = []
+            for line in text.split('\n'):
+                if line.startswith('\t'):
+                    line = line[1:]
+                texts.append(line)
+            new_text = '\n'.join(texts)
+            self._write_selected_item(new_text)
+        except Exception as e:
+            self._print(f'异常：{str(e)}', show_in_bar=False)
 
     def closeEvent(self, event):
         """重写窗口关闭事件"""
@@ -152,6 +198,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._refresh_files()
         self._change_title(os.path.join(NPC_DIR, self.current_file))
         self._print(f'重置文件：{dst}')
+        self.reload_file()
 
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
@@ -351,7 +398,6 @@ class Win(QMainWindow, Ui_MainWindow):
         print(msg)
         if show_in_bar is True:
             self.statusbar.showMessage(msg)
-
 
 if __name__ == "__main__":
     app = QApplication([])

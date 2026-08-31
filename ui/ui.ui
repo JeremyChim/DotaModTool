@@ -156,6 +156,12 @@
      <string>编辑</string>
     </property>
     <addaction name="change_selected_item_action"/>
+    <addaction name="separator"/>
+    <addaction name="tab_action"/>
+    <addaction name="back_action"/>
+    <addaction name="cut_action"/>
+    <addaction name="paste_action"/>
+    <addaction name="undo_action"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -314,6 +320,46 @@
   <action name="set_win_size_1800x900_action">
    <property name="text">
     <string>1800x900</string>
+   </property>
+  </action>
+  <action name="tab_action">
+   <property name="text">
+    <string>缩进</string>
+   </property>
+   <property name="shortcut">
+    <string>Tab</string>
+   </property>
+  </action>
+  <action name="back_action">
+   <property name="text">
+    <string>退格</string>
+   </property>
+   <property name="shortcut">
+    <string>Backspace</string>
+   </property>
+  </action>
+  <action name="cut_action">
+   <property name="text">
+    <string>剪切</string>
+   </property>
+   <property name="shortcut">
+    <string>X</string>
+   </property>
+  </action>
+  <action name="paste_action">
+   <property name="text">
+    <string>粘贴</string>
+   </property>
+   <property name="shortcut">
+    <string>V</string>
+   </property>
+  </action>
+  <action name="undo_action">
+   <property name="text">
+    <string>撤回</string>
+   </property>
+   <property name="shortcut">
+    <string>Z</string>
    </property>
   </action>
  </widget>
