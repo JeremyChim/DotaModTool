@@ -29,6 +29,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.undos = []
         self.cuts = []
         self.files = []  # 全部文件名缓存
         self.config = {}
@@ -64,6 +65,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.back_action.triggered.connect(self.back)
         self.cut_action.triggered.connect(self.cut)
         self.paste_action.triggered.connect(self.paste)
+        self.undo_action.triggered.connect(self.undo)
 
         # 启动项
         self._read_config()
@@ -71,6 +73,16 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_font_and_size_when_start()
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
+
+    def undo(self):
+        """撤回"""
+        if self.undos == []:
+            return
+        text = self._get_selected_item()
+        new_text = self.undos[-1]
+        self._write_selected_item(new_text)
+        self._print(f'撤回：{len(self.undos)}')
+        self.undos = self.undos[:-1]
 
     def cut(self):
         """剪切"""
@@ -124,23 +136,23 @@ class Win(QMainWindow, Ui_MainWindow):
             x, y = win_position.split(',')
             x, y, w, h = int(x), int(y), int(w), int(h)
             self.setGeometry(x, y, w, h)
-            self._print(f'设置窗口位置：{x, y}，窗口尺寸：{h, w}', show_in_bar=False)
+            self._print(f'设置窗口位置：{x, y}，窗口尺寸：{w, h}', show_in_bar=False)
         except Exception as e:
             self._print(f'异常：{str(e)}', show_in_bar=False)
         
     def set_win_size_1600x800(self):
-        """设置窗口尺寸800x1600"""
+        """设置窗口尺寸1600x800"""
         geo = self.geometry()
         x, y, w, h = int(geo.x()), int(geo.y()), 1600, 800
         self.setGeometry(x, y, w, h)
-        self._print('设置窗口尺寸 800x1600')
+        self._print('设置窗口尺寸 1600x800')
 
     def set_win_size_1800x900(self):
-        """设置窗口尺寸900x1800"""
+        """设置窗口尺寸1800x900"""
         geo = self.geometry()
         x, y, w, h = int(geo.x()), int(geo.y()), 1800, 900
         self.setGeometry(x, y, w, h)
-        self._print('设置窗口尺寸 900x1800')
+        self._print('设置窗口尺寸 1800x900')
 
     def top(self):
         """置顶窗口"""
@@ -351,8 +363,10 @@ class Win(QMainWindow, Ui_MainWindow):
         else:
             new_text = MOD2.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
         tab = tab.replace('\t', '\\t')
+        self.undos.append(ab_text)
         self._print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}', show_in_bar=False)
         self._print(f'new_text=\n{new_text}', show_in_bar=False)
+        self._print(f'self.undos={self.undos}', show_in_bar=False)
         return str(new_text)
 
     def _get_selected_item(self):
