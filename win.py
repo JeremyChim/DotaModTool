@@ -87,7 +87,8 @@ class Win(QMainWindow, Ui_MainWindow):
     def cut(self):
         """剪切"""
         text = self._get_selected_item()
-        self.cuts.append(text)
+        tab_text = self._tab_text(text)
+        self.cuts.append(tab_text)
         self._write_selected_item('')
         self._print(f'剪切：{len(self.cuts)}')
 
@@ -320,6 +321,13 @@ class Win(QMainWindow, Ui_MainWindow):
             "QListWidget::item:selected { background-color: #375a7f; color: #e6eef5; }"
             "QListWidget::item:hover:!selected { background-color: #3a3a3a; }"
         )
+
+    def _tab_text(self, text):
+        """加缩进"""
+        texts = ['\t'+ i  for i in text.split('\n')]
+        tab_text = '\n'.join(texts)
+        return tab_text
+
 
     def _save_win_size_and_position_when_win_close(self):
         """窗口关闭时，把尺寸和位置保存"""
