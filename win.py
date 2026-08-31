@@ -78,11 +78,11 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def expand_sidebar(self):
         """侧栏宽度设置为255"""
-        self.sidebar_frame # TODO:宽度设置为255
+        self.sidebar_frame.setFixedWidth(255)
 
     def collapse_sidebar(self):
         """侧栏宽度设置为5"""
-        self.sidebar_frame # TODO:宽度设置为5
+        self.sidebar_frame.setFixedWidth(5)
 
     def undo(self):
         """撤回"""
