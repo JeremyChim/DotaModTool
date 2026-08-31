@@ -1,7 +1,8 @@
 {
-  "current_file": "npc_dota_hero_clinkz.txt",
+  "current_file": "npc_dota_hero_leshrac.txt",
   "font": "JetBrains Mono",
   "font_size": 9,
+  "theme": "dark",
   "sa_value": "+50%",
   "sp_value": "+50%",
   "sa_value2": "-25%",

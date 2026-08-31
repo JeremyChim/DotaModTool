@@ -219,7 +219,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(shortcut)
         self.reset_file_action.setText(QCoreApplication.translate("MainWindow", u"\u91cd\u7f6e", None))
 #if QT_CONFIG(shortcut)
-        self.reset_file_action.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+D", None))
+        self.reset_file_action.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+R", None))
 #endif // QT_CONFIG(shortcut)
         self.search_lineEdit.setText("")
         self.search_lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22...", None))

@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import time
 
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QColor, QDesktopServices, QFont
@@ -46,6 +47,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.save_file_action.triggered.connect(self.save_file)
         self.reload_file_action.triggered.connect(self.reload_file)
         self.open_file_action.triggered.connect(self.open_file)
+        self.reset_file_action.triggered.connect(self.reset_file)
         self.change_selected_item_action.triggered.connect(self.change_selected_item)
         self.set_font_to_Consolas_action.triggered.connect(self.set_font_to_Consolas)
         self.set_font_to_JetBrains_Mono_action.triggered.connect(self.set_font_to_JetBrains_Mono)
@@ -54,10 +56,11 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_light_theme_action.triggered.connect(self.set_light_theme)
         self.set_dark_theme_action.triggered.connect(self.set_dark_theme)
 
-        # 启动时恢复上次打开的文件
+        # 启动项
         self._read_config()
         self.show_content_when_start()
         self.set_font_and_size_when_start()
+        self.set_theme_when_start()
 
     def show_files(self, files):
         """展示文件列表"""
@@ -93,6 +96,16 @@ class Win(QMainWindow, Ui_MainWindow):
         except Exception as e:
             self._print(f'异常：{str(e)}')
 
+    def reset_file(self):
+        """重置文件，把VPK_DIR目录里的文件名改成文件名_时间戳"""
+        path = os.path.join(VPK_DIR, self.current_file)
+        if not os.path.exists(path):
+            return
+        dst = os.path.join(VPK_DIR, f"{self.current_file}_{time.strftime('%Y%m%d_%H%M%S')}")
+        os.rename(path, dst)
+        self._refresh_files()
+        self._print(f'已重置：{dst}')
+
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
         self.current_file = item.text()
@@ -121,6 +134,12 @@ class Win(QMainWindow, Ui_MainWindow):
             self._set_font(font)
         if font_size is not None:
             self._set_font_size(font_size)
+
+    def set_theme_when_start(self):
+        """启动时，设置主题"""
+        theme = self.config.get("theme")
+        if theme == "dark":
+            self.set_dark_theme()
 
     def save_file(self):
         """把文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
@@ -191,6 +210,8 @@ class Win(QMainWindow, Ui_MainWindow):
         QApplication.instance().setStyleSheet(
             "QWidget { background-color: #2d2d2d; color: #e0e0e0; }"
             "QListWidget, QPlainTextEdit, QLineEdit { background-color: #1e1e1e; color: #e0e0e0; }"
+            "QListWidget::item:selected { background-color: #375a7f; color: #e6eef5; }"
+            "QListWidget::item:hover:!selected { background-color: #3a3a3a; }"
         )
 
     def _refresh_files(self):

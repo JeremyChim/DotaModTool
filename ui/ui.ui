@@ -301,7 +301,7 @@
     <string>重置</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+D</string>
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>
