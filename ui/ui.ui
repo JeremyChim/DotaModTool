@@ -146,9 +146,10 @@
     <property name="title">
      <string>文件</string>
     </property>
-    <addaction name="load_file_action"/>
     <addaction name="save_file_action"/>
     <addaction name="reload_file_action"/>
+    <addaction name="open_file_action"/>
+    <addaction name="delete_file_action"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -208,10 +209,16 @@
    <property name="text">
     <string>保存</string>
    </property>
+   <property name="shortcut">
+    <string>S</string>
+   </property>
   </action>
   <action name="reload_file_action">
    <property name="text">
     <string>重载</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
    </property>
   </action>
   <action name="change_selected_item_action">
@@ -271,6 +278,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="open_file_action">
+   <property name="text">
+    <string>打开</string>
+   </property>
+   <property name="shortcut">
+    <string>O</string>
+   </property>
+  </action>
+  <action name="delete_file_action">
+   <property name="text">
+    <string>删除</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>
