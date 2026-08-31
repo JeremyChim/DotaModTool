@@ -60,8 +60,8 @@ class Ui_MainWindow(object):
         self.reset_file_action.setObjectName(u"reset_file_action")
         self.set_win_size_1600x800_action = QAction(MainWindow)
         self.set_win_size_1600x800_action.setObjectName(u"set_win_size_1600x800_action")
-        self.set_win_size_1200x600_action = QAction(MainWindow)
-        self.set_win_size_1200x600_action.setObjectName(u"set_win_size_1200x600_action")
+        self.set_win_size_1800x900_action = QAction(MainWindow)
+        self.set_win_size_1800x900_action.setObjectName(u"set_win_size_1800x900_action")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_5 = QHBoxLayout(self.centralwidget)
@@ -177,8 +177,8 @@ class Ui_MainWindow(object):
         self.menu_6.addAction(self.top_action)
         self.menu_6.addAction(self.top_cancel_action)
         self.menu_6.addSeparator()
-        self.menu_6.addAction(self.set_win_size_1200x600_action)
         self.menu_6.addAction(self.set_win_size_1600x800_action)
+        self.menu_6.addAction(self.set_win_size_1800x900_action)
 
         self.retranslateUi(MainWindow)
 
@@ -228,7 +228,7 @@ class Ui_MainWindow(object):
         self.reset_file_action.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+R", None))
 #endif // QT_CONFIG(shortcut)
         self.set_win_size_1600x800_action.setText(QCoreApplication.translate("MainWindow", u"1600x800", None))
-        self.set_win_size_1200x600_action.setText(QCoreApplication.translate("MainWindow", u"1200x600", None))
+        self.set_win_size_1800x900_action.setText(QCoreApplication.translate("MainWindow", u"1800x900", None))
         self.search_lineEdit.setText("")
         self.search_lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22...", None))
 
