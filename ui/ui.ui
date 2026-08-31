@@ -175,8 +175,8 @@
      <property name="title">
       <string>主题</string>
      </property>
-     <addaction name="action_6"/>
-     <addaction name="action_7"/>
+     <addaction name="set_light_theme_action"/>
+     <addaction name="set_dark_theme_action"/>
     </widget>
     <widget class="QMenu" name="menu_6">
      <property name="geometry">
@@ -252,12 +252,12 @@
     <string>JetBrains Mono</string>
    </property>
   </action>
-  <action name="action_6">
+  <action name="set_light_theme_action">
    <property name="text">
     <string>亮色</string>
    </property>
   </action>
-  <action name="action_7">
+  <action name="set_dark_theme_action">
    <property name="text">
     <string>暗色</string>
    </property>

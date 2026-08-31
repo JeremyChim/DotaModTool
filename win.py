@@ -12,7 +12,11 @@ NPC_DIR = os.path.join(os.path.dirname(__file__), "npc", "heroes")
 VPK_DIR = os.path.join(os.path.dirname(__file__), "vpk", "pak01_dir", "scripts", "npc", "heroes")
 NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
 NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
-MOD = '''[TAB]"[AB_NAME]"
+KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
+MOD1 = '''[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"
+[TAB]"special_bonus_shard"\t\t"[SA_VALUE]"
+[TAB]"special_bonus_scepter"\t\t"[SP_VALUE]"'''
+MOD2 = '''[TAB]"[AB_NAME]"
 [TAB]{
 [TAB]\t\t"value"\t\t"[AB_VALUE]"
 [TAB]\t\t"special_bonus_shard"\t\t"[SA_VALUE]"
@@ -47,6 +51,8 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_font_to_JetBrains_Mono_action.triggered.connect(self.set_font_to_JetBrains_Mono)
         self.enlarge_font_size_action.triggered.connect(self.enlarge_font_size)
         self.reduce_font_size_action.triggered.connect(self.reduce_font_size)
+        self.set_light_theme_action.triggered.connect(self.set_light_theme)
+        self.set_dark_theme_action.triggered.connect(self.set_dark_theme)
 
         # 启动时恢复上次打开的文件
         self._read_config()
@@ -83,9 +89,9 @@ class Win(QMainWindow, Ui_MainWindow):
                 subprocess.run([NPP_PATH_X86, str(path)])
             else:
                 os.startfile(path)
-            self.statusbar.showMessage(f'打开文件：{str(path)}')
+            self._print(f'打开文件：{str(path)}')
         except Exception as e:
-            self.statusbar.showMessage(f'异常：{str(e)}')
+            self._print(f'异常：{str(e)}')
 
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
@@ -106,7 +112,7 @@ class Win(QMainWindow, Ui_MainWindow):
             path = os.path.join(NPC_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
-        self.statusbar.showMessage(f'加载文件：{path}')
+        self._print(f'加载文件：{path}')
 
     def set_font_and_size_when_start(self):
         """启动时，设置字体和大小"""
@@ -127,7 +133,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.config['current_file'] = self.current_file
         self._save_config()
         self._refresh_files()
-        self.statusbar.showMessage(f'保存文件：{path}')
+        self._print(f'保存文件：{path}')
 
     def reload_file(self):
         """重新加载文件内容"""
@@ -136,40 +142,53 @@ class Win(QMainWindow, Ui_MainWindow):
             path = os.path.join(NPC_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
-        self.statusbar.showMessage(f'重载文件：{path}')
+        self._print(f'重载文件：{path}')
 
     def change_selected_item(self):
         """获取content_listWidget的选中行，然后修改好后，再写回该行"""
         try:
-            text = self._get_selected_item()
-            new_text = self._change_text(text)
+            self._read_config()
+            sa_value, sp_value, sa_value2, sp_value2  = self.config.get("sa_value"), self.config.get("sp_value"), self.config.get("sa_value2"), self.config.get("sp_value2")
+            ab_text = self._get_selected_item()
+            has_keyword:bool = any(keyword in ab_text for keyword in KEYWORDS)
+            if has_keyword:
+                sa_value, sp_value = sa_value2, sp_value2
+            new_text = self._change_text(ab_text, sa_value, sp_value)
             self._write_selected_item(new_text)
         except Exception as e:
-            self.statusbar.showMessage(f'异常：{str(e)}')
+            self._print(f'异常：{str(e)}')
 
     def enlarge_font_size(self):
         """放大 content_listWidget 和 content_plainTextEdit 的字体"""
         font = self.content_listWidget.font()
         size = font.pointSize() + 1
         self._set_font_size(size)
-        self.statusbar.showMessage(f'设置字体大小为 {size}')
+        self._print(f'设置字体大小为 {size}')
 
     def reduce_font_size(self):
         """缩小 content_listWidget 和 content_plainTextEdit 的字体"""
         font = self.content_listWidget.font()
         size = font.pointSize() - 1
         self._set_font_size(size)
-        self.statusbar.showMessage(f'设置字体大小为 {size}')
+        self._print(f'设置字体大小为 {size}')
 
     def set_font_to_JetBrains_Mono(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：JetBrains Mono"""
         self._set_font('JetBrains Mono')
-        self.statusbar.showMessage('设置字体为 JetBrains Mono')
+        self._print('设置字体为 JetBrains Mono')
 
     def set_font_to_Consolas(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：Consolas"""
         self._set_font('Consolas')
-        self.statusbar.showMessage('设置字体为 Consolas')
+        self._print('设置字体为 Consolas')
+
+    def set_light_theme(self):
+        """设置亮色主题"""
+        # TODO
+
+    def set_dark_theme(self):
+        """设置暗色主题"""
+        # TODO
 
     def _refresh_files(self):
         """刷新文件列表"""
@@ -196,14 +215,16 @@ class Win(QMainWindow, Ui_MainWindow):
         self.config['font'] = font_type
         self._save_config()
 
-    def _change_text(self, text):
+    def _change_text(self, ab_text, sa_value, sp_value):
         """修改选中行"""
-        tab, ab_name, _, ab_value, _  = str(text).split('"')
-        print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}')
-        self._read_config()
-        sa_value, sp_value, sa_value2, sp_value2  = self.config.get("sa_value"), self.config.get("sp_value"), self.config.get("sa_value2"), self.config.get("sp_value2")
-        new_text = MOD.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
-        print(f'new_text=\n{new_text}')
+        tab, ab_name, _, ab_value, _  = str(ab_text).split('"')
+        if ab_name == 'value':
+            new_text = MOD1.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
+        else:
+            new_text = MOD2.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
+        tab = tab.replace('\t', '\\t')
+        self._print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}', show_in_bar=False)
+        self._print(f'new_text=\n{new_text}', show_in_bar=False)
         return str(new_text)
 
     def _get_selected_item(self):
@@ -242,6 +263,13 @@ class Win(QMainWindow, Ui_MainWindow):
         """保存config.json文件"""
         with open("config.json", "w", encoding="utf-8") as fh:
             json.dump(self.config, fh, ensure_ascii=False, indent=2)
+
+    def _print(self, msg = '', show_in_bar = True):
+        """内部打印和状态栏打印"""
+        msg = str(msg)
+        print(msg)
+        if show_in_bar is True:
+            self.statusbar.showMessage(msg)
 
 
 if __name__ == "__main__":
