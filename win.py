@@ -1,7 +1,7 @@
 import json
 import os
 
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import QListWidgetItem
 
 from ui.ui import *
@@ -13,8 +13,7 @@ MOD = '''[TAB]"[AB_NAME]"
 [TAB]\t\t"value"\t\t"[AB_VALUE]"
 [TAB]\t\t"special_bonus_shard"\t\t"[SA_VALUE]"
 [TAB]\t\t"special_bonus_scepter"\t\t"[SP_VALUE]"
-[TAB]}
-'''
+[TAB]}'''
 
 
 class Win(QMainWindow, Ui_MainWindow):
@@ -86,6 +85,8 @@ class Win(QMainWindow, Ui_MainWindow):
         with open(path, "w", encoding="utf-8") as fh:
             fh.write(self.content_plainTextEdit.toPlainText())
         self._change_title(path)
+        self.config['last_path'] = path
+        self._save_config()
 
     def change_selected_item(self):
         """获取content_listWidget的选中行，然后修改好后，再写回该行"""
@@ -98,20 +99,41 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def enlarge_font_size(self):
         """放大 content_listWidget 和 content_plainTextEdit 的字体"""
-        # TODO
+        font = self.content_listWidget.font()
+        size = font.pointSize() + 1
+        self._set_font_size(size)
 
     def reduce_font_size(self):
         """缩小 content_listWidget 和 content_plainTextEdit 的字体"""
-        # TODO
+        font = self.content_listWidget.font()
+        size = font.pointSize() - 1
+        self._set_font_size(size)
 
     def set_font_to_JetBrains_Mono(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：JetBrains Mono"""
-        # TODO
+        self._set_font('JetBrains Mono')
 
     def set_font_to_Consolas(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：Consolas"""
-        # TODO
+        self._set_font('Consolas')
 
+    def _set_font_size(self, font_size):
+        font_size = int(font_size)
+        if font_size < 1: font_size = 1
+        font = self.content_listWidget.font()
+        font.setPointSize(font_size)
+        self.content_listWidget.setFont(font)
+        self.content_plainTextEdit.setFont(font)
+        self.config['font_size'] = font_size
+        self._save_config()
+
+    def _set_font(self, font_type):
+        font_type = str(font_type)
+        font = QFont(font_type)
+        self.content_listWidget.setFont(font)
+        self.content_plainTextEdit.setFont(font)
+        self.config['font'] = font_type
+        self._save_config()
 
     def _change_text(self, text):
         """暂时加个一行hahaha就行"""
@@ -146,8 +168,6 @@ class Win(QMainWindow, Ui_MainWindow):
         self.content_listWidget.clear()
         self.content_listWidget.addItems(lines)
         self.content_plainTextEdit.setPlainText("\n".join(lines))
-        self.config['last_path'] = path
-        self._save_config()
 
     def _read_config(self):
         """读取config.json文件"""
