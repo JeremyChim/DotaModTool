@@ -88,7 +88,7 @@
           <item>
            <widget class="QTabWidget" name="view_tabWidget">
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="line_tab">
              <property name="enabled">
@@ -261,10 +261,16 @@
    <property name="text">
     <string>放大字体</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
   </action>
   <action name="reduce_font_size_action">
    <property name="text">
     <string>缩小字体</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
    </property>
   </action>
  </widget>

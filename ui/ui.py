@@ -170,7 +170,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.view_tabWidget.setCurrentIndex(1)
+        self.view_tabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -194,7 +194,13 @@ class Ui_MainWindow(object):
         self.action_8.setText(QCoreApplication.translate("MainWindow", u"\u7f6e\u9876", None))
         self.action_9.setText(QCoreApplication.translate("MainWindow", u"\u53d6\u6d88\u7f6e\u9876", None))
         self.enlarge_font_size_action.setText(QCoreApplication.translate("MainWindow", u"\u653e\u5927\u5b57\u4f53", None))
+#if QT_CONFIG(shortcut)
+        self.enlarge_font_size_action.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+=", None))
+#endif // QT_CONFIG(shortcut)
         self.reduce_font_size_action.setText(QCoreApplication.translate("MainWindow", u"\u7f29\u5c0f\u5b57\u4f53", None))
+#if QT_CONFIG(shortcut)
+        self.reduce_font_size_action.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+-", None))
+#endif // QT_CONFIG(shortcut)
         self.search_lineEdit.setText("")
         self.search_lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22...", None))
 
