@@ -184,11 +184,14 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def set_light_theme(self):
         """设置亮色主题"""
-        # TODO
+        QApplication.instance().setStyleSheet("")
 
     def set_dark_theme(self):
         """设置暗色主题"""
-        # TODO
+        QApplication.instance().setStyleSheet(
+            "QWidget { background-color: #2d2d2d; color: #e0e0e0; }"
+            "QListWidget, QPlainTextEdit, QLineEdit { background-color: #1e1e1e; color: #e0e0e0; }"
+        )
 
     def _refresh_files(self):
         """刷新文件列表"""
