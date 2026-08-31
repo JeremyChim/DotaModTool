@@ -1,13 +1,17 @@
 import json
 import os
+import subprocess
 
-from PySide6.QtGui import QColor, QFont
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QColor, QDesktopServices, QFont
 from PySide6.QtWidgets import QListWidgetItem
 
 from ui.ui import *
 
 NPC_DIR = os.path.join(os.path.dirname(__file__), "npc", "heroes")
 VPK_DIR = os.path.join(os.path.dirname(__file__), "vpk", "pak01_dir", "scripts", "npc", "heroes")
+NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
+NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 MOD = '''[TAB]"[AB_NAME]"
 [TAB]{
 [TAB]\t\t"value"\t\t"[AB_VALUE]"
@@ -22,7 +26,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.files = []  # 全部文件名缓存
         self.config = {}
-        self.current_file = ''
+        self.current_file = 'npc_dota_hero_abaddon.txt'
         self.init()
 
     def init(self):
@@ -37,6 +41,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.save_file_action.triggered.connect(self.save_file)
         self.reload_file_action.triggered.connect(self.reload_file)
+        self.open_file_action.triggered.connect(self.open_file)
         self.change_selected_item_action.triggered.connect(self.change_selected_item)
         self.set_font_to_Consolas_action.triggered.connect(self.set_font_to_Consolas)
         self.set_font_to_JetBrains_Mono_action.triggered.connect(self.set_font_to_JetBrains_Mono)
@@ -54,7 +59,7 @@ class Win(QMainWindow, Ui_MainWindow):
         for f in files:
             item = QListWidgetItem(f)
             if os.path.exists(os.path.join(VPK_DIR, f)):
-                item.setForeground(QColor(0, 128, 0))  # VPK中存在则标绿
+                item.setForeground(QColor("#ff00ff"))
             self.heroFiles_listWidget.addItem(item)
 
     def search(self, text):
@@ -62,6 +67,25 @@ class Win(QMainWindow, Ui_MainWindow):
         text = text.strip().lower()
         hits = [f for f in self.files if text in f.lower()] if text else self.files
         self.show_files(hits)
+
+    def open_file(self):
+        """打开文件"""
+        try:
+            path = os.path.join(VPK_DIR, self.current_file)
+            if not os.path.exists(path):
+                path = os.path.join(NPC_DIR, self.current_file)
+            self._show_content(path)
+            self._change_title(path)
+
+            if os.path.exists(NPP_PATH):
+                subprocess.run([NPP_PATH, str(path)])
+            elif os.path.exists(NPP_PATH_X86):
+                subprocess.run([NPP_PATH_X86, str(path)])
+            else:
+                os.startfile(path)
+            self.statusbar.showMessage(f'打开文件：{str(path)}')
+        except Exception as e:
+            self.statusbar.showMessage(f'异常：{str(e)}')
 
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
@@ -76,17 +100,13 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def show_content_when_start(self):
         """启动时，加载展示最近一次的文件内容"""
-        # path = self.config.get("last_path")
-        # if path and path != ""  and os.path.exists(path):
-        #     self._show_content(path)
-        #     self._change_title(path)
-        #     self.current_file = os.path.basename(path)
         self.current_file = self.config.get("current_file")
         path = os.path.join(VPK_DIR, self.current_file)
         if not os.path.exists(path):
             path = os.path.join(NPC_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
+        self.statusbar.showMessage(f'加载文件：{path}')
 
     def set_font_and_size_when_start(self):
         """启动时，设置字体和大小"""
@@ -98,15 +118,12 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def save_file(self):
         """把文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
-        if not getattr(self, "current_file", None):
-            return
         os.makedirs(VPK_DIR, exist_ok=True)
         path = os.path.join(VPK_DIR, self.current_file)
         with open(path, "w", encoding="utf-8") as fh:
             lines = [self.content_listWidget.item(i).text() for i in range(self.content_listWidget.count())]
             fh.write("\n".join(lines))
         self._change_title(path)
-        # self.config['last_path'] = path
         self.config['current_file'] = self.current_file
         self._save_config()
         self._refresh_files()
@@ -128,7 +145,7 @@ class Win(QMainWindow, Ui_MainWindow):
             new_text = self._change_text(text)
             self._write_selected_item(new_text)
         except Exception as e:
-            print(e)
+            self.statusbar.showMessage(f'异常：{str(e)}')
 
     def enlarge_font_size(self):
         """放大 content_listWidget 和 content_plainTextEdit 的字体"""
