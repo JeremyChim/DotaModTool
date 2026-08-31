@@ -22,6 +22,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.files = []  # 全部文件名缓存
         self.config = {}
+        self.current_file = ''
         self.init()
 
     def init(self):
@@ -35,6 +36,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.search_lineEdit.textChanged.connect(self.search)
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.save_file_action.triggered.connect(self.save_file)
+        self.reload_file_action.triggered.connect(self.reload_file)
         self.change_selected_item_action.triggered.connect(self.change_selected_item)
         self.set_font_to_Consolas_action.triggered.connect(self.set_font_to_Consolas)
         self.set_font_to_JetBrains_Mono_action.triggered.connect(self.set_font_to_JetBrains_Mono)
@@ -77,6 +79,7 @@ class Win(QMainWindow, Ui_MainWindow):
             self._change_title(path)
 
     def set_font_and_size_when_start(self):
+        """启动时，设置字体和大小"""
         font, font_size = self.config.get("font"), self.config.get("font_size")
         if font is not None:
             self._set_font(font)
@@ -90,10 +93,21 @@ class Win(QMainWindow, Ui_MainWindow):
         os.makedirs(VPK_DIR, exist_ok=True)
         path = os.path.join(VPK_DIR, self.current_file)
         with open(path, "w", encoding="utf-8") as fh:
-            fh.write(self.content_plainTextEdit.toPlainText())
+            lines = [self.content_listWidget.item(i).text() for i in range(self.content_listWidget.count())]
+            fh.write("\n".join(lines))
         self._change_title(path)
         self.config['last_path'] = path
         self._save_config()
+        self._refresh_files()
+        self.statusbar.showMessage(f'保存文件：{path}')
+
+    def reload_file(self):
+        """重新加载文件内容"""
+        path = os.path.join(VPK_DIR, self.current_file)
+        if not os.path.exists(path):
+            path = os.path.join(NPC_DIR, self.current_file)
+        self._show_content(path)
+        self._change_title(path)
 
     def change_selected_item(self):
         """获取content_listWidget的选中行，然后修改好后，再写回该行"""
@@ -109,26 +123,32 @@ class Win(QMainWindow, Ui_MainWindow):
         font = self.content_listWidget.font()
         size = font.pointSize() + 1
         self._set_font_size(size)
-        # TODO self.statusbar显示：'设置字体大小为 size'
+        self.statusbar.showMessage(f'设置字体大小为 {size}')
 
     def reduce_font_size(self):
         """缩小 content_listWidget 和 content_plainTextEdit 的字体"""
         font = self.content_listWidget.font()
         size = font.pointSize() - 1
         self._set_font_size(size)
-        # TODO self.statusbar显示：'设置字体大小为 size'
+        self.statusbar.showMessage(f'设置字体大小为 {size}')
 
     def set_font_to_JetBrains_Mono(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：JetBrains Mono"""
         self._set_font('JetBrains Mono')
-        # TODO self.statusbar显示：'设置字体为 JetBrains Mono'
+        self.statusbar.showMessage('设置字体为 JetBrains Mono')
 
     def set_font_to_Consolas(self):
         """设置 content_listWidget 和 content_plainTextEdit 的字体为：Consolas"""
         self._set_font('Consolas')
-        # TODO self.statusbar显示：'设置字体为 Consolas'
+        self.statusbar.showMessage('设置字体为 Consolas')
+
+    def _refresh_files(self):
+        """刷新文件列表"""
+        text = self.search_lineEdit.text()
+        self.search(text)
 
     def _set_font_size(self, font_size):
+        """设置字体大小"""
         font_size = int(font_size)
         if font_size < 1: font_size = 1
         font = self.content_listWidget.font()
@@ -139,6 +159,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._save_config()
 
     def _set_font(self, font_type):
+        """设置字体"""
         font_type = str(font_type)
         font = QFont(font_type)
         self.content_listWidget.setFont(font)
@@ -147,7 +168,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._save_config()
 
     def _change_text(self, text):
-        """暂时加个一行hahaha就行"""
+        """修改选中行"""
         tab, ab_name, _, ab_value, _  = str(text).split('"')
         print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}')
         self._read_config()
