@@ -68,7 +68,6 @@ class Win(QMainWindow, Ui_MainWindow):
         self.undo_action.triggered.connect(self.undo)
         self.expand_sidebar_action.triggered.connect(self.expand_sidebar)
         self.collapse_sidebar_action.triggered.connect(self.collapse_sidebar)
-
         self.content_listWidget.setEditTriggers(QListWidget.DoubleClicked)
 
         # 启动项
