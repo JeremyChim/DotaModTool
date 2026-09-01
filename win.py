@@ -70,6 +70,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.selected_row = 0
         self.theme = 'dark'
         self.charge = ''
         self.undos = []
@@ -92,6 +93,7 @@ class Win(QMainWindow, Ui_MainWindow):
         # 绑定控件
         self.search_lineEdit.textChanged.connect(self.search)
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
+        self.content_listWidget.itemClicked.connect(self._remember_row)
         self.save_file_action.triggered.connect(self.save_file)
         self.reload_file_action.triggered.connect(self.reload_file)
         self.open_file_action.triggered.connect(self.open_file)
@@ -431,6 +433,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._show_content(path)
         self._change_title(path)
         self._refresh_files()
+        self._go_to_row()
         self._print(f'重载文件：{path}')
 
     def change_selected_item(self):
@@ -591,6 +594,18 @@ class Win(QMainWindow, Ui_MainWindow):
             item.setFlags(item.flags() | Qt.ItemIsEditable)
             self.content_listWidget.addItem(item)
         self.content_plainTextEdit.setPlainText("\n".join(lines))
+
+    def _remember_row(self, item):
+        """content_listWidget 单击时记忆行号"""
+        self.selected_row = self.content_listWidget.row(item)
+
+    def _go_to_row(self):
+        """跳转到记忆行"""
+        if self.selected_row < 0 or self.selected_row >= self.content_listWidget.count():
+            return
+        item = self.content_listWidget.item(self.selected_row)
+        self.content_listWidget.setCurrentItem(item)
+        self.content_listWidget.scrollToItem(item, QListWidget.PositionAtCenter)
 
     def _read_config(self):
         """读取config.json文件"""
