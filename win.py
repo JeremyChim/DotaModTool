@@ -327,7 +327,6 @@ class Win(QMainWindow, Ui_MainWindow):
         if os.path.exists(dst):
             os.remove(dst)
         os.rename(path, dst)
-        self._refresh_files()
         self._change_title(os.path.join(NPC_DIR, self.current_file))
         self._print(f'重置文件：{dst}')
         self.reload_file()
@@ -388,6 +387,7 @@ class Win(QMainWindow, Ui_MainWindow):
             path = os.path.join(NPC_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
+        self._refresh_files()
         self._print(f'重载文件：{path}')
 
     def change_selected_item(self):
@@ -497,6 +497,10 @@ class Win(QMainWindow, Ui_MainWindow):
         tab, ab_name, _, ab_value, _  = str(ab_text).split('"')
         if ab_name == 'value':
             new_text = MOD1.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
+        elif ab_name == 'special_bonus_shard':
+            new_text = MOD1.replace("[TAB]", tab).replace("[AB_NAME]", 'value').replace("[AB_VALUE]", '0').replace("[SA_VALUE]", f'+{ab_value}').replace("[SP_VALUE]", f'+{ab_value}')
+        elif ab_name == 'special_bonus_scepter':
+            new_text = MOD1.replace("[TAB]", tab).replace("[AB_NAME]", 'value').replace("[AB_VALUE]", '0').replace("[SA_VALUE]", f'+{ab_value}').replace("[SP_VALUE]", f'+{ab_value}')
         else:
             new_text = MOD2.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
         tab = tab.replace('\t', '\\t')
