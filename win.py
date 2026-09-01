@@ -9,13 +9,16 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 from ui.ui import *
 
+NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
+NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
+
+KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
+
 ROOT_DIR = os.path.dirname(__file__)
 NPC_DIR = os.path.join(ROOT_DIR, "npc", "heroes")
 VPK_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc", "heroes")
 UNIT_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc")
-NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
-NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
-KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
+
 MOD1 = '''[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"
 [TAB]"special_bonus_shard"\t\t"[SA_VALUE]"
 [TAB]"special_bonus_scepter"\t\t"[SP_VALUE]"'''
