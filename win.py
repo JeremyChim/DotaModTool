@@ -8,6 +8,7 @@ from PySide6.QtGui import QColor, QDesktopServices, QFont
 from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 from ui.ui import *
+
 ROOT_DIR = os.path.dirname(__file__)
 NPC_DIR = os.path.join(ROOT_DIR, "npc", "heroes")
 VPK_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc", "heroes")
