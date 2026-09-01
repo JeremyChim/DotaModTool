@@ -13,6 +13,7 @@ NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
 NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 
 KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
+KEYSYMBOLS = ['+', '-', '=']
 
 ROOT_DIR = os.path.dirname(__file__)
 NPC_DIR = os.path.join(ROOT_DIR, "npc", "heroes")
@@ -22,13 +23,24 @@ UNIT_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc")
 MOD1 = '''[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"
 [TAB]"special_bonus_shard"\t\t"[SA_VALUE]"
 [TAB]"special_bonus_scepter"\t\t"[SP_VALUE]"'''
+
 MOD2 = '''[TAB]"[AB_NAME]"
 [TAB]{
 [TAB]\t"value"\t\t"[AB_VALUE]"
 [TAB]\t"special_bonus_shard"\t\t"[SA_VALUE]"
 [TAB]\t"special_bonus_scepter"\t\t"[SP_VALUE]"
 [TAB]}'''
-MOD3 = '''
+
+MOD3 = '''[TAB]"value"\t\t"0"
+[TAB]"special_bonus_shard"\t\t"[AB_VALUE]"
+[TAB]"special_bonus_scepter"\t\t"[AB_VALUE]"'''
+
+MOD4 = '''[TAB]"value"\t\t"0"
+[TAB]"special_bonus_shard"\t\t"[AB_VALUE]"
+[TAB]"special_bonus_scepter"\t\t"[AB_VALUE]"
+[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"'''
+
+MOD5 = '''
 [TAB]"AbilityCharges"
 [TAB]{
 [TAB]\t"value"\t\t"1"
@@ -110,9 +122,9 @@ class Win(QMainWindow, Ui_MainWindow):
         self.shortcut_8_action.triggered.connect(lambda: self._change_selected_item("shortcut_8_action"))
         self.shortcut_9_action.triggered.connect(lambda: self._change_selected_item("shortcut_9_action"))
         self.shortcut_0_action.triggered.connect(lambda: self._change_selected_item("shortcut_0_action"))
-        self.shortcut_min_action.triggered.connect(lambda: self._change_selected_item("shortcut_min_action"))
-        self.shortcut_equal_action.triggered.connect(lambda: self._change_selected_item("shortcut_equal_action"))
-        self.shortcut_add_action.triggered.connect(lambda: self._change_selected_item("shortcut_add_action"))
+        self.replace_min_action.triggered.connect(self.replace_min)
+        self.replace_equal_action.triggered.connect(self.replace_equal)
+        self.replace_add_action.triggered.connect(self.replace_add)
         self.cooldown_action.triggered.connect(lambda: self._change_selected_item("cooldown_action"))
         self.charge_copy_action.triggered.connect(self.charge_copy)
         self.charge_paste_action.triggered.connect(self.charge_paste)
@@ -131,9 +143,6 @@ class Win(QMainWindow, Ui_MainWindow):
         self.shortcut_8_action.setText(self.config.get("shortcut_8_action", ""))
         self.shortcut_9_action.setText(self.config.get("shortcut_9_action", ""))
         self.shortcut_0_action.setText(self.config.get("shortcut_0_action", ""))
-        self.shortcut_min_action.setText(self.config.get("shortcut_min_action", ""))
-        self.shortcut_equal_action.setText(self.config.get("shortcut_equal_action", ""))
-        self.shortcut_add_action.setText(self.config.get("shortcut_add_action", ""))
 
         # 启动项
         self.show_content_when_start()
@@ -141,6 +150,33 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
+
+    def replace_min(self):
+        """替换为减号"""
+        text = self._get_selected_item()
+        for symbol in KEYSYMBOLS:
+            if symbol in text:
+                text = text.replace(symbol, '-')
+                self._write_selected_item(text)
+                return
+
+    def replace_equal(self):
+        """替换为等号"""
+        text = self._get_selected_item()
+        for symbol in KEYSYMBOLS:
+            if symbol in text:
+                text = text.replace(symbol, '=')
+                self._write_selected_item(text)
+                return
+
+    def replace_add(self):
+        """替换为加号"""
+        text = self._get_selected_item()
+        for symbol in KEYSYMBOLS:
+            if symbol in text:
+                text = text.replace(symbol, '+')
+                self._write_selected_item(text)
+                return
 
     def root_dir(self):
         """打开根目录"""
@@ -158,7 +194,7 @@ class Win(QMainWindow, Ui_MainWindow):
         """充能复制"""
         ab_text = self._get_selected_item()
         tab, ab_name, _, ab_value, _  = str(ab_text).split('"')
-        charge_text = MOD3.replace("[TAB]", tab).replace("[AB_VALUE]", ab_value)
+        charge_text = MOD5.replace("[TAB]", tab).replace("[AB_VALUE]", ab_value)
         self._print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}', show_in_bar=False)
         self._print(f'charge_text=\n{charge_text}', show_in_bar=False)
         self.charge = str(charge_text)
@@ -497,10 +533,12 @@ class Win(QMainWindow, Ui_MainWindow):
         tab, ab_name, _, ab_value, _  = str(ab_text).split('"')
         if ab_name == 'value':
             new_text = MOD1.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
-        elif ab_name == 'special_bonus_shard':
-            new_text = MOD1.replace("[TAB]", tab).replace("[AB_NAME]", 'value').replace("[AB_VALUE]", '0').replace("[SA_VALUE]", f'+{ab_value}').replace("[SP_VALUE]", f'+{ab_value}')
-        elif ab_name == 'special_bonus_scepter':
-            new_text = MOD1.replace("[TAB]", tab).replace("[AB_NAME]", 'value').replace("[AB_VALUE]", '0').replace("[SA_VALUE]", f'+{ab_value}').replace("[SP_VALUE]", f'+{ab_value}')
+        elif ab_name == 'special_bonus_shard' or ab_name == 'special_bonus_scepter':
+            if '+' not in ab_value:  ab_value = '+' + ab_value
+            new_text = MOD3.replace("[TAB]", tab).replace("[AB_VALUE]", ab_value)
+        elif 'special_bonus_unique' in ab_name:
+            if '+' not in ab_value:  ab_value = '+' + ab_value
+            new_text = MOD4.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value)
         else:
             new_text = MOD2.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
         tab = tab.replace('\t', '\\t')
