@@ -1,10 +1,10 @@
 {
-  "current_file": "npc_dota_hero_winter_wyvern.txt",
+  "current_file": "npc_dota_hero_beastmaster.txt",
   "font": "JetBrains Mono",
   "font_size": 10,
   "theme": "dark",
-  "win_size": "1600x800",
-  "win_position": "127,99",
+  "win_size": "1920x1009",
+  "win_position": "0,23",
   "sidebar_expand": true,
   "sa_value": "+50%",
   "sp_value": "+50%",
