@@ -157,6 +157,20 @@
     </property>
     <addaction name="change_selected_item_action"/>
     <addaction name="separator"/>
+    <addaction name="shortcut_1_action"/>
+    <addaction name="shortcut_2_action"/>
+    <addaction name="shortcut_3_action"/>
+    <addaction name="shortcut_4_action"/>
+    <addaction name="shortcut_5_action"/>
+    <addaction name="shortcut_6_action"/>
+    <addaction name="shortcut_7_action"/>
+    <addaction name="shortcut_8_action"/>
+    <addaction name="shortcut_9_action"/>
+    <addaction name="shortcut_0_action"/>
+    <addaction name="shortcut_min_action"/>
+    <addaction name="shortcut_equal_action"/>
+    <addaction name="shortcut_add_action"/>
+    <addaction name="separator"/>
     <addaction name="tab_action"/>
     <addaction name="back_action"/>
     <addaction name="cut_action"/>
@@ -385,6 +399,110 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+`</string>
+   </property>
+  </action>
+  <action name="shortcut_1_action">
+   <property name="text">
+    <string>快捷键1</string>
+   </property>
+   <property name="shortcut">
+    <string>1</string>
+   </property>
+  </action>
+  <action name="shortcut_2_action">
+   <property name="text">
+    <string>快捷键2</string>
+   </property>
+   <property name="shortcut">
+    <string>2</string>
+   </property>
+  </action>
+  <action name="shortcut_3_action">
+   <property name="text">
+    <string>快捷键3</string>
+   </property>
+   <property name="shortcut">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="shortcut_4_action">
+   <property name="text">
+    <string>快捷键4</string>
+   </property>
+   <property name="shortcut">
+    <string>4</string>
+   </property>
+  </action>
+  <action name="shortcut_5_action">
+   <property name="text">
+    <string>快捷键5</string>
+   </property>
+   <property name="shortcut">
+    <string>5</string>
+   </property>
+  </action>
+  <action name="shortcut_6_action">
+   <property name="text">
+    <string>快捷键6</string>
+   </property>
+   <property name="shortcut">
+    <string>6</string>
+   </property>
+  </action>
+  <action name="shortcut_7_action">
+   <property name="text">
+    <string>快捷键7</string>
+   </property>
+   <property name="shortcut">
+    <string>7</string>
+   </property>
+  </action>
+  <action name="shortcut_8_action">
+   <property name="text">
+    <string>快捷键8</string>
+   </property>
+   <property name="shortcut">
+    <string>8</string>
+   </property>
+  </action>
+  <action name="shortcut_9_action">
+   <property name="text">
+    <string>快捷键9</string>
+   </property>
+   <property name="shortcut">
+    <string>9</string>
+   </property>
+  </action>
+  <action name="shortcut_0_action">
+   <property name="text">
+    <string>快捷键0</string>
+   </property>
+   <property name="shortcut">
+    <string>0</string>
+   </property>
+  </action>
+  <action name="shortcut_min_action">
+   <property name="text">
+    <string>快捷键-</string>
+   </property>
+   <property name="shortcut">
+    <string>-</string>
+   </property>
+  </action>
+  <action name="shortcut_equal_action">
+   <property name="text">
+    <string>快捷键=</string>
+   </property>
+   <property name="shortcut">
+    <string>=</string>
+   </property>
+  </action>
+  <action name="shortcut_add_action">
+   <property name="text">
+    <string>快捷键+</string>
+   </property>
+   <property name="shortcut">
+    <string>+</string>
    </property>
   </action>
  </widget>
