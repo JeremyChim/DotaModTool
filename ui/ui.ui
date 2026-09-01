@@ -167,9 +167,10 @@
     <addaction name="shortcut_8_action"/>
     <addaction name="shortcut_9_action"/>
     <addaction name="shortcut_0_action"/>
-    <addaction name="shortcut_min_action"/>
-    <addaction name="shortcut_equal_action"/>
-    <addaction name="shortcut_add_action"/>
+    <addaction name="separator"/>
+    <addaction name="replace_min_action"/>
+    <addaction name="replace_equal_action"/>
+    <addaction name="replace_add_action"/>
     <addaction name="separator"/>
     <addaction name="cooldown_action"/>
     <addaction name="charge_copy_action"/>
@@ -494,25 +495,25 @@
     <string>0</string>
    </property>
   </action>
-  <action name="shortcut_min_action">
+  <action name="replace_min_action">
    <property name="text">
-    <string>快捷键-</string>
+    <string>替换成-</string>
    </property>
    <property name="shortcut">
     <string>-</string>
    </property>
   </action>
-  <action name="shortcut_equal_action">
+  <action name="replace_equal_action">
    <property name="text">
-    <string>快捷键=</string>
+    <string>替换成=</string>
    </property>
    <property name="shortcut">
     <string>=</string>
    </property>
   </action>
-  <action name="shortcut_add_action">
+  <action name="replace_add_action">
    <property name="text">
-    <string>快捷键+</string>
+    <string>替换成+</string>
    </property>
    <property name="shortcut">
     <string>+</string>
