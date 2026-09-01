@@ -8,9 +8,10 @@ from PySide6.QtGui import QColor, QDesktopServices, QFont
 from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 from ui.ui import *
-
-NPC_DIR = os.path.join(os.path.dirname(__file__), "npc", "heroes")
-VPK_DIR = os.path.join(os.path.dirname(__file__), "vpk", "pak01_dir", "scripts", "npc", "heroes")
+ROOT_DIR = os.path.dirname(__file__)
+NPC_DIR = os.path.join(ROOT_DIR, "npc", "heroes")
+VPK_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc", "heroes")
+UNIT_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc")
 NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
 NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
@@ -23,12 +24,35 @@ MOD2 = '''[TAB]"[AB_NAME]"
 [TAB]\t"special_bonus_shard"\t\t"[SA_VALUE]"
 [TAB]\t"special_bonus_scepter"\t\t"[SP_VALUE]"
 [TAB]}'''
+MOD3 = '''
+[TAB]"AbilityCharges"
+[TAB]{
+[TAB]\t"value"\t\t"1"
+[TAB]\t"special_bonus_shard"\t\t"+1"
+[TAB]\t"special_bonus_scepter"\t\t"+1"
+[TAB]}
+[TAB]"AbilityChargeRestoreTime"
+[TAB]{
+[TAB]\t"value"\t\t"[AB_VALUE]"
+[TAB]\t"special_bonus_shard"\t\t"-25%"
+[TAB]\t"special_bonus_scepter"\t\t"-25%"
+[TAB]\t"special_bonus_unique_xxx"\t\t"-50%"
+[TAB]}
+[TAB]"AbilityCooldown"		
+[TAB]{
+[TAB]\t"value"\t\t"0"
+[TAB]\t"special_bonus_shard"\t\t"-25%"
+[TAB]\t"special_bonus_scepter"\t\t"-25%"
+[TAB]\t"special_bonus_unique_xxx"\t\t"-50%"
+[TAB]}
+'''
 
 
 class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.charge = ''
         self.undos = []
         self.cuts = []
         self.files = []  # 全部文件名缓存
@@ -85,6 +109,27 @@ class Win(QMainWindow, Ui_MainWindow):
         self.shortcut_min_action.triggered.connect(lambda: self._change_selected_item("shortcut_min_action"))
         self.shortcut_equal_action.triggered.connect(lambda: self._change_selected_item("shortcut_equal_action"))
         self.shortcut_add_action.triggered.connect(lambda: self._change_selected_item("shortcut_add_action"))
+        self.cooldown_action.triggered.connect(lambda: self._change_selected_item("cooldown_action"))
+        self.charge_copy_action.triggered.connect(self.charge_copy)
+        self.charge_paste_action.triggered.connect(self.charge_paste)
+        self.root_dir_action.triggered.connect(self.root_dir)
+        self.heroes_dir_action.triggered.connect(self.heroes_dir)
+        self.unit_dir_action.triggered.connect(self.unit_dir)
+        
+        # 控件改名
+        self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
+        self.shortcut_2_action.setText(self.config.get("shortcut_2_action", ""))
+        self.shortcut_3_action.setText(self.config.get("shortcut_3_action", ""))
+        self.shortcut_4_action.setText(self.config.get("shortcut_4_action", ""))
+        self.shortcut_5_action.setText(self.config.get("shortcut_5_action", ""))
+        self.shortcut_6_action.setText(self.config.get("shortcut_6_action", ""))
+        self.shortcut_7_action.setText(self.config.get("shortcut_7_action", ""))
+        self.shortcut_8_action.setText(self.config.get("shortcut_8_action", ""))
+        self.shortcut_9_action.setText(self.config.get("shortcut_9_action", ""))
+        self.shortcut_0_action.setText(self.config.get("shortcut_0_action", ""))
+        self.shortcut_min_action.setText(self.config.get("shortcut_min_action", ""))
+        self.shortcut_equal_action.setText(self.config.get("shortcut_equal_action", ""))
+        self.shortcut_add_action.setText(self.config.get("shortcut_add_action", ""))
 
         # 启动项
         self.show_content_when_start()
@@ -92,6 +137,38 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
+
+    def root_dir(self):
+        """打开根目录"""
+        os.startfile(ROOT_DIR)
+
+    def heroes_dir(self):
+        """打开heroes目录"""
+        os.startfile(VPK_DIR)
+
+    def unit_dir(self):
+        """打开unit目录"""
+        os.startfile(UNIT_DIR)
+
+    def charge_copy(self):
+        """充能复制"""
+        ab_text = self._get_selected_item()
+        tab, ab_name, _, ab_value, _  = str(ab_text).split('"')
+        charge_text = MOD3.replace("[TAB]", tab).replace("[AB_VALUE]", ab_value)
+        self._print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}', show_in_bar=False)
+        self._print(f'charge_text=\n{charge_text}', show_in_bar=False)
+        self.charge = str(charge_text)
+        self._print(f'充能复制，ab_value={ab_value}')
+
+    def charge_paste(self):
+        """充能粘贴"""
+        if self.charge == '':
+            return
+        text = self._get_selected_item()
+        new_text = text + '\n' + self.charge
+        self._write_selected_item(new_text)
+        self._print(f'充能粘贴')
+        self.charge = ''
 
     def set_sidebar_when_start(self):
         """启动时，展开或收起侧栏"""
@@ -327,8 +404,7 @@ class Win(QMainWindow, Ui_MainWindow):
         """获取content_listWidget的选中行，然后修改好后，再写回该行"""
         try:
             self._read_config()
-            action_value = self.config.get(action_name)
-            if action_value is None: action_value = '=1'
+            action_value = self.config.get(action_name, "=666")
             ab_text = self._get_selected_item()
             new_text = self._change_text(ab_text, action_value, action_value)
             self._write_selected_item(new_text)

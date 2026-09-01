@@ -171,6 +171,10 @@
     <addaction name="shortcut_equal_action"/>
     <addaction name="shortcut_add_action"/>
     <addaction name="separator"/>
+    <addaction name="cooldown_action"/>
+    <addaction name="charge_copy_action"/>
+    <addaction name="charge_paste_action"/>
+    <addaction name="separator"/>
     <addaction name="tab_action"/>
     <addaction name="back_action"/>
     <addaction name="cut_action"/>
@@ -223,9 +227,18 @@
     <addaction name="menu_5"/>
     <addaction name="menu_6"/>
    </widget>
+   <widget class="QMenu" name="menu_7">
+    <property name="title">
+     <string>路径</string>
+    </property>
+    <addaction name="root_dir_action"/>
+    <addaction name="unit_dir_action"/>
+    <addaction name="heroes_dir_action"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
    <addaction name="menu_3"/>
+   <addaction name="menu_7"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action">
@@ -503,6 +516,45 @@
    </property>
    <property name="shortcut">
     <string>+</string>
+   </property>
+  </action>
+  <action name="charge_copy_action">
+   <property name="text">
+    <string>充能复制</string>
+   </property>
+   <property name="shortcut">
+    <string>G</string>
+   </property>
+  </action>
+  <action name="charge_paste_action">
+   <property name="text">
+    <string>充能粘贴</string>
+   </property>
+   <property name="shortcut">
+    <string>H</string>
+   </property>
+  </action>
+  <action name="cooldown_action">
+   <property name="text">
+    <string>冷却修改</string>
+   </property>
+   <property name="shortcut">
+    <string>D</string>
+   </property>
+  </action>
+  <action name="unit_dir_action">
+   <property name="text">
+    <string>单位数据</string>
+   </property>
+  </action>
+  <action name="heroes_dir_action">
+   <property name="text">
+    <string>英雄数据</string>
+   </property>
+  </action>
+  <action name="root_dir_action">
+   <property name="text">
+    <string>根目录</string>
    </property>
   </action>
  </widget>
