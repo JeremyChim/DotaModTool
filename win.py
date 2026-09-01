@@ -38,6 +38,9 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def init(self):
         """初始化所有的控件绑定，按钮搜索框等控件，都使用该函数进行初始化绑定"""
+        # 加载配置
+        self._read_config()
+
         # 加载文件列表
         self.files = sorted(f for f in os.listdir(NPC_DIR) if f.endswith(".txt"))
         self.show_files(self.files)
@@ -69,9 +72,21 @@ class Win(QMainWindow, Ui_MainWindow):
         self.expand_sidebar_action.triggered.connect(self.expand_sidebar)
         self.collapse_sidebar_action.triggered.connect(self.collapse_sidebar)
         self.content_listWidget.setEditTriggers(QListWidget.DoubleClicked)
+        self.shortcut_1_action.triggered.connect(lambda: self._change_selected_item("shortcut_1_action"))
+        self.shortcut_2_action.triggered.connect(lambda: self._change_selected_item("shortcut_2_action"))
+        self.shortcut_3_action.triggered.connect(lambda: self._change_selected_item("shortcut_3_action"))
+        self.shortcut_4_action.triggered.connect(lambda: self._change_selected_item("shortcut_4_action"))
+        self.shortcut_5_action.triggered.connect(lambda: self._change_selected_item("shortcut_5_action"))
+        self.shortcut_6_action.triggered.connect(lambda: self._change_selected_item("shortcut_6_action"))
+        self.shortcut_7_action.triggered.connect(lambda: self._change_selected_item("shortcut_7_action"))
+        self.shortcut_8_action.triggered.connect(lambda: self._change_selected_item("shortcut_8_action"))
+        self.shortcut_9_action.triggered.connect(lambda: self._change_selected_item("shortcut_9_action"))
+        self.shortcut_0_action.triggered.connect(lambda: self._change_selected_item("shortcut_0_action"))
+        self.shortcut_min_action.triggered.connect(lambda: self._change_selected_item("shortcut_min_action"))
+        self.shortcut_equal_action.triggered.connect(lambda: self._change_selected_item("shortcut_equal_action"))
+        self.shortcut_add_action.triggered.connect(lambda: self._change_selected_item("shortcut_add_action"))
 
         # 启动项
-        self._read_config()
         self.show_content_when_start()
         self.set_font_and_size_when_start()
         self.set_theme_when_start()
@@ -153,6 +168,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._save_win_size_and_position_when_win_close()
 
     def set_win_size_and_position_when_start(self):
+        """启动时，设置窗口尺寸和位置"""
         try:
             win_size, win_position = self.config.get('win_size'), self.config.get('win_position')
             w, h = win_size.split('x')
@@ -303,6 +319,18 @@ class Win(QMainWindow, Ui_MainWindow):
             if has_keyword:
                 sa_value, sp_value = sa_value2, sp_value2
             new_text = self._change_text(ab_text, sa_value, sp_value)
+            self._write_selected_item(new_text)
+        except Exception as e:
+            self._print(f'异常：{str(e)}')
+
+    def _change_selected_item(self, action_name):
+        """获取content_listWidget的选中行，然后修改好后，再写回该行"""
+        try:
+            self._read_config()
+            action_value = self.config.get(action_name)
+            if action_value is None: action_value = '=1'
+            ab_text = self._get_selected_item()
+            new_text = self._change_text(ab_text, action_value, action_value)
             self._write_selected_item(new_text)
         except Exception as e:
             self._print(f'异常：{str(e)}')
