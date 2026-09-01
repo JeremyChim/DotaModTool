@@ -521,6 +521,7 @@ class Win(QMainWindow, Ui_MainWindow):
         item = self.content_listWidget.currentItem()
         if item:
             item.setText(text)
+            item.setForeground(QColor("#ff00ff"))
 
     def _change_title(self, title):
         """修改窗口标题"""
