@@ -9,6 +9,8 @@ from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 from ui.ui import *
 
+COLOR_REF = {'dark': '#c678dd', 'light': '#ff00ff'}
+
 NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
 NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 
@@ -68,6 +70,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.theme = 'dark'
         self.charge = ''
         self.undos = []
         self.cuts = []
@@ -326,7 +329,8 @@ class Win(QMainWindow, Ui_MainWindow):
         for f in files:
             item = QListWidgetItem(f)
             if os.path.exists(os.path.join(VPK_DIR, f)):
-                item.setForeground(QColor("#ff00ff"))
+                color = self._get_color(self.theme)
+                item.setForeground(QColor(color))
             self.heroFiles_listWidget.addItem(item)
 
     def search(self, text):
@@ -338,6 +342,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def open_file(self):
         """打开文件"""
         try:
+            self.save_file()
             path = os.path.join(VPK_DIR, self.current_file)
             if not os.path.exists(path):
                 path = os.path.join(NPC_DIR, self.current_file)
@@ -402,6 +407,8 @@ class Win(QMainWindow, Ui_MainWindow):
         theme = self.config.get("theme")
         if theme == "dark":
             self.set_dark_theme()
+        else:
+            self.set_light_theme()
 
     def save_file(self):
         """把文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
@@ -478,15 +485,19 @@ class Win(QMainWindow, Ui_MainWindow):
     def set_light_theme(self):
         """设置亮色主题"""
         QApplication.instance().setStyleSheet("")
+        self.theme = 'light'
+        self._print('设置主题为亮色', show_in_bar=False)
 
     def set_dark_theme(self):
         """设置暗色主题"""
         QApplication.instance().setStyleSheet(
-            "QWidget { background-color: #2d2d2d; color: #e0e0e0; }"
-            "QListWidget, QPlainTextEdit, QLineEdit { background-color: #1e1e1e; color: #e0e0e0; }"
-            "QListWidget::item:selected { background-color: #375a7f; color: #e6eef5; }"
-            "QListWidget::item:hover:!selected { background-color: #3a3a3a; }"
+            "QWidget { background-color: #21252b; color: #e0e0e0; }"
+            "QListWidget, QPlainTextEdit, QLineEdit { background-color: #282c34; color: #98c379; }"
+            "QListWidget::item:selected { background-color: #44474e; color: #98c379; }"
+            "QListWidget::item:hover:!selected { background-color: #44474e; }"
         )
+        self.theme = 'dark'
+        self._print('设置主题为暗色', show_in_bar=False)
 
     def _tab_text(self, text):
         """加缩进"""
@@ -559,7 +570,12 @@ class Win(QMainWindow, Ui_MainWindow):
         item = self.content_listWidget.currentItem()
         if item:
             item.setText(text)
-            item.setForeground(QColor("#ff00ff"))
+            color = self._get_color(self.theme)
+            item.setForeground(QColor(color))
+
+    def _get_color(self, theme):
+        """根据主题获取颜色"""
+        return QColor(COLOR_REF.get(theme, '#ff00ff'))
 
     def _change_title(self, title):
         """修改窗口标题"""
