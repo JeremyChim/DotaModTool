@@ -138,6 +138,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.expand_sidebar_action.triggered.connect(self.expand_sidebar)
         self.collapse_sidebar_action.triggered.connect(self.collapse_sidebar)
         self.content_listWidget.setEditTriggers(QListWidget.DoubleClicked) # 行编辑器双击编辑
+        self.content_listWidget.setSelectionMode(QListWidget.ExtendedSelection) # 行视图支持多选
         self.content_plainTextEdit.installEventFilter(self) # 文本编辑器的TAB/Shift+TAB缩进
         self.shortcut_1_action.triggered.connect(lambda: self._change_selected_item("shortcut_1_action"))
         self.shortcut_2_action.triggered.connect(lambda: self._change_selected_item("shortcut_2_action"))
@@ -181,12 +182,12 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_sidebar_when_start()
 
     def delete_selected_item(self):
-        """删除content_listWidget的选中行"""
-        item = self.content_listWidget.currentItem()
-        if item:
-            row = self.content_listWidget.row(item)
+        """删除所有选中行"""
+        rows = self._selected_rows()
+        for row in reversed(rows):
             self.content_listWidget.takeItem(row)
-            self._print(f'删除行：{row}')
+        if rows:
+            self._print(f'删除行：{len(rows)} 行')
 
     def replace_min(self):
         """替换为减号"""
@@ -311,28 +312,15 @@ class Win(QMainWindow, Ui_MainWindow):
         self.cuts = []
 
     def tab(self):
-        """缩进"""
-        try:
-            text = self._get_selected_item()
-            texts = ['\t'+ i  for i in text.split('\n')]
-            tab_text = '\n'.join(texts)
-            self._write_selected_item(tab_text)
-        except Exception as e:
-            self._print(f'异常：{str(e)}', show_in_bar=False)
+        """缩进所有选中行"""
+        for item in self._selected_items():
+            self._set_item_text(item, '\t' + item.text())
 
     def back(self):
-        """退格"""
-        try:
-            text = self._get_selected_item()
-            texts = []
-            for line in text.split('\n'):
-                if line.startswith('\t'):
-                    line = line[1:]
-                texts.append(line)
-            new_text = '\n'.join(texts)
-            self._write_selected_item(new_text)
-        except Exception as e:
-            self._print(f'异常：{str(e)}', show_in_bar=False)
+        """反缩进所有选中行"""
+        for item in self._selected_items():
+            t = item.text()
+            self._set_item_text(item, t[1:] if t.startswith('\t') else t)
 
     def closeEvent(self, event):
         """重写窗口关闭事件"""
@@ -499,27 +487,24 @@ class Win(QMainWindow, Ui_MainWindow):
         self._print(f'重载文件：{path}')
 
     def change_selected_item(self):
-        """获取content_listWidget的选中行，然后修改好后，再写回该行"""
+        """对所有选中行：读取配置后修改并写回"""
         try:
             self._read_config()
-            sa_value, sp_value, sa_value2, sp_value2  = self.config.get("sa_value"), self.config.get("sp_value"), self.config.get("sa_value2"), self.config.get("sp_value2")
-            ab_text = self._get_selected_item()
-            has_keyword:bool = any(keyword in ab_text for keyword in KEYWORDS)
-            if has_keyword:
-                sa_value, sp_value = sa_value2, sp_value2
-            new_text = self._change_text(ab_text, sa_value, sp_value)
-            self._write_selected_item(new_text)
+            sa_value, sp_value, sa_value2, sp_value2 = self.config.get("sa_value"), self.config.get("sp_value"), self.config.get("sa_value2"), self.config.get("sp_value2")
+            for item in self._selected_items():
+                ab_text = item.text()
+                sa, sp = (sa_value2, sp_value2) if any(k in ab_text for k in KEYWORDS) else (sa_value, sp_value)
+                self._set_item_text(item, self._change_text(ab_text, sa, sp))
         except Exception as e:
             self._print(f'异常：{str(e)}')
 
     def _change_selected_item(self, action_name):
-        """获取content_listWidget的选中行，然后修改好后，再写回该行"""
+        """对所有选中行：用指定动作值修改并写回"""
         try:
             self._read_config()
             action_value = self.config.get(action_name, "=666")
-            ab_text = self._get_selected_item()
-            new_text = self._change_text(ab_text, action_value, action_value)
-            self._write_selected_item(new_text)
+            for item in self._selected_items():
+                self._set_item_text(item, self._change_text(item.text(), action_value, action_value))
         except Exception as e:
             self._print(f'异常：{str(e)}')
 
@@ -641,6 +626,19 @@ class Win(QMainWindow, Ui_MainWindow):
     def _get_color(self, theme):
         """根据主题获取颜色"""
         return QColor(COLOR_REF.get(theme, '#ff00ff'))
+
+    def _selected_rows(self):
+        """返回选中行的行号（升序）"""
+        return sorted(i.row() for i in self.content_listWidget.selectedIndexes())
+
+    def _selected_items(self):
+        """返回选中行对应的 item（按行号升序）"""
+        return [self.content_listWidget.item(r) for r in self._selected_rows()]
+
+    def _set_item_text(self, item, text):
+        """写入某 item 的文本并刷新主题色"""
+        item.setText(text)
+        item.setForeground(self._get_color(self.theme))
 
     def _change_title(self, title):
         """修改窗口标题"""
