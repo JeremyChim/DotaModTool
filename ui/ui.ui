@@ -157,6 +157,7 @@
      <string>编辑</string>
     </property>
     <addaction name="change_selected_item_action"/>
+    <addaction name="delete_selected_item_action"/>
     <addaction name="separator"/>
     <addaction name="shortcut_1_action"/>
     <addaction name="shortcut_2_action"/>
@@ -609,6 +610,14 @@
    </property>
    <property name="shortcut">
     <string>U</string>
+   </property>
+  </action>
+  <action name="delete_selected_item_action">
+   <property name="text">
+    <string>删除选中行</string>
+   </property>
+   <property name="shortcut">
+    <string>Del</string>
    </property>
   </action>
  </widget>

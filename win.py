@@ -159,6 +159,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.root_dir_action.triggered.connect(self.root_dir)
         self.heroes_dir_action.triggered.connect(self.heroes_dir)
         self.unit_dir_action.triggered.connect(self.unit_dir)
+        self.delete_selected_item_action.triggered.connect(self.delete_selected_item)
         
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -178,6 +179,14 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
+
+    def delete_selected_item(self):
+        """删除content_listWidget的选中行"""
+        item = self.content_listWidget.currentItem()
+        if item:
+            row = self.content_listWidget.row(item)
+            self.content_listWidget.takeItem(row)
+            self._print(f'删除行：{row}')
 
     def replace_min(self):
         """替换为减号"""
