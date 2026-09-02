@@ -175,6 +175,7 @@
     <addaction name="separator"/>
     <addaction name="cooldown_action"/>
     <addaction name="charge_copy_action"/>
+    <addaction name="charge_un_copy_action"/>
     <addaction name="charge_paste_action"/>
     <addaction name="separator"/>
     <addaction name="tab_action"/>
@@ -600,6 +601,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="charge_un_copy_action">
+   <property name="text">
+    <string>充能复制(天赋)</string>
+   </property>
+   <property name="shortcut">
+    <string>U</string>
    </property>
   </action>
  </widget>

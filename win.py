@@ -53,14 +53,33 @@ MOD5 = '''[TAB]"AbilityCharges"
 [TAB]\t"value"\t\t"[AB_VALUE]"
 [TAB]\t"special_bonus_shard"\t\t"-25%"
 [TAB]\t"special_bonus_scepter"\t\t"-25%"
-[TAB]\t"special_bonus_unique_xxx"\t\t"-50%"
 [TAB]}
 [TAB]"AbilityCooldown"		
 [TAB]{
 [TAB]\t"value"\t\t"0"
 [TAB]\t"special_bonus_shard"\t\t"-25%"
 [TAB]\t"special_bonus_scepter"\t\t"-25%"
-[TAB]\t"special_bonus_unique_xxx"\t\t"-50%"
+[TAB]}'''
+
+MOD6 = '''[TAB]"AbilityCharges"
+[TAB]{
+[TAB]\t"value"\t\t"1"
+[TAB]\t"special_bonus_shard"\t\t"+1"
+[TAB]\t"special_bonus_scepter"\t\t"+1"
+[TAB]}
+[TAB]"AbilityChargeRestoreTime"
+[TAB]{
+[TAB]\t"value"\t\t"[AB_VALUE]"
+[TAB]\t"special_bonus_shard"\t\t"-25%"
+[TAB]\t"special_bonus_scepter"\t\t"-25%"
+[TAB]\t"[UN_NAME]"\t\t"[UN_VALUE]"
+[TAB]}
+[TAB]"AbilityCooldown"		
+[TAB]{
+[TAB]\t"value"\t\t"0"
+[TAB]\t"special_bonus_shard"\t\t"-25%"
+[TAB]\t"special_bonus_scepter"\t\t"-25%"
+[TAB]\t"[UN_NAME]"\t\t"[UN_VALUE]"
 [TAB]}'''
 
 
@@ -70,7 +89,10 @@ class Win(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.selected_row = 0
         self.theme = 'dark'
-        self.charge = ''
+        self.charge_tab = ''
+        self.charge_ab_value = ''
+        self.charge_un_name = ''
+        self.charge_un_value = ''
         self.undos = []
         self.cuts = []
         self.files = []  # 全部文件名缓存
@@ -132,6 +154,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.replace_add_action.triggered.connect(self.replace_add)
         self.cooldown_action.triggered.connect(lambda: self._change_selected_item("cooldown_action"))
         self.charge_copy_action.triggered.connect(self.charge_copy)
+        self.charge_un_copy_action.triggered.connect(self.charge_un_copy)
         self.charge_paste_action.triggered.connect(self.charge_paste)
         self.root_dir_action.triggered.connect(self.root_dir)
         self.heroes_dir_action.triggered.connect(self.heroes_dir)
@@ -198,22 +221,39 @@ class Win(QMainWindow, Ui_MainWindow):
     def charge_copy(self):
         """充能复制"""
         ab_text = self._get_selected_item()
-        tab, ab_name, _, ab_value, _  = str(ab_text).split('"')
-        charge_text = MOD5.replace("[TAB]", tab).replace("[AB_VALUE]", ab_value)
-        self._print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}', show_in_bar=False)
-        self._print(f'charge_text=\n{charge_text}', show_in_bar=False)
-        self.charge = str(charge_text)
-        self._print(f'充能复制，ab_value={ab_value}')
+        charge_tab, ab_name, _, charge_ab_value, _  = str(ab_text).split('"')
+        if ab_name == 'value':
+            charge_tab = charge_tab[:-1]    # 减少一层缩进
+        self.charge_tab = charge_tab
+        self.charge_ab_value = charge_ab_value
+        self._print(f'charge_tab={charge_tab}, charge_ab_value={charge_ab_value}', show_in_bar=False)
+        self._print(f'充能复制，charge_ab_value={charge_ab_value}')
+
+    def charge_un_copy(self):
+        """充能复制(unique)"""
+        ab_text = self._get_selected_item()
+        _, un_name, _, un_value, _  = str(ab_text).split('"')
+        self.charge_un_name = un_name
+        self.charge_un_value = un_value
+        self._print(f'un_name={un_name}, un_value={un_value}', show_in_bar=False)
+        self._print(f'充能复制(unique)，un_name={un_name}, un_value={un_value}')
 
     def charge_paste(self):
         """充能粘贴"""
-        if self.charge == '':
+        if self.charge_ab_value == '':
             return
         text = self._get_selected_item()
-        new_text = text + '\n' + self.charge
-        self._write_selected_item(new_text)
+        if self.charge_un_value != '':
+            mod_text = MOD6.replace("[TAB]", self.charge_tab).replace("[AB_VALUE]", self.charge_ab_value).replace("[UN_NAME]", self.charge_un_name).replace("[UN_VALUE]", self.charge_un_value)
+        else:
+            mod_text = MOD5.replace("[TAB]", self.charge_tab).replace("[AB_VALUE]", self.charge_ab_value)
+        new_text = text + '\n' + mod_text
+        self._write_selected_item(new_text)   
         self._print(f'充能粘贴')
-        self.charge = ''
+        self.charge_tab = ''
+        self.charge_ab_value = ''
+        self.charge_un_name = ''
+        self.charge_un_value = ''
 
     def set_sidebar_when_start(self):
         """启动时，展开或收起侧栏"""
