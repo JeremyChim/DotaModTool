@@ -3,8 +3,8 @@ import os
 import subprocess
 import time
 
-from PySide6.QtCore import QUrl, Qt
-from PySide6.QtGui import QColor, QDesktopServices, QFont
+from PySide6.QtCore import QEvent, QUrl, Qt
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QTextCursor
 from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 from ui.ui import *
@@ -42,8 +42,7 @@ MOD4 = '''[TAB]"value"\t\t"0"
 [TAB]"special_bonus_scepter"\t\t"[AB_VALUE]"
 [TAB]"[AB_NAME]"\t\t"[AB_VALUE]"'''
 
-MOD5 = '''
-[TAB]"AbilityCharges"
+MOD5 = '''[TAB]"AbilityCharges"
 [TAB]{
 [TAB]\t"value"\t\t"1"
 [TAB]\t"special_bonus_shard"\t\t"+1"
@@ -62,8 +61,7 @@ MOD5 = '''
 [TAB]\t"special_bonus_shard"\t\t"-25%"
 [TAB]\t"special_bonus_scepter"\t\t"-25%"
 [TAB]\t"special_bonus_unique_xxx"\t\t"-50%"
-[TAB]}
-'''
+[TAB]}'''
 
 
 class Win(QMainWindow, Ui_MainWindow):
@@ -94,7 +92,8 @@ class Win(QMainWindow, Ui_MainWindow):
         self.search_lineEdit.textChanged.connect(self.search)
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.content_listWidget.itemClicked.connect(self._remember_row)
-        self.save_file_action.triggered.connect(self.save_file)
+        self.save_file_line_action.triggered.connect(self.save_file_line)
+        self.save_file_text_action.triggered.connect(self.save_file_text)
         self.reload_file_action.triggered.connect(self.reload_file)
         self.open_file_action.triggered.connect(self.open_file)
         self.reset_file_action.triggered.connect(self.reset_file)
@@ -116,7 +115,8 @@ class Win(QMainWindow, Ui_MainWindow):
         self.undo_action.triggered.connect(self.undo)
         self.expand_sidebar_action.triggered.connect(self.expand_sidebar)
         self.collapse_sidebar_action.triggered.connect(self.collapse_sidebar)
-        self.content_listWidget.setEditTriggers(QListWidget.DoubleClicked)
+        self.content_listWidget.setEditTriggers(QListWidget.DoubleClicked) # 行编辑器双击编辑
+        self.content_plainTextEdit.installEventFilter(self) # 文本编辑器的TAB/Shift+TAB缩进
         self.shortcut_1_action.triggered.connect(lambda: self._change_selected_item("shortcut_1_action"))
         self.shortcut_2_action.triggered.connect(lambda: self._change_selected_item("shortcut_2_action"))
         self.shortcut_3_action.triggered.connect(lambda: self._change_selected_item("shortcut_3_action"))
@@ -344,7 +344,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def open_file(self):
         """打开文件"""
         try:
-            self.save_file()
+            self.save_file_line()
             path = os.path.join(VPK_DIR, self.current_file)
             if not os.path.exists(path):
                 path = os.path.join(NPC_DIR, self.current_file)
@@ -412,13 +412,26 @@ class Win(QMainWindow, Ui_MainWindow):
         else:
             self.set_light_theme()
 
-    def save_file(self):
-        """把文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
+    def save_file_line(self):
+        """把行视图的文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
         os.makedirs(VPK_DIR, exist_ok=True)
         path = os.path.join(VPK_DIR, self.current_file)
         with open(path, "w", encoding="utf-8") as fh:
             lines = [self.content_listWidget.item(i).text() for i in range(self.content_listWidget.count())]
             fh.write("\n".join(lines))
+        self._change_title(path)
+        self.config['current_file'] = self.current_file
+        self._save_config()
+        self._refresh_files()
+        self._print(f'保存文件：{path}')
+
+    def save_file_text(self):
+        """把文本视图的文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
+        os.makedirs(VPK_DIR, exist_ok=True)
+        path = os.path.join(VPK_DIR, self.current_file)
+        with open(path, "w", encoding="utf-8") as fh:
+            text = self.content_plainTextEdit.toPlainText()
+            fh.write(text)
         self._change_title(path)
         self.config['current_file'] = self.current_file
         self._save_config()
@@ -606,6 +619,41 @@ class Win(QMainWindow, Ui_MainWindow):
         item = self.content_listWidget.item(self.selected_row)
         self.content_listWidget.setCurrentItem(item)
         self.content_listWidget.scrollToItem(item, QListWidget.PositionAtCenter)
+
+    def eventFilter(self, obj, event):
+        """content_plainTextEdit 的 TAB/Shift+TAB 缩进所选多行"""
+        if obj is self.content_plainTextEdit and event.type() == QEvent.Type.KeyPress:
+            if event.key() in (Qt.Key_Tab, Qt.Key_Backtab):
+                self._indent_selection(event.modifiers() & Qt.ShiftModifier)
+                return True
+        return super().eventFilter(obj, event)
+
+    def _indent_selection(self, dedent):
+        """缩进/反缩进文本编辑器中选中的多行"""
+        te = self.content_plainTextEdit
+        cursor = te.textCursor()
+        if not cursor.hasSelection():
+            return
+        doc = te.document()
+        first = doc.findBlock(cursor.selectionStart())
+        last = doc.findBlock(cursor.selectionEnd())
+        cursor.beginEditBlock()
+        b = first
+        while b.isValid():
+            c = QTextCursor(b)
+            if dedent:
+                t = b.text()
+                if t[:1] == '\t':
+                    c.deleteChar()
+                elif t[:4] == ' ' * 4:
+                    for _ in range(4):
+                        c.deleteChar()
+            else:
+                c.insertText('\t')
+            if b == last:
+                break
+            b = b.next()
+        cursor.endEditBlock()
 
     def _read_config(self):
         """读取config.json文件"""
