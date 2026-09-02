@@ -159,17 +159,6 @@
     <addaction name="change_selected_item_action"/>
     <addaction name="delete_selected_item_action"/>
     <addaction name="separator"/>
-    <addaction name="shortcut_1_action"/>
-    <addaction name="shortcut_2_action"/>
-    <addaction name="shortcut_3_action"/>
-    <addaction name="shortcut_4_action"/>
-    <addaction name="shortcut_5_action"/>
-    <addaction name="shortcut_6_action"/>
-    <addaction name="shortcut_7_action"/>
-    <addaction name="shortcut_8_action"/>
-    <addaction name="shortcut_9_action"/>
-    <addaction name="shortcut_0_action"/>
-    <addaction name="separator"/>
     <addaction name="replace_min_action"/>
     <addaction name="replace_equal_action"/>
     <addaction name="replace_add_action"/>
@@ -184,6 +173,7 @@
     <addaction name="cut_action"/>
     <addaction name="paste_action"/>
     <addaction name="undo_action"/>
+    <addaction name="action_2"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
@@ -245,8 +235,35 @@
     <addaction name="separator"/>
     <addaction name="action_vpk"/>
    </widget>
+   <widget class="QMenu" name="menu_8">
+    <property name="title">
+     <string>预设</string>
+    </property>
+    <addaction name="shortcut_1_action"/>
+    <addaction name="shortcut_2_action"/>
+    <addaction name="shortcut_3_action"/>
+    <addaction name="shortcut_4_action"/>
+    <addaction name="shortcut_5_action"/>
+    <addaction name="shortcut_6_action"/>
+    <addaction name="shortcut_7_action"/>
+    <addaction name="shortcut_8_action"/>
+    <addaction name="shortcut_9_action"/>
+    <addaction name="shortcut_0_action"/>
+    <addaction name="separator"/>
+    <addaction name="shortcut_ctrl_1_action"/>
+    <addaction name="shortcut_ctrl_2_action"/>
+    <addaction name="shortcut_ctrl_3_action"/>
+    <addaction name="shortcut_ctrl_4_action"/>
+    <addaction name="shortcut_ctrl_5_action"/>
+    <addaction name="shortcut_ctrl_6_action"/>
+    <addaction name="shortcut_ctrl_7_action"/>
+    <addaction name="shortcut_ctrl_8_action"/>
+    <addaction name="shortcut_ctrl_9_action"/>
+    <addaction name="shortcut_ctrl_0_action"/>
+   </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
+   <addaction name="menu_8"/>
    <addaction name="menu_3"/>
    <addaction name="menu_7"/>
   </widget>
@@ -618,6 +635,91 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_1_action">
+   <property name="text">
+    <string>快捷键Ctrl+1</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>快捷操作</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_2_action">
+   <property name="text">
+    <string>快捷键Ctrl+2</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_3_action">
+   <property name="text">
+    <string>快捷键Ctrl+3</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_4_action">
+   <property name="text">
+    <string>快捷键Ctrl+4</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_5_action">
+   <property name="text">
+    <string>快捷键Ctrl+5</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+5</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_6_action">
+   <property name="text">
+    <string>快捷键Ctrl+6</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+6</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_7_action">
+   <property name="text">
+    <string>快捷键Ctrl+7</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+7</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_8_action">
+   <property name="text">
+    <string>快捷键Ctrl+8</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_9_action">
+   <property name="text">
+    <string>快捷键Ctrl+9</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+9</string>
+   </property>
+  </action>
+  <action name="shortcut_ctrl_0_action">
+   <property name="text">
+    <string>快捷键Ctrl+0</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
    </property>
   </action>
  </widget>
