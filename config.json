@@ -20,8 +20,5 @@
   "shortcut_8_action": "+100%",
   "shortcut_9_action": "=99999",
   "shortcut_0_action": "=0",
-  "shortcut_min_action": "-50%",
-  "shortcut_equal_action": "=100",
-  "shortcut_add_action": "+1",
   "cooldown_action": "-25%"
 }
