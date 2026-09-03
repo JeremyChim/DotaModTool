@@ -16,7 +16,11 @@ COLOR_REF = {'dark': '#c678dd', 'light': '#ff00ff'}
 NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
 NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 
-STEAM_DIRS = ['C:\\Program Files (x86)\\Steam', 'C:\\Program Files\\Steam', 'D:\\Program Files (x86)\\Steam', 'D:\\Program Files\\Steam', 'D:\\APP\\Steam'] # 常用STEAM路径
+STEAM_DIRS = ['C:\\Program Files (x86)\\Steam', 
+              'C:\\Program Files\\Steam', 
+              'D:\\Program Files (x86)\\Steam', 
+              'D:\\Program Files\\Steam', 
+              'D:\\APP\\Steam'] # 常用STEAM路径
 
 KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
 KEYSYMBOLS = ['+', '-', '=']
