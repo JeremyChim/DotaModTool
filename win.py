@@ -216,6 +216,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.delete_selected_item_action.triggered.connect(self.delete_selected_item)
         self.generate_vpk_action.triggered.connect(self.generate_vpk)
         self.generate_vpk_and_move_action.triggered.connect(self.generate_vpk_and_move)
+        self.game_dir_action.triggered.connect(self.go_to_game_dir)
         
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -246,7 +247,6 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
         self.find_steam_dir_when_start()
-    
 
     def find_steam_dir_when_start(self):
         """启动时，自动寻找STEAM文件夹，优先读配置，不行再自动寻找"""
@@ -273,7 +273,6 @@ class Win(QMainWindow, Ui_MainWindow):
                 self.config['steam_dir'] = steam_dir
                 self._save_config()
                 return
-
         # 都没有就打印
         self._print(f'未能找到：steam_dir，默认使用{self.steam_dir}')
 
@@ -345,14 +344,25 @@ class Win(QMainWindow, Ui_MainWindow):
     def root_dir(self):
         """打开根目录"""
         os.startfile(ROOT_DIR)
+        self._print(f'打开根目录:{ROOT_DIR}')
 
     def heroes_dir(self):
-        """打开heroes目录"""
+        """打开英雄目录"""
         os.startfile(HERO_DIR2)
+        self._print(f'打开英雄目录:{HERO_DIR2}')
 
     def unit_dir(self):
-        """打开unit目录"""
+        """打开单位目录"""
         os.startfile(NPC_DIR2)
+        self._print(f'打开单位目录:{NPC_DIR2}')
+
+    def go_to_game_dir(self):
+        """打开游戏目录"""
+        if os.path.exists(self.game_dir):
+            os.startfile(self.game_dir)
+            self._print(f'打开游戏目录:{self.game_dir}')
+        else:
+            self._print(f'游戏目录不存在:{self.game_dir}')
 
     def charge_copy(self):
         """充能复制"""
@@ -743,7 +753,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.addrows.append(len(new_text.split('\n')) - 1 ) # 记录新增行数
         self._print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}', show_in_bar=False)
         self._print(f'new_text=\n{new_text}', show_in_bar=False)
-        self._print(f'self.undos={self.undos}', show_in_bar=False)
+        # self._print(f'self.undos={self.undos}', show_in_bar=False)
         return str(new_text)
 
     def _get_selected_item(self):
