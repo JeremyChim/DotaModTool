@@ -256,22 +256,33 @@ class Win(QMainWindow, Ui_MainWindow):
     def change_gold_and_xp(self):
         """修改单位数据：金币和经验"""
         try:
+            self._read_config()
+            xp_gold_mul = self.config.get('xp_gold_mul')
+            if xp_gold_mul is None:
+                self._print('配置文件：没有 xp_gold_mul 配置项，创建一个')
+                xp_gold_mul = 2
+                self.config['xp_gold_mul'] = xp_gold_mul
+                self._save_config()
+                return
+            if xp_gold_mul == 1:
+                self._print('配置文件：xp_gold_mul 为 1，无需修改')
+                return
             with open(UNIT_FILE, 'r') as f:
                 lines = f.read().splitlines()
             lines2 = []
             for i, line in enumerate(lines):
                 if 'BountyGoldMin' in line or 'BountyGoldMax' in line or 'BountyXP' in line:
-                    tab, xp_gold, tab2, value, _ = line.split('"')
-                    value2 = str(int(value)*2)
+                    _, xp_gold, _, value, _ = line.split('"')
+                    value2 = str(int(float(value) * float(xp_gold_mul)))
                     if value2 != value:
                         line = line.replace(value, value2)
                         self._print(f'修改：{i+1}行：{xp_gold} = {value} -> {value2}', show_in_bar=False)
                 lines2.append(line)
             with open(UNIT_FILE2, 'w') as f:
                 f.write('\n'.join(lines2))
-            self._print(f'修改单位数据：金币和经验成功：{UNIT_FILE2}', show_in_bar=False)
+            self._print(f'修改单位数据：金币和经验成功：{UNIT_FILE2}')
         except Exception as e:
-            self._print(f'修改单位数据：金币和经验失败，{e}', show_in_bar=False)
+            self._print(f'修改单位数据：金币和经验失败，{e}')
     
     def change_items(self):
         """修改商店物品：冷却时间"""
@@ -910,6 +921,5 @@ class Win(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication([])
     win = Win()
-    # win.show()
-    # app.exec()
-    win.change_gold_and_xp()
+    win.show()
+    app.exec()
