@@ -3,6 +3,7 @@ import os
 import subprocess
 import time
 import shutil
+from datetime import datetime
 
 from PySide6.QtCore import QEvent, QUrl, Qt
 from PySide6.QtGui import QColor, QDesktopServices, QFont, QTextCursor
@@ -15,11 +16,7 @@ COLOR_REF = {'dark': '#c678dd', 'light': '#ff00ff'}
 NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
 NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 
-STEAM_DIR = 'D:\\APP\\Steam'
-DOTA2_DIR = os.path.join(STEAM_DIR, "steamapps", "common", "dota 2 beta")
-GAME_DIR = os.path.join(DOTA2_DIR, "game")
-MOD_DIR = os.path.join(GAME_DIR, "mod")
-MOD_FILE = os.path.join(MOD_DIR, "pak01_dir.vpk")
+STEAM_DIRS = ['C:\\Program Files (x86)\\Steam', 'C:\\Program Files\\Steam', 'D:\\Program Files (x86)\\Steam', 'D:\\Program Files\\Steam', 'D:\\APP\\Steam'] # 常用STEAM路径
 
 KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
 KEYSYMBOLS = ['+', '-', '=']
@@ -111,6 +108,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.steam_dir = 'C:\\Program Files (x86)\\Steam'
         self.selected_row = 0
         self.addrows = []
         self.theme = 'dark'
@@ -124,6 +122,22 @@ class Win(QMainWindow, Ui_MainWindow):
         self.config = {}
         self.current_file = 'npc_dota_hero_abaddon.txt'
         self.init()
+
+    @property
+    def dota2_dir(self):
+        return os.path.join(self.steam_dir, "steamapps", "common", "dota 2 beta")
+
+    @property
+    def game_dir(self):
+        return os.path.join(self.dota2_dir, "game")
+    
+    @property
+    def mod_dir(self):
+        return os.path.join(self.game_dir, "mod")
+
+    @property
+    def mod_file(self):
+        return os.path.join(self.mod_dir, "pak01_dir.vpk")
 
     def init(self):
         """初始化所有的控件绑定，按钮搜索框等控件，都使用该函数进行初始化绑定"""
@@ -227,6 +241,37 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
+        self.find_steam_dir_when_start()
+    
+
+    def find_steam_dir_when_start(self):
+        """启动时，自动寻找STEAM文件夹，优先读配置，不行再自动寻找"""
+        steam_dir = self.config.get('steam_dir')
+        # 如果没有这个配置项，就创建一个
+        if steam_dir is None: 
+            self._print(f'配置文件：没有 steam_dir 配置项，创建一个')
+            steam_dir = ''
+            self.config['steam_dir'] = steam_dir
+            self._save_config()
+        # 读配置
+        if steam_dir != '':
+            if os.path.exists(steam_dir):
+                self._print(f'配置文件：steam_dir 存在，steam_dir={steam_dir}')
+                self.steam_dir = steam_dir
+                self.config['steam_dir'] = steam_dir
+                self._save_config()
+                return
+        # 自动寻找
+        for steam_dir in STEAM_DIRS:
+            if os.path.exists(steam_dir):
+                self._print(f'自动寻找：steam_dir 存在，steam_dir={steam_dir}')
+                self.steam_dir = steam_dir
+                self.config['steam_dir'] = steam_dir
+                self._save_config()
+                return
+
+        # 都没有就打印
+        self._print(f'未能找到：steam_dir，默认使用{self.steam_dir}')
 
     def generate_vpk(self):
         """生成vpk"""
@@ -249,12 +294,14 @@ class Win(QMainWindow, Ui_MainWindow):
         if not os.path.exists(VPK_FILE):
             self._print(f'VPK_FILE 不存在，VPK_FILE={VPK_FILE}')
             return
-        if not os.path.exists(MOD_DIR):
-            self._print(f'MOD_DIR 不存在，MOD_DIR={MOD_DIR}')
+        if not os.path.exists(self.game_dir):
+            self._print(f'self.game_dir 不存在，self.game_dir={self.game_dir}')
             return
-        shutil.move(VPK_FILE, MOD_FILE) # 移动至目标路径，覆盖
-        self._print(f'生成并移动，MOD_FILE={MOD_FILE}')
-            
+        if not os.path.exists(self.mod_dir):
+            self._print(f'self.mod_dir 不存在，新建一个，self.game_dir={self.game_dir}')
+            os.makedirs(self.mod_dir, exist_ok=True)
+        shutil.move(VPK_FILE, self.mod_file) # 移动至目标路径，覆盖
+        self._print(f'生成并移动，MOD_FILE={self.mod_file}')
 
     def delete_selected_item(self):
         """删除所有选中行"""
@@ -804,8 +851,12 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def _print(self, msg = '', show_in_bar = True):
         """内部打印和状态栏打印"""
+        now = datetime.now()
+        time_str = now.strftime("%Y-%m-%d %H:%M:%S") + f".{now.strftime('%f')[:3]}"
         msg = str(msg)
         print(msg)
+        log = f'[{time_str}] {msg}'
+        self.log_plainTextEdit.appendPlainText(log)
         if show_in_bar is True:
             self.statusbar.showMessage(msg)
 
