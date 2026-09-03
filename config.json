@@ -1,11 +1,11 @@
 {
-  "steam_dir": "D:\\APP\\Steam",
+  "steam_dir": "E:\\GAME",
   "current_file": "npc_dota_hero_mirana.txt",
   "font": "JetBrains Mono",
   "font_size": 11,
   "theme": "dark",
   "win_size": "1583x788",
-  "win_position": "199,140",
+  "win_position": "235,138",
   "sidebar_expand": true,
   "sa_value": "+50%",
   "sp_value": "+50%",
