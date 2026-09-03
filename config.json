@@ -30,5 +30,17 @@
   "shortcut_ctrl_8_action": "+200%",
   "shortcut_ctrl_9_action": "=99999",
   "shortcut_ctrl_0_action": "=0",
-  "cooldown_action": "-25%"
+  "cooldown_action": "-25%",
+  "shortcut_count": {
+    "shortcut_7_action": 6,
+    "shortcut_ctrl_6_action": 4,
+    "cooldown_action": 6,
+    "shortcut_5_action": 1,
+    "shortcut_1_action": 3,
+    "shortcut_ctrl_2_action": 2,
+    "shortcut_ctrl_3_action": 2,
+    "shortcut_3_action": 3,
+    "shortcut_6_action": 5,
+    "shortcut_ctrl_5_action": 3
+  }
 }

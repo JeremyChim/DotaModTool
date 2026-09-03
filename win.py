@@ -88,6 +88,7 @@ class Win(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.selected_row = 0
+        self.addrows = []
         self.theme = 'dark'
         self.charge_tab = ''
         self.charge_ab_value = ''
@@ -312,6 +313,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._write_selected_item(new_text)
         self._print(f'撤回：{len(self.undos)}')
         self.undos = self.undos[:-1]
+        self.addrows = self.addrows[:-1]
 
     def cut(self):
         """剪切"""
@@ -524,7 +526,16 @@ class Win(QMainWindow, Ui_MainWindow):
             self._read_config()
             action_value = self.config.get(action_name, "=666")
             for item in self._selected_items():
-                self._set_item_text(item, self._change_text(item.text(), action_value, action_value))
+                new_text = self._change_text(item.text(), action_value, action_value) # 修改文本
+                self._set_item_text(item, new_text) # 写回修改后的文本
+                self.addrows.append(len(new_text.split('\n')) - 1 ) # 记录新增行数
+            # 记录动作次数
+            if self.config.get('shortcut_count') is None:
+                self.config['shortcut_count'] = {}
+            if self.config.get('shortcut_count').get(action_name) is None:
+                self.config['shortcut_count'][action_name] = 0
+            self.config['shortcut_count'][action_name] += 1
+            self._save_config()
         except Exception as e:
             self._print(f'异常：{str(e)}')
 
@@ -623,7 +634,8 @@ class Win(QMainWindow, Ui_MainWindow):
         else:
             new_text = MOD2.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value).replace("[SA_VALUE]", sa_value).replace("[SP_VALUE]", sp_value)
         tab = tab.replace('\t', '\\t')
-        self.undos.append(ab_text)
+        self.undos.append(ab_text) # 记录撤回
+        self.addrows.append(len(new_text.split('\n')) - 1 ) # 记录新增行数
         self._print(f'tab={tab}, ab_name={ab_name}, ab_value={ab_value}', show_in_bar=False)
         self._print(f'new_text=\n{new_text}', show_in_bar=False)
         self._print(f'self.undos={self.undos}', show_in_bar=False)
@@ -681,7 +693,8 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def _go_to_row(self):
         """跳转到记忆行"""
-        if self.selected_row < 0 or self.selected_row >= self.content_listWidget.count():
+        row = self.selected_row + sum(self.addrows)
+        if row < 0 or row >= self.content_listWidget.count():
             return
         item = self.content_listWidget.item(self.selected_row)
         self.content_listWidget.setCurrentItem(item)
