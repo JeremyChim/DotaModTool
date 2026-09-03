@@ -1,4 +1,5 @@
 import json
+from math import e
 import os
 import subprocess
 import time
@@ -254,8 +255,24 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def change_gold_and_xp(self):
         """修改单位数据：金币和经验"""
-        pass
-
+        try:
+            with open(UNIT_FILE, 'r') as f:
+                lines = f.read().splitlines()
+            lines2 = []
+            for i, line in enumerate(lines):
+                if 'BountyGoldMin' in line or 'BountyGoldMax' in line or 'BountyXP' in line:
+                    tab, xp_gold, tab2, value, _ = line.split('"')
+                    value2 = str(int(value)*2)
+                    if value2 != value:
+                        line = line.replace(value, value2)
+                        self._print(f'修改：{i+1}行：{xp_gold} = {value} -> {value2}', show_in_bar=False)
+                lines2.append(line)
+            with open(UNIT_FILE2, 'w') as f:
+                f.write('\n'.join(lines2))
+            self._print(f'修改单位数据：金币和经验成功：{UNIT_FILE2}', show_in_bar=False)
+        except Exception as e:
+            self._print(f'修改单位数据：金币和经验失败，{e}', show_in_bar=False)
+    
     def change_items(self):
         """修改商店物品：冷却时间"""
         pass
@@ -893,5 +910,6 @@ class Win(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication([])
     win = Win()
-    win.show()
-    app.exec()
+    # win.show()
+    # app.exec()
+    win.change_gold_and_xp()
