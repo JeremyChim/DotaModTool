@@ -1,11 +1,11 @@
 {
   "steam_dir": "E:\\GAME",
-  "current_file": "npc_dota_hero_mirana.txt",
+  "current_file": "npc_dota_hero_juggernaut.txt",
   "font": "JetBrains Mono",
   "font_size": 11,
   "theme": "dark",
-  "win_size": "1920x1017",
-  "win_position": "0,23",
+  "win_size": "1600x944",
+  "win_position": "171,71",
   "sidebar_expand": true,
   "xp_gold_mul": 1,
   "sa_value": "+50%",
@@ -34,15 +34,17 @@
   "shortcut_ctrl_0_action": "=0",
   "cooldown_action": "-25%",
   "shortcut_count": {
-    "shortcut_7_action": 6,
+    "shortcut_7_action": 9,
     "shortcut_ctrl_6_action": 4,
-    "cooldown_action": 6,
-    "shortcut_5_action": 1,
-    "shortcut_1_action": 4,
-    "shortcut_ctrl_2_action": 2,
-    "shortcut_ctrl_3_action": 2,
-    "shortcut_3_action": 3,
-    "shortcut_6_action": 5,
-    "shortcut_ctrl_5_action": 3
+    "cooldown_action": 9,
+    "shortcut_5_action": 3,
+    "shortcut_1_action": 9,
+    "shortcut_ctrl_2_action": 3,
+    "shortcut_ctrl_3_action": 5,
+    "shortcut_3_action": 7,
+    "shortcut_6_action": 8,
+    "shortcut_ctrl_5_action": 4,
+    "shortcut_4_action": 1,
+    "shortcut_9_action": 1
   }
 }
