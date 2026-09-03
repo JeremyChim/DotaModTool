@@ -1,13 +1,12 @@
 import json
-from math import e
 import os
 import subprocess
 import time
 import shutil
 from datetime import datetime
 
-from PySide6.QtCore import QEvent, QUrl, Qt
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QTextCursor
+from PySide6.QtCore import QEvent, Qt
+from PySide6.QtGui import QColor, QFont, QTextCursor
 from PySide6.QtWidgets import QListWidget, QListWidgetItem
 
 from ui.ui import *
