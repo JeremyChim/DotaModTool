@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import time
+import shutil
 
 from PySide6.QtCore import QEvent, QUrl, Qt
 from PySide6.QtGui import QColor, QDesktopServices, QFont, QTextCursor
@@ -14,13 +15,25 @@ COLOR_REF = {'dark': '#c678dd', 'light': '#ff00ff'}
 NPP_PATH = 'C:\\Program Files\\Notepad++\\notepad++.exe'
 NPP_PATH_X86 = 'C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
 
+STEAM_DIR = 'D:\\APP\\Steam'
+DOTA2_DIR = os.path.join(STEAM_DIR, "steamapps", "common", "dota 2 beta")
+GAME_DIR = os.path.join(DOTA2_DIR, "game")
+MOD_DIR = os.path.join(GAME_DIR, "mod")
+MOD_FILE = os.path.join(MOD_DIR, "pak01_dir.vpk")
+
 KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
 KEYSYMBOLS = ['+', '-', '=']
 
 ROOT_DIR = os.path.dirname(__file__)
 
+VPK_DIR = os.path.join(ROOT_DIR, "vpk")
+PAK_DIR = os.path.join(VPK_DIR, "pak01_dir")
+
+VPK_EXE = os.path.join(VPK_DIR, "vpk.exe")
+VPK_FILE = os.path.join(VPK_DIR, "pak01_dir.vpk")
+
 NPC_DIR = os.path.join(ROOT_DIR, "npc")
-NPC_DIR2 = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc")
+NPC_DIR2 = os.path.join(VPK_DIR, "pak01_dir", "scripts", "npc")
 HERO_DIR = os.path.join(NPC_DIR, "heroes")
 HERO_DIR2 = os.path.join(NPC_DIR2, "heroes")
 
@@ -183,6 +196,8 @@ class Win(QMainWindow, Ui_MainWindow):
         self.heroes_dir_action.triggered.connect(self.heroes_dir)
         self.unit_dir_action.triggered.connect(self.unit_dir)
         self.delete_selected_item_action.triggered.connect(self.delete_selected_item)
+        self.generate_vpk_action.triggered.connect(self.generate_vpk)
+        self.generate_vpk_and_move_action.triggered.connect(self.generate_vpk_and_move)
         
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -212,6 +227,34 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_theme_when_start()
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
+
+    def generate_vpk(self):
+        """生成vpk"""
+        try:
+            if not os.path.exists(VPK_EXE):
+                print(VPK_EXE)
+                self._print(f'vpk.exe 不存在，请把 vpk.exe 放在 {VPK_DIR} 目录下')
+                return
+            subprocess.run([VPK_EXE, PAK_DIR]) # 指令：vpk.exe pak01_dir
+            if os.path.exists(VPK_FILE):
+                self._print(f'生成 vpk 成功，VPK_FILE={VPK_FILE}')
+            else:
+                self._print(f'生成 vpk 失败，VPK_EXE={VPK_EXE}，PAK_DIR={PAK_DIR}')
+        except Exception as e:
+            self._print(f'异常：{str(e)}')
+
+    def generate_vpk_and_move(self):
+        """生成vpk并移动到游戏目录MOD文件夹"""
+        self.generate_vpk()
+        if not os.path.exists(VPK_FILE):
+            self._print(f'VPK_FILE 不存在，VPK_FILE={VPK_FILE}')
+            return
+        if not os.path.exists(MOD_DIR):
+            self._print(f'MOD_DIR 不存在，MOD_DIR={MOD_DIR}')
+            return
+        shutil.move(VPK_FILE, MOD_FILE) # 移动至目标路径，覆盖
+        self._print(f'生成并移动，MOD_FILE={MOD_FILE}')
+            
 
     def delete_selected_item(self):
         """删除所有选中行"""
