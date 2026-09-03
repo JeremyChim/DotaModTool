@@ -18,9 +18,20 @@ KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
 KEYSYMBOLS = ['+', '-', '=']
 
 ROOT_DIR = os.path.dirname(__file__)
-NPC_DIR = os.path.join(ROOT_DIR, "npc", "heroes")
-VPK_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc", "heroes")
-UNIT_DIR = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc")
+
+NPC_DIR = os.path.join(ROOT_DIR, "npc")
+NPC_DIR2 = os.path.join(ROOT_DIR, "vpk", "pak01_dir", "scripts", "npc")
+HERO_DIR = os.path.join(NPC_DIR, "heroes")
+HERO_DIR2 = os.path.join(NPC_DIR2, "heroes")
+
+ITEM_FILE = os.path.join(NPC_DIR, "items.txt")
+ITEM_FILE2 = os.path.join(NPC_DIR2, "items.txt")
+
+NEURAL_FILE = os.path.join(NPC_DIR, "neutral_items.txt")
+NEURAL_FILE2 = os.path.join(NPC_DIR2, "neutral_items.txt")
+
+UNIT_FILE = os.path.join(NPC_DIR, "npc_units.txt")
+UNIT_FILE2 = os.path.join(NPC_DIR2, "npc_units.txt")
 
 MOD1 = '''[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"
 [TAB]"special_bonus_shard"\t\t"[SA_VALUE]"
@@ -107,7 +118,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._read_config()
 
         # 加载文件列表
-        self.files = sorted(f for f in os.listdir(NPC_DIR) if f.endswith(".txt"))
+        self.files = sorted(f for f in os.listdir(HERO_DIR) if f.endswith(".txt"))
         self.show_files(self.files)
         self.search_lineEdit.clear()
 
@@ -243,11 +254,11 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def heroes_dir(self):
         """打开heroes目录"""
-        os.startfile(VPK_DIR)
+        os.startfile(HERO_DIR2)
 
     def unit_dir(self):
         """打开unit目录"""
-        os.startfile(UNIT_DIR)
+        os.startfile(NPC_DIR2)
 
     def charge_copy(self):
         """充能复制"""
@@ -389,7 +400,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.heroFiles_listWidget.clear()
         for f in files:
             item = QListWidgetItem(f)
-            if os.path.exists(os.path.join(VPK_DIR, f)):
+            if os.path.exists(os.path.join(HERO_DIR2, f)):
                 color = self._get_color(self.theme)
                 item.setForeground(QColor(color))
             self.heroFiles_listWidget.addItem(item)
@@ -404,9 +415,9 @@ class Win(QMainWindow, Ui_MainWindow):
         """打开文件"""
         try:
             self.save_file_line()
-            path = os.path.join(VPK_DIR, self.current_file)
+            path = os.path.join(HERO_DIR2, self.current_file)
             if not os.path.exists(path):
-                path = os.path.join(NPC_DIR, self.current_file)
+                path = os.path.join(HERO_DIR, self.current_file)
             self._show_content(path)
             self._change_title(path)
 
@@ -422,23 +433,23 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def reset_file(self):
         """重置文件，把VPK_DIR目录里的文件名改成文件名1"""
-        path = os.path.join(VPK_DIR, self.current_file)
+        path = os.path.join(HERO_DIR2, self.current_file)
         if not os.path.exists(path):
             return
-        dst = os.path.join(VPK_DIR, f"{self.current_file}1")
+        dst = os.path.join(HERO_DIR2, f"{self.current_file}1")
         if os.path.exists(dst):
             os.remove(dst)
         os.rename(path, dst)
-        self._change_title(os.path.join(NPC_DIR, self.current_file))
+        self._change_title(os.path.join(HERO_DIR, self.current_file))
         self._print(f'重置文件：{dst}')
         self.reload_file()
 
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
         self.current_file = item.text()
-        path = os.path.join(VPK_DIR, self.current_file)
+        path = os.path.join(HERO_DIR2, self.current_file)
         if not os.path.exists(path):
-            path = os.path.join(NPC_DIR, self.current_file)
+            path = os.path.join(HERO_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
         self.config['current_file'] = self.current_file
@@ -448,9 +459,9 @@ class Win(QMainWindow, Ui_MainWindow):
     def show_content_when_start(self):
         """启动时，加载展示最近一次的文件内容"""
         self.current_file = self.config.get("current_file")
-        path = os.path.join(VPK_DIR, self.current_file)
+        path = os.path.join(HERO_DIR2, self.current_file)
         if not os.path.exists(path):
-            path = os.path.join(NPC_DIR, self.current_file)
+            path = os.path.join(HERO_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
         self._print(f'加载文件：{path}')
@@ -473,8 +484,8 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def save_file_line(self):
         """把行视图的文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
-        os.makedirs(VPK_DIR, exist_ok=True)
-        path = os.path.join(VPK_DIR, self.current_file)
+        os.makedirs(HERO_DIR2, exist_ok=True)
+        path = os.path.join(HERO_DIR2, self.current_file)
         with open(path, "w", encoding="utf-8") as fh:
             lines = [self.content_listWidget.item(i).text() for i in range(self.content_listWidget.count())]
             fh.write("\n".join(lines))
@@ -486,8 +497,8 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def save_file_text(self):
         """把文本视图的文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
-        os.makedirs(VPK_DIR, exist_ok=True)
-        path = os.path.join(VPK_DIR, self.current_file)
+        os.makedirs(HERO_DIR2, exist_ok=True)
+        path = os.path.join(HERO_DIR2, self.current_file)
         with open(path, "w", encoding="utf-8") as fh:
             text = self.content_plainTextEdit.toPlainText()
             fh.write(text)
@@ -499,9 +510,9 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def reload_file(self):
         """重新加载文件内容"""
-        path = os.path.join(VPK_DIR, self.current_file)
+        path = os.path.join(HERO_DIR2, self.current_file)
         if not os.path.exists(path):
-            path = os.path.join(NPC_DIR, self.current_file)
+            path = os.path.join(HERO_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
         self._refresh_files()

@@ -228,12 +228,13 @@
     <addaction name="root_dir_action"/>
     <addaction name="unit_dir_action"/>
     <addaction name="heroes_dir_action"/>
-    <addaction name="action_6"/>
+    <addaction name="game_dir_action"/>
     <addaction name="separator"/>
-    <addaction name="action_4"/>
-    <addaction name="action_5"/>
+    <addaction name="change_gold_and_xp_action"/>
+    <addaction name="change_neutral_items_action"/>
     <addaction name="separator"/>
-    <addaction name="action_vpk"/>
+    <addaction name="generate_vpk_action"/>
+    <addaction name="generate_vpk_and_move_action"/>
    </widget>
    <widget class="QMenu" name="menu_8">
     <property name="title">
@@ -593,24 +594,30 @@
     <string>F1</string>
    </property>
   </action>
-  <action name="action_vpk">
+  <action name="generate_vpk_action">
    <property name="text">
     <string>生成vpk</string>
    </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
   </action>
-  <action name="action_4">
+  <action name="change_gold_and_xp_action">
    <property name="text">
     <string>修改金币经验</string>
    </property>
   </action>
-  <action name="action_5">
+  <action name="change_neutral_items_action">
    <property name="text">
     <string>修改中立物品</string>
    </property>
   </action>
-  <action name="action_6">
+  <action name="game_dir_action">
    <property name="text">
     <string>游戏目录</string>
+   </property>
+   <property name="shortcut">
+    <string>F4</string>
    </property>
   </action>
   <action name="save_file_text_action">
@@ -720,6 +727,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="generate_vpk_and_move_action">
+   <property name="text">
+    <string>生成vpk并移动</string>
+   </property>
+   <property name="shortcut">
+    <string>F6</string>
    </property>
   </action>
  </widget>
