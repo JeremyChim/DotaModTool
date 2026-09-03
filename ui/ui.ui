@@ -267,6 +267,7 @@
     <addaction name="separator"/>
     <addaction name="change_gold_and_xp_action"/>
     <addaction name="change_neutral_items_action"/>
+    <addaction name="change_items_action"/>
     <addaction name="separator"/>
     <addaction name="generate_vpk_action"/>
     <addaction name="generate_vpk_and_move_action"/>
@@ -770,6 +771,11 @@
    </property>
    <property name="shortcut">
     <string>F6</string>
+   </property>
+  </action>
+  <action name="change_items_action">
+   <property name="text">
+    <string>修改商店物品</string>
    </property>
   </action>
  </widget>

@@ -217,7 +217,10 @@ class Win(QMainWindow, Ui_MainWindow):
         self.generate_vpk_action.triggered.connect(self.generate_vpk)
         self.generate_vpk_and_move_action.triggered.connect(self.generate_vpk_and_move)
         self.game_dir_action.triggered.connect(self.go_to_game_dir)
-        
+        self.change_gold_and_xp_action.triggered.connect(self.change_gold_and_xp)
+        self.change_items_action.triggered.connect(self.change_items)
+        self.change_neutral_items_action.triggered.connect(self.change_neutral_items)
+
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
         self.shortcut_2_action.setText(self.config.get("shortcut_2_action", ""))
@@ -247,6 +250,18 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
         self.find_steam_dir_when_start()
+
+    def change_gold_and_xp(self):
+        """修改单位数据：金币和经验"""
+        pass
+
+    def change_items(self):
+        """修改商店物品：冷却时间"""
+        pass
+
+    def change_neutral_items(self):
+        """修改中立物品数据：冷却时间"""
+        pass
 
     def find_steam_dir_when_start(self):
         """启动时，自动寻找STEAM文件夹，优先读配置，不行再自动寻找"""
