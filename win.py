@@ -264,9 +264,6 @@ class Win(QMainWindow, Ui_MainWindow):
                 self.config['xp_gold_mul'] = xp_gold_mul
                 self._save_config()
                 return
-            if xp_gold_mul == 1:
-                self._print('配置文件：xp_gold_mul 为 1，无需修改')
-                return
             with open(UNIT_FILE, 'r') as f:
                 lines = f.read().splitlines()
             lines2 = []
