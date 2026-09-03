@@ -20,7 +20,8 @@ STEAM_DIRS = ['C:\\Program Files (x86)\\Steam',
               'C:\\Program Files\\Steam', 
               'D:\\Program Files (x86)\\Steam', 
               'D:\\Program Files\\Steam', 
-              'D:\\APP\\Steam'] # 常用STEAM路径
+              'D:\\APP\\Steam',
+              'E:\\GAME'] # 常用STEAM路径
 
 KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
 KEYSYMBOLS = ['+', '-', '=']
