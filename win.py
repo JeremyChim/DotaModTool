@@ -994,6 +994,5 @@ class Win(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication([])
     win = Win()
-    win.change_neutral_items()
-    # win.show()
-    # app.exec()
+    win.show()
+    app.exec()
