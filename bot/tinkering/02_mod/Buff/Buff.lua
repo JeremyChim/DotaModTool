@@ -170,6 +170,10 @@ function Buff:Init()
             if hero and S.AbilityUsageHeroList[hero:GetUnitName()] then
                 S.AbilityUsageThink(hero)
             end
+
+            if hero and hero:IsAlive() then
+                S.TryPickUpNearbyBounty(hero)
+            end
         end
 
         if GameRules:GetDOTATime(false, false) > 0 then
@@ -203,12 +207,8 @@ function Buff:Init()
             end
 
             -- Towers
-            if bBuffFlags.towers.radiant then
-                T.HandleTowerBuff(DOTA_TEAM_GOODGUYS)
-            end
-            if bBuffFlags.towers.dire then
-                T.HandleTowerBuff(DOTA_TEAM_BADGUYS)
-            end
+            T.HandleTowerBuff(DOTA_TEAM_GOODGUYS, bBuffFlags.towers.radiant)
+            T.HandleTowerBuff(DOTA_TEAM_BADGUYS, bBuffFlags.towers.dire)
 
             hHeroList = {}
             -- Neutral Items
@@ -224,7 +224,7 @@ function Buff:Init()
             end
 
             NeutralItems.GiveNeutralItems(hHeroList)
-			
+
             -- Gold and Experience For Player
             local me = PlayerResource:GetPlayer(0):GetAssignedHero()
             GPM.UpdateBotGold(me, 5)
@@ -232,15 +232,34 @@ function Buff:Init()
 
             -- Gold and Experience
             for _, h in pairs(TeamRadiant) do
+                -- if bBuffFlags.gpm.radiant then
+                --     GPM.UpdateBotGold(h, TeamRadiant)
+                -- end
                 GPM.UpdateBotGold(h, 5)
 				XP.UpdateXP(h, 5)
             end
 
             for _, h in pairs(TeamDire) do
-				GPM.UpdateBotGold(h, 10)
-				XP.UpdateXP(h, 10)
+                -- if bBuffFlags.gpm.dire then
+                --     GPM.UpdateBotGold(h, TeamDire)
+                -- end
+                GPM.UpdateBotGold(h, 5)
+				XP.UpdateXP(h, 5)
             end
 
+            -- if not Helper.IsTurboMode() then
+            --     for _, h in pairs(TeamRadiant) do
+            --         if bBuffFlags.xpm.radiant then
+            --             XP.UpdateXP(h, TeamRadiant)
+            --         end
+            --     end
+
+            --     for _, h in pairs(TeamDire) do
+            --         if bBuffFlags.xpm.dire then
+            --             XP.UpdateXP(h, TeamDire)
+            --         end
+            --     end
+            -- end
         end
 
         return 1
