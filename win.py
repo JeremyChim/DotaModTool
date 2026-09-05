@@ -237,7 +237,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.generate_vpk_action.triggered.connect(self.generate_vpk)
         self.generate_vpk_and_move_action.triggered.connect(self.generate_vpk_and_move)
         self.game_dir_action.triggered.connect(self.go_to_game_dir)
-        self.change_gold_and_xp_action.triggered.connect(self.change_gold_and_xp)
+        self.change_gold_and_xp_action.triggered.connect(self._change_gold_and_xp)
         self.change_items_action.triggered.connect(self.change_items)
         self.change_neutral_items_action.triggered.connect(self.change_neutral_items)
         self.vscripts_dir_action.triggered.connect(self.go_to_vscripts_dir)
@@ -298,38 +298,95 @@ class Win(QMainWindow, Ui_MainWindow):
         os.startfile(self.open_hyper_ai_dir)
         self._print(f'打开open_hyper_ai脚本目录:{self.open_hyper_ai_dir}')
 
-    def change_gold_and_xp(self):
-        """修改单位数据：金币和经验"""
+    def change_units(self):
+        """修改单位数据"""
         try:
-            self._print(f'修改单位数据：金币和经验。。。', show_in_bar=False)
+            self._print(f'修改单位数据 | 开始 ', show_in_bar=False)
             self._read_config()
             xp_gold_mul = self.config.get('xp_gold_mul')
+            units = self.config.get('units')
+            # 配置
             if xp_gold_mul is None:
-                self._print('配置文件：没有 xp_gold_mul 配置项，创建一个 xp_gold_mul = 2')
-                xp_gold_mul = 2
-                self.config['xp_gold_mul'] = xp_gold_mul
+                self._print('配置文件 | 没有 xp_gold_mul 配置项 | 创建一个 xp_gold_mul = 2')
+                self.config['xp_gold_mul'] = 2
                 self._save_config()
                 return
+            # 配置
+            if units is None:
+                self._print('配置文件 | 没有 units 配置项 | 创建一个 units = ["npc_dota_goodguys_tower4|StatusHealthRegen|100"...]')
+                self.config['units'] = ["npc_dota_goodguys_tower4|StatusHealthRegen|100",
+                                        "npc_dota_badguys_tower4|StatusHealthRegen|100",
+                                        "npc_dota_goodguys_fort|StatusHealthRegen|200",
+                                        "npc_dota_badguys_fort|StatusHealthRegen|200"]
+                self._save_config()
+                return
+            # 读
             with open(UNIT_FILE, 'r') as f:
-                lines = f.read().splitlines()
-            lines2 = []
-            for i, line in enumerate(lines, 1):
-                if 'BountyGoldMin' in line or 'BountyGoldMax' in line or 'BountyXP' in line:
-                    _, xp_gold, _, value, _ = line.split('"')
-                    value2 = str(int(float(value) * float(xp_gold_mul)))
-                    if value2 != value:
-                        line = line.replace(value, value2)
-                        self._print(f'修改单位数据：{i:5}行：{xp_gold} = {value} -> {value2}', show_in_bar=False)
-                lines2.append(line)
+                texts = f.read().splitlines()
+            texts2 = texts[:]
+            # 单位属性
+            for i in units:
+                item, attr, value = i.split('|')
+                texts2 = self._change_attr_value(texts2, item, attr, value)
+            # 金币和经验
+            texts2 = self._change_gold_and_xp(texts2, xp_gold_mul)
+            # 写入
             with open(UNIT_FILE2, 'w') as f:
-                f.write('\n'.join(lines2))
-            self._print(f'修改单位数据：金币和经验成功：{UNIT_FILE2}')
+                f.write('\n'.join(texts2))
+            self._print(f'修改单位数据 | 完成：{UNIT_FILE2}')
         except Exception as e:
-            self._print(f'修改单位数据：金币和经验失败，{e}')
+            self._print(f'修改单位数据 | 异常：{e}')
+
+    def _change_gold_and_xp(self, texts: list[str], mul_value):
+        """修改单位数据：金币和经验"""
+        texts2 = []
+        for i, line in enumerate(texts, 1):
+            if 'BountyGoldMin' in line or 'BountyGoldMax' in line or 'BountyXP' in line:
+                _, xp_gold, _, value, _ = line.split('"')
+                value2 = str(int(float(value) * float(mul_value)))
+                if value2 != value:
+                    line = line.replace(value, value2)
+                    self._print(f'修改单位数据 | {i:5}行 | {xp_gold} | {value} -> {value2}', show_in_bar=False)
+            texts2.append(line)
+        return texts2
     
     def change_items(self):
-        """修改商店物品：冷却时间"""
-        pass
+        """修改商店物品"""
+        try:
+            self._print(f'修改商店物品 | 开始')
+            self._read_config()
+            items = self.config.get('items')
+            if items is None:
+                self._print('配置文件 | 没有 items 配置项 | 创建一个 items = ["item_aghanims_shard|ItemInitialStockTime|690.0"]')
+                self.config['items'] = ["item_aghanims_shard|ItemInitialStockTime|690.0"]
+                self._save_config()
+                return
+            with open(ITEM_FILE, 'r') as f:
+                lines = f.read().splitlines()
+            lines2 = lines[:]
+            for i in items:
+                item, attr, value = i.split('|')
+                lines2 = self._change_attr_value(lines2, item, attr, value)
+            with open(ITEM_FILE2, 'w') as f:
+                f.write('\n'.join(lines2))
+            self._print(f'修改商店物品 | 完成：{ITEM_FILE2}')
+        except Exception as e:
+            self._print(f'修改单位数据 | 异常：{e}')
+
+    def _change_attr_value(self, texts, item, attr, value):
+        """修改属性，单个函数"""
+        item = f'"{item}"'
+        attr = f'"{attr}"'
+        texts2 = texts[:]
+        for i, line in enumerate(texts):
+            if item in line:
+                for j, line2 in enumerate(texts[i:]):
+                    if attr in line2:
+                        _, _, _, old_value, _ =  line2.split('"')
+                        new_line = line2.replace(old_value, value)
+                        texts2[i+j] = new_line
+                        self._print(f'修改属性 | {i+j+1:5}行 | {item} | {attr} | 值：{old_value} -> {value}', show_in_bar=False)
+                        return texts2
 
     def change_neutral_items(self):
         """修改中立物品数据：冷却时间"""
@@ -339,9 +396,9 @@ class Win(QMainWindow, Ui_MainWindow):
             if times is None:
                 self.config['neutral_items'] = ["0:00", "5:00", "15:00", "25:00", "35:00", "40:00"]
                 self._save_config()
-                self._print(f'修配置文件：没有 neutral_items 配置项，创建一个 neutral_items = ["0:00", "5:00", "15:00", "25:00", "35:00", "40:00"]')
+                self._print(f'配置文件 | 没有 neutral_items 配置项 | 创建一个 neutral_items = ["0:00", "5:00", "15:00", "25:00", "35:00", "40:00"]')
                 return
-            self._print(f'修改中立物品数据：冷却时间。。。', show_in_bar=False)
+            self._print(f'修改中立物品数据 | 开始 ', show_in_bar=False)
             with open(NEURAL_FILE, 'r') as f:
                 lines = f.read().splitlines()
             lv = 1
@@ -351,19 +408,19 @@ class Win(QMainWindow, Ui_MainWindow):
                     _, _, _, time, _ = line.split('"')
                     time2 = times[-1]
                     line = line.replace(time, time2)
-                    self._print(f'修改中立物品数据：冷却时间：{i:5}行：5级中立物品(重新选择)：{time} -> {time2}', show_in_bar=False)
+                    self._print(f'修改中立物品数据 | {i:5}行 | 5级中立物品(无限制) | {time} -> {time2}', show_in_bar=False)
                 elif 'start_time' in line:
                     _, _, _, time, _ = line.split('"')
                     time2 = times[lv-1]
                     line = line.replace(time, time2)
-                    self._print(f'修改中立物品数据：冷却时间：{i:5}行：{lv}级中立物品：{time} -> {time2}', show_in_bar=False)
+                    self._print(f'修改中立物品数据 | {i:5}行 | {lv}级中立物品 | {time} -> {time2}', show_in_bar=False)
                     lv += 1
                 lines2.append(line)
             with open(NEURAL_FILE2, 'w') as f:
                 f.write('\n'.join(lines2))
-            self._print(f'修改中立物品数据：冷却时间：{NEURAL_FILE2}')
+            self._print(f'修改中立物品数据 | 完成：{NEURAL_FILE2}')
         except Exception as e:
-            self._print(f'修改中立物品数据：冷却时间，{e}')
+            self._print(f'修改中立物品数据 | 异常：{e}')
 
     def find_steam_dir_when_start(self):
         """启动时，自动寻找STEAM文件夹，优先读配置，不行再自动寻找"""
@@ -994,5 +1051,8 @@ class Win(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication([])
     win = Win()
-    win.show()
-    app.exec()
+    # win.show()
+    # app.exec()
+    win.change_items()
+    win.change_neutral_items()
+    win.change_units()

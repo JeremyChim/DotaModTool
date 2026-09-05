@@ -5734,7 +5734,7 @@
 		"ItemStockInitial"				"0"
 		"ItemStockMax"					"1"
 		"ItemInitialStockTime"			"690.0"
-		"ItemInitialStockTimeTurbo"		"510.0"
+		"ItemInitialStockTimeTurbo"		"0.0"
 
 		"SuggestLategame"				"1"
 	}
