@@ -1,0 +1,653 @@
+local X = {}
+
+local J = require( GetScriptDirectory()..'/FunLib/jmz_func')
+
+local bot = GetBot()
+
+local botHP, botMP, botName, botHealth, botHealthRegen, botManaRegen, botLocation, botTarget
+local botLevel, botActiveMode
+local nAllyHeroes
+local nEnemyHeroes
+
+local fRetreatFromTormentorTime = 0
+local fRetreatFromRoshanTime = 0
+
+local fCurrentRunTime = 0
+local fShouldRunTime = 0
+local fLastRetreatDesire = 0
+
+local hTeamAncient, hEnemyAncient
+
+function GetDesire()
+	local desire = GetDesireRaw()
+	local activeMode = bot:GetActiveMode()
+	local activeModeDesire = bot:GetActiveModeDesire()
+	if  activeMode ~= BOT_MODE_RETREAT
+    and activeModeDesire > 0
+    and desire > 0
+    and desire == activeModeDesire
+	then
+		desire = desire - 0.05
+	end
+	return desire
+end
+
+function GetDesireRaw()
+    botActiveMode = bot:GetActiveMode()
+
+    if not bot:IsAlive()
+    or bot:HasModifier('modifier_dazzle_nothl_projection_soul_clone')
+    or bot:HasModifier('modifier_skeleton_king_reincarnation_scepter_active')
+    or bot:HasModifier('modifier_item_helm_of_the_undying_active')
+    or bot:HasModifier('modifier_dazzle_nothl_projection_soul_clone')
+    or (botActiveMode == BOT_MODE_EVASIVE_MANEUVERS)
+    or (bot:GetUnitName() == 'npc_dota_hero_lone_druid' and bot:HasModifier('modifier_fountain_aura_buff') and DotaTime() < 0)
+    then
+        return BOT_MODE_DESIRE_NONE
+    end
+
+    botHP = J.GetHP(bot)
+    botMP = J.GetMP(bot)
+    botName = bot:GetUnitName()
+    botHealth = bot:GetHealth()
+    botHealthRegen = bot:GetHealthRegen()
+    botManaRegen = bot:GetManaRegen()
+    botLocation = bot:GetLocation()
+    botTarget = J.GetProperTarget(bot)
+    botLevel = bot:GetLevel()
+    nAllyHeroes = {}
+    nEnemyHeroes = {}
+    hTeamAncient = GetAncient(GetTeam())
+    hEnemyAncient = GetAncient(GetOpposingTeam())
+    local nAllyTowers = bot:GetNearbyTowers(1200, false)
+    local nEnemyTowers = bot:GetNearbyTowers(1200, true)
+    local nEnemyLaneCreeps = bot:GetNearbyLaneCreeps(1200, true)
+    local bWeAreStronger = J.WeAreStronger(bot, 1600)
+    local bTeamFight = J.IsInTeamFight(bot, 1200)
+
+    local unitList = GetUnitList(UNIT_LIST_ALL)
+	for _, unit in pairs(unitList) do
+		if J.IsValidHero(unit)
+		and GetUnitToUnitDistance(bot, unit) <= 1600
+        and ((J.IsSuspiciousIllusion(unit) and unit:HasModifier('modifier_arc_warden_tempest_double'))
+			or not J.IsSuspiciousIllusion(unit))
+        and not J.IsMeepoClone(unit)
+		and not unit:HasModifier('modifier_necrolyte_reapers_scythe')
+		and not unit:HasModifier('modifier_dazzle_nothl_projection_physical_body_debuff')
+		and not unit:HasModifier('modifier_skeleton_king_reincarnation_scepter_active')
+        and not unit:HasModifier('modifier_item_helm_of_the_undying_active')
+        and not unit:HasModifier('modifier_teleporting')
+        and not string.find(botName, 'lone_druid_bear')
+		and unit:GetTeam() ~= TEAM_NEUTRAL
+		and unit:GetTeam() ~= TEAM_NONE
+		then
+			if GetTeam() == unit:GetTeam() then
+                table.insert(nAllyHeroes, unit)
+			else
+                table.insert(nEnemyHeroes, unit)
+			end
+		end
+	end
+
+    -- -- tormentor is too far now
+    -- -- retreat from tormentor if can die
+    -- if DotaTime() > (J.IsModeTurbo() and (10 * 60) or (20 * 60)) then
+    --     local TormentorLocation = J.GetTormentorLocation(GetTeam())
+    --     if DotaTime() < fRetreatFromTormentorTime + 20 then
+    --         if not bot:HasModifier('modifier_fountain_aura_buff') or J.GetHP(bot) < 0.5 then
+    --             return BOT_MODE_DESIRE_ABSOLUTE
+    --         else
+    --             fRetreatFromTormentorTime = 0
+    --         end
+    --     end
+
+    --     if GetUnitToLocationDistance(bot, TormentorLocation) < 1200
+    --     and J.GetHP(bot) < 0.25
+    --     and bot.tormentor_state == true then
+    --         fRetreatFromTormentorTime = DotaTime()
+    --     end
+    -- end
+
+    -------------------------
+    -- Not part of actual retreat
+    if (botName == 'npc_dota_hero_lone_druid' and DotaTime() > 25 and DotaTime() < fRetreatFromRoshanTime + 6.5) then
+        return 3.33
+    end
+
+    local vRoshanLocation = J.GetCurrentRoshanLocation()
+
+    if botName == 'npc_dota_hero_lone_druid'
+    and botActiveMode == BOT_MODE_ITEM
+    and GetUnitToLocationDistance(bot, vRoshanLocation)
+    and IsLocationVisible(vRoshanLocation)
+    then
+        for _, droppedItem in pairs(GetDroppedItemList()) do
+            if droppedItem ~= nil
+            and droppedItem.item:GetName() == 'item_aegis'
+            and GetUnitToLocationDistance(bot, droppedItem.location) < 1200
+            then
+                fRetreatFromRoshanTime = DotaTime()
+                return 3.33
+            end
+        end
+    end
+
+    -- when roshan dies, every desire sometimes drops to 0 somehow and it lingers in Roshan mode (which is also 0)
+    if botActiveMode == BOT_MODE_ROSHAN
+    and not J.IsRoshanAlive()
+    and GetUnitToLocationDistance(bot, vRoshanLocation)
+    and IsLocationVisible(vRoshanLocation)
+    then
+        local bAegisNearby = false
+        for _, droppedItem in pairs(GetDroppedItemList()) do
+            if droppedItem ~= nil
+            and droppedItem.item:GetName() == 'item_aegis'
+            and GetUnitToLocationDistance(bot, droppedItem.location) < 1200
+            then
+                bAegisNearby = true
+                break
+            end
+        end
+
+        if not bAegisNearby then
+            return BOT_MODE_DESIRE_MODERATE
+        end
+    end
+    -------------------------
+
+    if bot:HasModifier('modifier_fountain_fury_swipes_damage_increase')
+    or (not bTeamFight and J.IsTargetedByEnemyWithModifier(bot, nEnemyHeroes, 'modifier_skeleton_king_reincarnation_scepter_active'))
+    or (not bTeamFight and J.IsTargetedByEnemyWithModifier(bot, nEnemyHeroes, 'modifier_item_helm_of_the_undying_active'))
+    then
+        return BOT_MODE_DESIRE_ABSOLUTE
+    end
+
+    if (bot:HasModifier('modifier_doom_bringer_doom_aura_enemy') and (#nEnemyHeroes > 0 or #nEnemyHeroes > #nAllyHeroes + 1) and botName ~= 'npc_dota_hero_medusa')
+    or (bot:HasModifier('modifier_razor_static_link_debuff') and J.IsUnitNearby(bot ,nEnemyHeroes, 700, 'npc_dota_hero_razor', true) and #nEnemyHeroes >= #nAllyHeroes)
+    or (bot:HasModifier('modifier_ursa_fury_swipes_damage_increase') and not bTeamFight and J.IsUnitNearby(bot, nEnemyHeroes, 700, 'npc_dota_hero_ursa', true))
+    or (bot:HasModifier('modifier_ice_blast') and not bTeamFight and #nEnemyHeroes > #nAllyHeroes)
+    then
+        return BOT_MODE_DESIRE_ABSOLUTE
+    end
+
+    if botName == 'npc_dota_hero_huskar' and not bot:HasModifier('modifier_item_spirit_vessel_damage') then
+        local hAbility = bot:GetAbilityByName('huskar_berserkers_blood')
+        if hAbility and hAbility:IsTrained() and hAbility:GetLevel() >= 3 then
+            if botHP > 0.2 and botHealthRegen > 30 then botHP = 1 end
+            if botHP < 0.3 and (#nEnemyHeroes == 0 and J.HasItem(bot, 'item_armlet')) then botHP = 1 end
+        end
+    end
+
+    if botName == 'npc_dota_hero_obsidian_destroyer' then
+        local hAbility1 = bot:GetAbilityByName('obsidian_destroyer_arcane_orb')
+        local hAbility2 = bot:GetAbilityByName('obsidian_destroyer_equilibrium')
+        if hAbility1 and hAbility1:IsTrained() and hAbility1:GetLevel() >= 4 and hAbility2 then
+            botMP = 1
+        end
+    end
+
+    if --[[(botHP <= 0.3) or]] ((botHP <= 0.6 or botMP < 0.4 ) and bot:DistanceFromFountain() <= 4000 and not bTeamFight) then
+        return BOT_MODE_DESIRE_VERYHIGH + 0.04
+    end
+
+    if bot:HasModifier('modifier_fountain_aura_buff') then
+        local fountainBuffHealth, fountainBuffMana = 0.05 * 3, 0.06 * 3
+        if botHP + fountainBuffHealth <= 0.9 or (botMP + fountainBuffMana <= 0.8 and botName ~= 'npc_dota_hero_huskar') then
+            return BOT_MODE_DESIRE_ABSOLUTE
+        end
+
+        if (#nEnemyHeroes > #nAllyHeroes) and not bWeAreStronger and not J.CanBeAttacked(hTeamAncient)
+        then
+            return BOT_MODE_DESIRE_HIGH
+        end
+    end
+
+    -- should directly run
+	if bot:IsAlive() and not bot:HasModifier('modifier_fountain_aura_buff') then
+        -- print(fShouldRunTime, fCurrentRunTime, botName)
+		if fCurrentRunTime ~= 0 and DotaTime() < fCurrentRunTime + fShouldRunTime then
+			return BOT_MODE_DESIRE_ABSOLUTE * 2
+		else
+			fCurrentRunTime = 0
+		end
+
+		fShouldRunTime = X.ShouldRun()
+		if fShouldRunTime ~= 0 then
+			if fCurrentRunTime == 0 then
+				fCurrentRunTime = DotaTime()
+			end
+
+			return BOT_MODE_DESIRE_ABSOLUTE * 2
+		end
+	end
+
+    if (J.IsInTeamFight(bot, 1600) and J.IsGoingOnSomeone(bot) and bot:GetActiveModeDesire() >= BOT_MODE_DESIRE_VERYHIGH) then
+        return BOT_MODE_DESIRE_NONE
+    end
+
+    local nDesire = 0
+
+    -- try complete items
+    local nCompletItemDesire = X.ConsiderCompleteItem()
+    if nCompletItemDesire > 0 then
+        return nCompletItemDesire
+    end
+
+    if bot:HasModifier('modifier_oracle_false_promise_timer') then
+        botHP = 1
+    end
+
+    -- fall
+    local count = 0
+    for _, id in pairs( GetTeamPlayers(GetOpposingTeam())) do
+        if IsHeroAlive(id) then
+            local info = GetHeroLastSeenInfo(id)
+            if info ~= nil then
+                local dInfo = info[1]
+                if dInfo ~= nil and GetUnitToLocationDistance(bot, dInfo.location) <= 3200 and dInfo.time_since_seen <= 5.0 then
+                    count = count + 1
+                end
+            end
+        end
+    end
+
+    local nEnemyNearbyCount = Max(#nEnemyHeroes, count)
+    local nAllyNearbyCount = #nAllyHeroes
+
+    unitList = GetUnitList(UNIT_LIST_ALL)
+    for _, unit in ipairs(unitList) do
+        if J.IsValid(unit) and J.IsInRange(bot, unit, 1200) then
+            local sUnitName = unit:GetUnitName()
+
+            if bot:GetTeam() ~= unit:GetTeam() then
+                if string.find(sUnitName, 'warlock_golem')
+                or string.find(sUnitName, 'tombstone')
+                or string.find(sUnitName, 'npc_dota_phoenix_sun')
+                then
+                    nEnemyNearbyCount = nEnemyNearbyCount + 1
+                end
+                if string.find(sUnitName, 'tower') then
+                    local towerDamage = bot:GetActualIncomingDamage((unit:GetAttackDamage() / unit:GetSecondsPerAttack()) * 5.0, DAMAGE_TYPE_PHYSICAL) - botHealthRegen * 5.0
+                    if towerDamage / botHealth >= 0.5 then
+                        nEnemyNearbyCount = nEnemyNearbyCount + 1
+                    end
+                end
+            elseif bot:GetTeam() == unit:GetTeam() then
+                if string.find(sUnitName, 'npc_dota_phoenix_sun') then
+                    nAllyNearbyCount = nAllyNearbyCount + 1
+                end
+
+                if unit:IsHero() and not unit:IsIllusion() then
+                    if (GetUnitToUnitDistance(bot, unit) / unit:GetCurrentMovementSpeed()) <= 6.0 then
+                        if J.IsHaveAegis(unit) then
+                            nAllyNearbyCount = nAllyNearbyCount + 1
+                        end
+                    end
+
+                    if sUnitName == 'npc_dota_hero_skeleton_king' then
+                        local hAbility = unit:GetAbilityByName('skeleton_king_reincarnation')
+                        if hAbility and hAbility:IsTrained() then
+                            if hAbility:GetCooldownTimeRemaining() == 0 and unit:GetMana() > hAbility:GetManaCost() * 1.5 then
+                                nAllyNearbyCount = nAllyNearbyCount + 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if  J.IsInLaningPhase()
+    and J.IsValidBuilding(nAllyTowers[1])
+    and J.IsInRange(bot, nAllyTowers[1], 350)
+    and bot:HasModifier('modifier_tower_aura_bonus')
+    and #nEnemyLaneCreeps <= 1
+    then
+        nAllyNearbyCount = nAllyNearbyCount + 1
+    end
+
+    botHP = Clamp(botHP + (botHealthRegen * 5.0 / bot:GetMaxHealth()) , 0, 1)
+    botMP = Clamp(botMP + (botManaRegen * 5.0 / bot:GetMaxMana()) , 0, 1)
+    local nHealth = 0
+
+    if botName == 'npc_dota_hero_medusa' then
+        local unitHealth = botHealth - (bot:GetMana() * 0.98 * (2 + 0.1 * botLevel))
+        local unitMaxHealth = bot:GetMaxHealth() - (bot:GetMaxMana() * 0.98 * (2 + 0.1 * botLevel))
+        nHealth = (unitHealth / unitMaxHealth) * 0.2 + botMP * 0.8
+    elseif botName == 'npc_dota_hero_huskar' then
+        nHealth = botHP
+    else
+        nHealth = botHP * 0.8 + botMP * 0.2
+    end
+
+    -- nDesire = 1 - ((nHealth + 1 - (1 - nHealth ^ 2) ^ 4) / 2)
+    local one = GetAdjustedValueCausedPatch(1)
+    nHealth = RemapValClamped(nHealth, 0, 1, 0, one)
+    nDesire = one - ((nHealth + one - one * ((1 - (nHealth ^ 2) / one) ^ 4)) / 2)
+
+    if nEnemyNearbyCount > 0 then
+        if nEnemyNearbyCount - nAllyNearbyCount > 0 then
+            nDesire = nDesire + (nEnemyNearbyCount - nAllyNearbyCount) * (GetAdjustedValueCausedPatch(0.75) / 3)
+        end
+
+        if not bWeAreStronger and nEnemyNearbyCount >= nAllyNearbyCount then nDesire = nDesire + GetAdjustedValueCausedPatch(0.25) end
+        if nAllyNearbyCount >= nEnemyNearbyCount or bWeAreStronger then
+            if bot:HasModifier('modifier_oracle_false_promise_timer') and J.GetModifierTime(bot, 'modifier_oracle_false_promise_timer') > 2.0 and J.IsUnitNearby(bot, nAllyHeroes, 1200, 'npc_dota_hero_oracle', true) then
+                nDesire = nDesire - GetAdjustedValueCausedPatch(0.25)
+            end
+            if bot:HasModifier('modifier_dazzle_shallow_grave') and J.GetModifierTime(bot, 'modifier_dazzle_shallow_grave') >= 2.0 and J.IsUnitNearby(bot, nAllyHeroes, 1200, 'npc_dota_hero_dazzle', true) then
+                nDesire = nDesire - GetAdjustedValueCausedPatch(0.2)
+            end
+            if bot:HasModifier('modifier_item_satanic_unholy') then
+                nDesire = nDesire - GetAdjustedValueCausedPatch(0.3)
+            end
+
+            local hAbility = bot:GetAbilityByName('slark_shadow_dance')
+            if J.CanCastAbility(hAbility)
+            or (hAbility ~= nil and hAbility:IsTrained() and hAbility:GetCooldownTimeRemaining() <= 3 and bot:GetMana() >= 150)
+            or (bot:HasModifier('modifier_slark_shadow_dance') and J.GetModifierTime(bot, 'modifier_slark_shadow_dance') > 1.5)
+            then
+                nDesire = nDesire - GetAdjustedValueCausedPatch(0.3)
+            end
+        end
+
+        if J.IsMeepoClone(bot) then
+            local meepoPrime = nil
+            for i = 1, 5 do
+                local member = GetTeamMember(i)
+                if member and member:GetUnitName() == 'npc_dota_hero_meepo' and bot ~= member then
+                    meepoPrime = member
+                    break
+                end
+            end
+
+            if meepoPrime then
+                if GetUnitToUnitDistance(bot, meepoPrime) > 1200 or J.IsRetreating(meepoPrime) then
+                    nDesire = nDesire + GetAdjustedValueCausedPatch(0.25)
+                end
+            end
+        end
+    end
+
+    if bot:DistanceFromFountain() > 4000 then
+        if (nEnemyNearbyCount == 0 and count == 0) and #nEnemyTowers == 0 then nDesire = nDesire - GetAdjustedValueCausedPatch(0.25) end
+    end
+
+    if J.IsInLaningPhase() then
+        if  (not bot:WasRecentlyDamagedByAnyHero(3.0))
+        and (not bot:WasRecentlyDamagedByCreep(2.0) and botHP > 0.2)
+        and (not bot:WasRecentlyDamagedByTower(2.0) and botHP > 0.2)
+        and (bot:DistanceFromFountain() > 4000)
+        and (#J.GetHeroesTargetingUnit(nEnemyHeroes, bot) == 0)
+        then
+            if botHP > 0.25
+            or botHealthRegen > 20
+            or bot:HasModifier('modifier_tango_heal')
+			or bot:HasModifier('modifier_flask_healing')
+			or bot:HasModifier('modifier_juggernaut_healing_ward_heal')
+			or bot:HasModifier('modifier_item_urn_heal')
+			or bot:HasModifier('modifier_item_spirit_vessel_heal')
+            then
+                nDesire = nDesire - GetAdjustedValueCausedPatch(0.25)
+            end
+        end
+    end
+
+    if bot:HasModifier('modifier_slark_shadow_dance_passive_regen') then
+        nDesire = nDesire - GetAdjustedValueCausedPatch(0.25)
+    end
+
+    -- mulling
+    -- nDesire = nDesire + X.GetUnitDesire(1200)
+    -- nDesire = nDesire + X.RetreatWhenTowerTargetedDesire()
+
+    -- nDesire = Clamp(nDesire, 0.0, BOT_MODE_DESIRE_ABSOLUTE)
+
+    -- local alpha = GetAdjustedValueCausedPatch(0.3)
+    -- nDesire = fLastRetreatDesire * (GetAdjustedValueCausedPatch(1) - alpha) + nDesire * alpha
+    -- fLastRetreatDesire = nDesire
+
+    return Clamp(nDesire, 0.0, BOT_MODE_DESIRE_ABSOLUTE)
+end
+
+function X.GetUnitDesire(nRadius)
+    local unitList = GetUnitList(UNIT_LIST_ENEMIES)
+    for _, unit in pairs(unitList) do
+        if J.IsValid(unit)
+        and not unit:IsBuilding()
+        and J.IsInRange(bot, unit, nRadius)
+        then
+            local sUnitName = unit:GetUnitName()
+            -- local unitHealth = unit:GetHealth()
+            -- local botDamage = (bot:GetAttackDamage() / bot:GetSecondsPerAttack()) * 5.0
+            local unitDamage = 0
+            local bIsTargetingThisBot = J.IsChasingTarget(unit, bot) or unit:GetAttackTarget() == bot
+
+            if not unit:HasModifier('modifier_arc_warden_tempest_double') and J.IsSuspiciousIllusion(unit)
+            then
+                local tIllusions = J.GetSameUnitType(bot, 1600, sUnitName, false)
+                unitDamage = J.GetUnitListTotalAttackDamage(tIllusions, 5.0)
+                local illusionDamage = bot:GetActualIncomingDamage(unitDamage, DAMAGE_TYPE_PHYSICAL) - botHealthRegen * 5.0
+
+                if illusionDamage / botHealth > 0.5 then
+                    if illusionDamage / botHealth > 0.65 then
+                        return 0.9
+                    else
+                        return 0.75
+                    end
+                end
+            elseif string.find(sUnitName, 'warlock_golem') and bIsTargetingThisBot
+            then
+                local tWarlockGolems = J.GetSameUnitType(bot, 1600, sUnitName, false)
+                unitDamage = J.GetUnitListTotalAttackDamage(tWarlockGolems, 5.0)
+                local golemsDamage = bot:GetActualIncomingDamage(unitDamage, DAMAGE_TYPE_PHYSICAL) - botHealthRegen * 5.0
+
+                if golemsDamage / botHealth > 0.45 then
+                    return 0.9
+                end
+            elseif string.find(sUnitName, 'spiderlings') and bIsTargetingThisBot
+                and not J.IsInTeamFight(bot, 1600)
+            then
+                local tSpiderlings = J.GetSameUnitType(bot, 1600, sUnitName, true)
+                unitDamage = J.GetUnitListTotalAttackDamage(tSpiderlings, 5.0)
+                local spiderlingsDamage = bot:GetActualIncomingDamage(unitDamage, DAMAGE_TYPE_PHYSICAL) - botHealthRegen * 5.0
+
+                if spiderlingsDamage / botHealth > 0.25 then
+                    return 0.75
+                end
+            elseif string.find(sUnitName, 'eidolon') and bIsTargetingThisBot
+                and not J.IsInTeamFight(bot, 1600)
+            then
+                local tEidolons = J.GetSameUnitType(bot, 1600, sUnitName, true)
+                unitDamage = J.GetUnitListTotalAttackDamage(tEidolons, 5.0)
+                local eidolonDamage = bot:GetActualIncomingDamage(unitDamage, DAMAGE_TYPE_PHYSICAL) - botHealthRegen * 5.0
+
+                if eidolonDamage / botHealth > 0.25 then
+                    return 0.9
+                end
+            end
+        end
+    end
+
+    return 0
+end
+
+function X.RetreatWhenTowerTargetedDesire()
+	if DotaTime() > 10 * 60
+    or J.IsInTeamFight(bot, 1600)
+	then
+		return 0
+	end
+
+	local nEnemyTowers = bot:GetNearbyTowers(800, true)
+
+    -- reduce feeding causes
+	if J.IsValidBuilding(nEnemyTowers[1]) and not J.IsPushing(bot) then
+        if J.IsGoingOnSomeone(bot) then
+            if J.IsValidHero(botTarget)
+            and not J.IsSuspiciousIllusion(botTarget)
+            and not botTarget:HasModifier('modifier_dazzle_shallow_grave')
+            and not botTarget:HasModifier('modifier_necrolyte_reapers_scythe')
+            then
+                local nDamage = bot:GetEstimatedDamageToTarget(true, botTarget, 5.0, DAMAGE_TYPE_ALL) * 1.2
+                nDamage = botTarget:GetActualIncomingDamage(nDamage, DAMAGE_TYPE_ALL)
+                if nDamage / botTarget:GetHealth() < 0.88 then
+                    return 0.9
+                end
+            end
+        end
+
+        if nEnemyTowers[1]:GetAttackTarget() == bot then
+            return 0.9
+        end
+	end
+
+	return 0
+end
+
+-- from mode_farm_generic
+function X.ShouldRun()
+    if bot:IsChanneling() then return 0 end
+
+    if ((bot:GetCurrentMovementSpeed() > 330 and bot:DistanceFromFountain() < 10000) or bot:DistanceFromFountain() < 5000) and not bot:WasRecentlyDamagedByAnyHero(5.0) then
+        if botName == 'npc_dota_hero_medusa' then
+            local eta = bot:DistanceFromFountain() / bot:GetCurrentMovementSpeed()
+            if botMP < 0.2 and botMP + ((botManaRegen * eta) / bot:GetMaxMana()) < 0.4 then
+                return eta
+            end
+        else
+            local eta = bot:DistanceFromFountain() / bot:GetCurrentMovementSpeed()
+            if botHP < 0.2 and botHP + ((botHealthRegen * eta) / bot:GetMaxHealth()) < 0.4 then
+                return eta
+            end
+        end
+    end
+
+	if J.GetModifierTime(bot, 'modifier_medusa_stone_gaze_facing') > 3.33 then
+		return 3.33
+	end
+
+    if J.IsInLaningPhase() or (J.IsEarlyGame() and botHP < 0.35)then
+        local nEnemyCreeps = bot:GetNearbyCreeps(600, true)
+        if J.IsGoingOnSomeone(bot) and J.IsValidHero(botTarget) and #nEnemyCreeps >= 4 and bot:WasRecentlyDamagedByCreep(3.0) then
+            local eta = (GetUnitToUnitDistance(bot, botTarget) - bot:GetAttackRange()) / bot:GetCurrentMovementSpeed()
+            local nInRangeAlly = J.GetAlliesNearLoc(botLocation, 900)
+            if J.GetTotalEstimatedDamageToTarget(nInRangeAlly, botTarget, 2.5 - eta) < botTarget:GetHealth() then
+                return 2.5
+            end
+        end
+    end
+
+    for _, enemyHero in pairs(nEnemyHeroes) do
+        if J.IsValidHero(enemyHero)
+        and not J.IsSuspiciousIllusion(enemyHero)
+        and not enemyHero:HasModifier('modifier_necrolyte_reapers_scythe') then
+            local enemyHeroAttackRange = enemyHero:GetAttackRange()
+            if (enemyHero:HasModifier('modifier_muerta_pierce_the_veil_buff') and J.IsInRange(bot, enemyHero, enemyHeroAttackRange) and botHP < 0.5) then
+                local fModifierTime = J.GetModifierTime(enemyHero, 'modifier_muerta_pierce_the_veil_buff')
+                if enemyHero:GetEstimatedDamageToTarget(false, bot, fModifierTime, DAMAGE_TYPE_MAGICAL) >= (botHealth + botHealthRegen * fModifierTime) then
+                    return fModifierTime
+                end
+            elseif (enemyHero:HasModifier('modifier_bristleback_active_conical_quill_spray') and J.IsInRange(bot, enemyHero, 400) and not enemyHero:IsFacingLocation(botLocation, 70)) then
+                return 3
+            end
+        end
+    end
+
+	local nDistanceFromEnemyFountain = J.GetDistanceFromEnemyFountain(bot)
+	local nDistanceFromEnemyAncient = GetUnitToUnitDistance(bot, hEnemyAncient)
+	local nAliveEnemyCount = J.GetNumOfAliveHeroes(true)
+    local botAssignedLane = bot:GetAssignedLane()
+
+	if nDistanceFromEnemyFountain < 1560 then
+		return 2
+	end
+
+	if DotaTime() > 30 and J.IsEarlyGame() then
+		if (botAssignedLane == LANE_TOP and nDistanceFromEnemyFountain < (GetTeam() == TEAM_RADIANT and 12000 or 9000))
+		or (botAssignedLane == LANE_MID and nDistanceFromEnemyFountain < (GetTeam() == TEAM_RADIANT and 9000 or 8000))
+		or (botAssignedLane == LANE_BOT and nDistanceFromEnemyFountain < (GetTeam() == TEAM_RADIANT and 8700 or 11500))
+		then
+			if J.IsValidHero(botTarget)
+            and J.CanBeAttacked(botTarget)
+			and not J.IsSuspiciousIllusion(botTarget)
+            and not J.CanKillTarget(botTarget, bot:GetAttackDamage() * 2.33, DAMAGE_TYPE_PHYSICAL)
+			then
+				return 2.88
+			end
+		end
+	end
+
+	local nEnemyTowers = bot:GetNearbyTowers(900, true)
+	local nEnemyBarracks = bot:GetNearbyBarracks(900, true)
+
+	if #nEnemyBarracks >= 1 and nAliveEnemyCount >= 2 then
+		if #nEnemyTowers >= 2
+        or nDistanceFromEnemyAncient <= 1314
+        or nDistanceFromEnemyFountain <= 2828
+		then
+			return 2
+		end
+	end
+
+    if botActiveMode == BOT_MODE_WATCHER or botActiveMode == BOT_MODE_WISDOM_SHRINE then
+        if nDistanceFromEnemyFountain < 10000 then
+            local tower = (GetTeam() == TEAM_RADIANT and GetTower(TEAM_DIRE, TOWER_BOT_1)) or GetTower(TEAM_RADIANT, TOWER_TOP_1)
+            if tower and tower:IsAlive() and (#nEnemyHeroes > #nAllyHeroes or #nAllyHeroes < 3) then
+                return 2.5
+            end
+        end
+    end
+
+	return 0
+end
+
+function X.ConsiderCompleteItem()
+    local nTeamFightLocation = J.GetTeamFightLocation(bot)
+    if nTeamFightLocation == nil and #nEnemyHeroes == 0 and bot:DistanceFromFountain() < 4400 and not bot:HasModifier('modifier_fountain_aura_buff') then
+        if J.Item.GetEmptyInventoryAmount(bot) == 0 then
+            -- check if stash has recipe
+            local bRecipeInStash = false
+            local sItemRecipe = ''
+            for i = 9, 14 do
+                local hStashItem = bot:GetItemInSlot(i)
+                if hStashItem then
+                    if string.find(hStashItem:GetName(), 'item_recipe') then
+                        sItemRecipe = hStashItem:GetName()
+                        bRecipeInStash = true
+                        break
+                    end
+                end
+            end
+
+            if bRecipeInStash then
+                -- check if can form ^ item
+                local sItemName = string.gsub(sItemRecipe, '_recipe', '')
+                local tItemComponents = GetItemComponents(sItemName)[1]
+                local count = 0
+                for i = 0, 14 do
+                    local hItem = bot:GetItemInSlot(i)
+                    if hItem and not hItem:IsCombineLocked() then
+                        local sItemName_ = hItem:GetName()
+                        -- there's a broken item progression (<- valve bug)
+                        if i <= 8 and string.find(sItemName_, 'recipe') then
+                            return 0
+                        end
+
+                        for j = 1, #tItemComponents do
+                            if sItemName_ == tItemComponents[j] then
+                                count = count + 1
+                            end
+                        end
+                    end
+                end
+
+                if count > 0 and count == #tItemComponents then
+                    return BOT_MODE_DESIRE_ABSOLUTE * 1.5
+                end
+            end
+        end
+    end
+
+    return 0
+end
