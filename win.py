@@ -301,10 +301,11 @@ class Win(QMainWindow, Ui_MainWindow):
     def change_gold_and_xp(self):
         """修改单位数据：金币和经验"""
         try:
+            self._print(f'修改单位数据：金币和经验。。。', show_in_bar=False)
             self._read_config()
             xp_gold_mul = self.config.get('xp_gold_mul')
             if xp_gold_mul is None:
-                self._print('配置文件：没有 xp_gold_mul 配置项，创建一个')
+                self._print('配置文件：没有 xp_gold_mul 配置项，创建一个 xp_gold_mul = 2')
                 xp_gold_mul = 2
                 self.config['xp_gold_mul'] = xp_gold_mul
                 self._save_config()
@@ -312,13 +313,13 @@ class Win(QMainWindow, Ui_MainWindow):
             with open(UNIT_FILE, 'r') as f:
                 lines = f.read().splitlines()
             lines2 = []
-            for i, line in enumerate(lines):
+            for i, line in enumerate(lines, 1):
                 if 'BountyGoldMin' in line or 'BountyGoldMax' in line or 'BountyXP' in line:
                     _, xp_gold, _, value, _ = line.split('"')
                     value2 = str(int(float(value) * float(xp_gold_mul)))
                     if value2 != value:
                         line = line.replace(value, value2)
-                        self._print(f'修改：{i+1}行：{xp_gold} = {value} -> {value2}', show_in_bar=False)
+                        self._print(f'修改单位数据：{i:5}行：{xp_gold} = {value} -> {value2}', show_in_bar=False)
                 lines2.append(line)
             with open(UNIT_FILE2, 'w') as f:
                 f.write('\n'.join(lines2))
@@ -332,7 +333,37 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def change_neutral_items(self):
         """修改中立物品数据：冷却时间"""
-        pass
+        try:
+            self._read_config()
+            times = self.config.get('neutral_items')
+            if times is None:
+                self.config['neutral_items'] = ["0:00", "5:00", "15:00", "25:00", "35:00", "40:00"]
+                self._save_config()
+                self._print(f'修配置文件：没有 neutral_items 配置项，创建一个 neutral_items = ["0:00", "5:00", "15:00", "25:00", "35:00", "40:00"]')
+                return
+            self._print(f'修改中立物品数据：冷却时间。。。', show_in_bar=False)
+            with open(NEURAL_FILE, 'r') as f:
+                lines = f.read().splitlines()
+            lv = 1
+            lines2 = []
+            for i, line in enumerate(lines, 1):
+                if 'madstone_no_limit_time' in line:
+                    _, _, _, time, _ = line.split('"')
+                    time2 = times[-1]
+                    line = line.replace(time, time2)
+                    self._print(f'修改中立物品数据：冷却时间：{i:5}行：5级中立物品(重新选择)：{time} -> {time2}', show_in_bar=False)
+                elif 'start_time' in line:
+                    _, _, _, time, _ = line.split('"')
+                    time2 = times[lv-1]
+                    line = line.replace(time, time2)
+                    self._print(f'修改中立物品数据：冷却时间：{i:5}行：{lv}级中立物品：{time} -> {time2}', show_in_bar=False)
+                    lv += 1
+                lines2.append(line)
+            with open(NEURAL_FILE2, 'w') as f:
+                f.write('\n'.join(lines2))
+            self._print(f'修改中立物品数据：冷却时间：{NEURAL_FILE2}')
+        except Exception as e:
+            self._print(f'修改中立物品数据：冷却时间，{e}')
 
     def find_steam_dir_when_start(self):
         """启动时，自动寻找STEAM文件夹，优先读配置，不行再自动寻找"""
@@ -963,5 +994,6 @@ class Win(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication([])
     win = Win()
-    win.show()
-    app.exec()
+    win.change_neutral_items()
+    # win.show()
+    # app.exec()
