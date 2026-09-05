@@ -7,7 +7,13 @@
   "win_size": "1600x944",
   "win_position": "246,57",
   "sidebar_expand": true,
-  "xp_gold_mul": 1,
+  "xp_gold_mul": 1.0,
+  "units": [
+    "npc_dota_goodguys_tower4|StatusHealthRegen|100",
+    "npc_dota_badguys_tower4|StatusHealthRegen|100",
+    "npc_dota_goodguys_fort|StatusHealthRegen|200",
+    "npc_dota_badguys_fort|StatusHealthRegen|200"
+  ],
   "neutral_items": [
     "0:00",
     "5:00",
@@ -15,6 +21,10 @@
     "25:00",
     "35:00",
     "40:00"
+  ],
+  "items": [
+    "item_aghanims_shard|ItemInitialStockTime|690.0",
+    "item_aghanims_shard|ItemInitialStockTimeTurbo|0.0"
   ],
   "sa_value": "+50%",
   "sp_value": "+50%",
