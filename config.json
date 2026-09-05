@@ -5,9 +5,17 @@
   "font_size": 11,
   "theme": "dark",
   "win_size": "1600x944",
-  "win_position": "171,71",
+  "win_position": "246,57",
   "sidebar_expand": true,
   "xp_gold_mul": 1,
+  "neutral_items": [
+    "0:00",
+    "5:00",
+    "15:00",
+    "25:00",
+    "35:00",
+    "40:00"
+  ],
   "sa_value": "+50%",
   "sp_value": "+50%",
   "sa_value2": "-25%",
