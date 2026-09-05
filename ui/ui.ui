@@ -274,12 +274,13 @@
     <addaction name="game_dir_action"/>
     <addaction name="menu_9"/>
     <addaction name="separator"/>
-    <addaction name="change_gold_and_xp_action"/>
+    <addaction name="change_units_action"/>
     <addaction name="change_neutral_items_action"/>
     <addaction name="change_items_action"/>
     <addaction name="separator"/>
     <addaction name="generate_vpk_action"/>
     <addaction name="generate_vpk_and_move_action"/>
+    <addaction name="config_file_action"/>
    </widget>
    <widget class="QMenu" name="menu_8">
     <property name="title">
@@ -647,7 +648,7 @@
     <string>F5</string>
    </property>
   </action>
-  <action name="change_gold_and_xp_action">
+  <action name="change_units_action">
    <property name="text">
     <string>修改金币经验</string>
    </property>
@@ -800,6 +801,11 @@
   <action name="vscripts_dir_action">
    <property name="text">
     <string>vscripts</string>
+   </property>
+  </action>
+  <action name="config_file_action">
+   <property name="text">
+    <string>打开配置</string>
    </property>
   </action>
  </widget>
