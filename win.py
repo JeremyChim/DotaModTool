@@ -1078,6 +1078,3 @@ if __name__ == "__main__":
     win = Win()
     win.show()
     app.exec()
-    # win.change_items()
-    # win.change_neutral_items()
-    # win.change_units()
