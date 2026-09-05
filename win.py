@@ -27,6 +27,7 @@ KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
 KEYSYMBOLS = ['+', '-', '=']
 
 ROOT_DIR = os.path.dirname(__file__)
+CONFIG_FILE = os.path.join(ROOT_DIR, "config.json")
 
 VPK_DIR = os.path.join(ROOT_DIR, "vpk")
 PAK_DIR = os.path.join(VPK_DIR, "pak01_dir")
@@ -237,12 +238,13 @@ class Win(QMainWindow, Ui_MainWindow):
         self.generate_vpk_action.triggered.connect(self.generate_vpk)
         self.generate_vpk_and_move_action.triggered.connect(self.generate_vpk_and_move)
         self.game_dir_action.triggered.connect(self.go_to_game_dir)
-        self.change_gold_and_xp_action.triggered.connect(self._change_gold_and_xp)
+        self.change_units_action.triggered.connect(self.change_units)
         self.change_items_action.triggered.connect(self.change_items)
         self.change_neutral_items_action.triggered.connect(self.change_neutral_items)
         self.vscripts_dir_action.triggered.connect(self.go_to_vscripts_dir)
         self.tinkering_dir_action.triggered.connect(self.go_to_tinkering_dir)
         self.open_hyper_ai_dir_action.triggered.connect(self.go_to_open_hyper_ai_dir)
+        self.config_file_action.triggered.connect(self.config_file)
 
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -273,6 +275,22 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
         self.find_steam_dir_when_start()
+
+    def config_file(self):
+        """打开配置文件"""
+        try:
+            if not os.path.exists(CONFIG_FILE):
+                self._print(f'未找到 CONFIG_FILE 目录:{self.CONFIG_FILE}')
+                return   
+            if os.path.exists(NPP_PATH):
+                subprocess.run([NPP_PATH, CONFIG_FILE])
+            elif os.path.exists(NPP_PATH_X86):
+                subprocess.run([NPP_PATH_X86, CONFIG_FILE])
+            else:
+                os.startfile(CONFIG_FILE)
+            self._print(f'打开 CONFIG_FILE ：{CONFIG_FILE}')
+        except Exception as e:
+            self._print(f'异常：{str(e)}')
     
     def go_to_vscripts_dir(self):
         """打开vscripts目录"""
@@ -304,32 +322,38 @@ class Win(QMainWindow, Ui_MainWindow):
             self._print(f'修改单位数据 | 开始 ', show_in_bar=False)
             self._read_config()
             xp_gold_mul = self.config.get('xp_gold_mul')
+            xp_gold_mul_enable = self.config.get('xp_gold_mul_enable')
             units = self.config.get('units')
+            units_enable = self.config.get('units_enable')
             # 配置
-            if xp_gold_mul is None:
+            if xp_gold_mul is None or xp_gold_mul_enable is None:
                 self._print('配置文件 | 没有 xp_gold_mul 配置项 | 创建一个 xp_gold_mul = 2')
-                self.config['xp_gold_mul'] = 2
+                self.config['xp_gold_mul'] = 2.0
+                self.config['xp_gold_mul_enable'] = True
                 self._save_config()
                 return
             # 配置
-            if units is None:
+            if units is None or units_enable is None:
                 self._print('配置文件 | 没有 units 配置项 | 创建一个 units = ["npc_dota_goodguys_tower4|StatusHealthRegen|100"...]')
                 self.config['units'] = ["npc_dota_goodguys_tower4|StatusHealthRegen|100",
                                         "npc_dota_badguys_tower4|StatusHealthRegen|100",
                                         "npc_dota_goodguys_fort|StatusHealthRegen|200",
                                         "npc_dota_badguys_fort|StatusHealthRegen|200"]
+                self.config['units_enable'] = True
                 self._save_config()
                 return
             # 读
             with open(UNIT_FILE, 'r') as f:
                 texts = f.read().splitlines()
             texts2 = texts[:]
-            # 单位属性
-            for i in units:
-                item, attr, value = i.split('|')
-                texts2 = self._change_attr_value(texts2, item, attr, value)
             # 金币和经验
-            texts2 = self._change_gold_and_xp(texts2, xp_gold_mul)
+            if xp_gold_mul_enable is True:
+                texts2 = self._change_gold_and_xp(texts2, xp_gold_mul)
+            # 单位属性
+            if units_enable is True:
+                for i in units:
+                    item, attr, value = i.split('|')
+                    texts2 = self._change_attr_value(texts2, item, attr, value)
             # 写入
             with open(UNIT_FILE2, 'w') as f:
                 f.write('\n'.join(texts2))
@@ -340,6 +364,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def _change_gold_and_xp(self, texts: list[str], mul_value):
         """修改单位数据：金币和经验"""
         texts2 = []
+        self._print(f'修改单位数据 | 金币和经验 | mul_value = {mul_value} ', show_in_bar=False)
         for i, line in enumerate(texts, 1):
             if 'BountyGoldMin' in line or 'BountyGoldMax' in line or 'BountyXP' in line:
                 _, xp_gold, _, value, _ = line.split('"')
@@ -1051,8 +1076,8 @@ class Win(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication([])
     win = Win()
-    # win.show()
-    # app.exec()
-    win.change_items()
-    win.change_neutral_items()
-    win.change_units()
+    win.show()
+    app.exec()
+    # win.change_items()
+    # win.change_neutral_items()
+    # win.change_units()
