@@ -174,7 +174,7 @@
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -236,7 +236,7 @@
       <rect>
        <x>464</x>
        <y>176</y>
-       <width>120</width>
+       <width>125</width>
        <height>200</height>
       </rect>
      </property>
@@ -260,10 +260,19 @@
     <property name="title">
      <string>脚本</string>
     </property>
+    <widget class="QMenu" name="menu_9">
+     <property name="title">
+      <string>脚本目录</string>
+     </property>
+     <addaction name="vscripts_dir_action"/>
+     <addaction name="tinkering_dir_action"/>
+     <addaction name="open_hyper_ai_dir_action"/>
+    </widget>
     <addaction name="root_dir_action"/>
     <addaction name="unit_dir_action"/>
     <addaction name="heroes_dir_action"/>
     <addaction name="game_dir_action"/>
+    <addaction name="menu_9"/>
     <addaction name="separator"/>
     <addaction name="change_gold_and_xp_action"/>
     <addaction name="change_neutral_items_action"/>
@@ -776,6 +785,21 @@
   <action name="change_items_action">
    <property name="text">
     <string>修改商店物品</string>
+   </property>
+  </action>
+  <action name="tinkering_dir_action">
+   <property name="text">
+    <string>tinkering</string>
+   </property>
+  </action>
+  <action name="open_hyper_ai_dir_action">
+   <property name="text">
+    <string>open_hyper_ai</string>
+   </property>
+  </action>
+  <action name="vscripts_dir_action">
+   <property name="text">
+    <string>vscripts</string>
    </property>
   </action>
  </widget>
