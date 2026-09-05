@@ -1,6 +1,7 @@
 import json
 import os
 import subprocess
+import sys
 import time
 import shutil
 from datetime import datetime
@@ -26,7 +27,12 @@ STEAM_DIRS = ['C:\\Program Files (x86)\\Steam',
 KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
 KEYSYMBOLS = ['+', '-', '=']
 
-ROOT_DIR = os.path.dirname(__file__)
+# PyInstaller 单文件程序中的 __file__ 位于临时解压目录；外部数据文件则
+# 与 exe 放在一起。直接运行源码时仍使用当前脚本所在目录。
+if getattr(sys, "frozen", False):
+    ROOT_DIR = os.path.dirname(sys.executable)
+else:
+    ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(ROOT_DIR, "config.json")
 
 VPK_DIR = os.path.join(ROOT_DIR, "vpk")
@@ -1052,14 +1058,14 @@ class Win(QMainWindow, Ui_MainWindow):
     def _read_config(self):
         """读取config.json文件"""
         try:
-            with open("config.json", encoding="utf-8") as fh:
+            with open(CONFIG_FILE, encoding="utf-8") as fh:
                 self.config = json.load(fh)
         except (FileNotFoundError, json.JSONDecodeError):
             pass
 
     def _save_config(self):
         """保存config.json文件"""
-        with open("config.json", "w", encoding="utf-8") as fh:
+        with open(CONFIG_FILE, "w", encoding="utf-8") as fh:
             json.dump(self.config, fh, ensure_ascii=False, indent=2)
 
     def _print(self, msg = '', show_in_bar = True):
