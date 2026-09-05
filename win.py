@@ -130,19 +130,38 @@ class Win(QMainWindow, Ui_MainWindow):
 
     @property
     def dota2_dir(self):
+        """DOTA2路径"""
         return os.path.join(self.steam_dir, "steamapps", "common", "dota 2 beta")
 
     @property
     def game_dir(self):
+        """游戏路径"""
         return os.path.join(self.dota2_dir, "game")
     
     @property
     def mod_dir(self):
+        """mod文件夹路径"""
         return os.path.join(self.game_dir, "mod")
 
     @property
     def mod_file(self):
+        """mod文件路径"""
         return os.path.join(self.mod_dir, "pak01_dir.vpk")
+
+    @property
+    def vscripts_dir(self):
+        """vscripts路径"""
+        return os.path.join(self.game_dir, "dota", "scripts", "vscripts")
+
+    @property
+    def tinkering_dir(self):
+        """BOT脚本tinkering路径"""
+        return os.path.join(self.steam_dir, "steamapps", "workshop", "content", "570", "3139791706")
+
+    @property
+    def open_hyper_ai_dir(self):
+        """BOT脚本open_hyper_ai路径"""
+        return os.path.join(self.steam_dir, "steamapps", "workshop", "content", "570", "3246316298")
 
     def init(self):
         """初始化所有的控件绑定，按钮搜索框等控件，都使用该函数进行初始化绑定"""
@@ -221,6 +240,9 @@ class Win(QMainWindow, Ui_MainWindow):
         self.change_gold_and_xp_action.triggered.connect(self.change_gold_and_xp)
         self.change_items_action.triggered.connect(self.change_items)
         self.change_neutral_items_action.triggered.connect(self.change_neutral_items)
+        self.vscripts_dir_action.triggered.connect(self.go_to_vscripts_dir)
+        self.tinkering_dir_action.triggered.connect(self.go_to_tinkering_dir)
+        self.open_hyper_ai_dir_action.triggered.connect(self.go_to_open_hyper_ai_dir)
 
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -251,6 +273,30 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
         self.find_steam_dir_when_start()
+    
+    def go_to_vscripts_dir(self):
+        """打开vscripts目录"""
+        if not os.path.exists(self.vscripts_dir):
+            self._print(f'未找到vscripts目录:{self.vscripts_dir}')
+            return
+        os.startfile(self.vscripts_dir)
+        self._print(f'打开vscripts目录:{self.vscripts_dir}')
+
+    def go_to_tinkering_dir(self):
+        """打开tinkering脚本目录"""
+        if not os.path.exists(self.tinkering_dir):
+            self._print(f'未找到tinkering脚本目录:{self.tinkering_dir}')
+            return
+        os.startfile(self.tinkering_dir)
+        self._print(f'打开tinkering脚本目录:{self.tinkering_dir}')
+
+    def go_to_open_hyper_ai_dir(self):
+        """打开open_hyper_ai脚本目录"""
+        if not os.path.exists(self.open_hyper_ai_dir):
+            self._print(f'未找到open_hyper_ai脚本目录:{self.open_hyper_ai_dir}')
+            return
+        os.startfile(self.open_hyper_ai_dir)
+        self._print(f'打开open_hyper_ai脚本目录:{self.open_hyper_ai_dir}')
 
     def change_gold_and_xp(self):
         """修改单位数据：金币和经验"""

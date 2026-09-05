@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.6.3
+## Created by: Qt User Interface Compiler version 6.11.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -154,6 +154,12 @@ class Ui_MainWindow(object):
         self.generate_vpk_and_move_action.setObjectName(u"generate_vpk_and_move_action")
         self.change_items_action = QAction(MainWindow)
         self.change_items_action.setObjectName(u"change_items_action")
+        self.tinkering_dir_action = QAction(MainWindow)
+        self.tinkering_dir_action.setObjectName(u"tinkering_dir_action")
+        self.open_hyper_ai_dir_action = QAction(MainWindow)
+        self.open_hyper_ai_dir_action.setObjectName(u"open_hyper_ai_dir_action")
+        self.vscripts_dir_action = QAction(MainWindow)
+        self.vscripts_dir_action.setObjectName(u"vscripts_dir_action")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_5 = QHBoxLayout(self.centralwidget)
@@ -247,7 +253,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1600, 23))
+        self.menubar.setGeometry(QRect(0, 0, 1600, 24))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         self.menu_2 = QMenu(self.menubar)
@@ -260,9 +266,11 @@ class Ui_MainWindow(object):
         self.menu_5.setObjectName(u"menu_5")
         self.menu_6 = QMenu(self.menu_3)
         self.menu_6.setObjectName(u"menu_6")
-        self.menu_6.setGeometry(QRect(464, 176, 120, 200))
+        self.menu_6.setGeometry(QRect(464, 176, 125, 200))
         self.menu_7 = QMenu(self.menubar)
         self.menu_7.setObjectName(u"menu_7")
+        self.menu_9 = QMenu(self.menu_7)
+        self.menu_9.setObjectName(u"menu_9")
         self.menu_8 = QMenu(self.menubar)
         self.menu_8.setObjectName(u"menu_8")
         MainWindow.setMenuBar(self.menubar)
@@ -320,6 +328,7 @@ class Ui_MainWindow(object):
         self.menu_7.addAction(self.unit_dir_action)
         self.menu_7.addAction(self.heroes_dir_action)
         self.menu_7.addAction(self.game_dir_action)
+        self.menu_7.addAction(self.menu_9.menuAction())
         self.menu_7.addSeparator()
         self.menu_7.addAction(self.change_gold_and_xp_action)
         self.menu_7.addAction(self.change_neutral_items_action)
@@ -327,6 +336,9 @@ class Ui_MainWindow(object):
         self.menu_7.addSeparator()
         self.menu_7.addAction(self.generate_vpk_action)
         self.menu_7.addAction(self.generate_vpk_and_move_action)
+        self.menu_9.addAction(self.vscripts_dir_action)
+        self.menu_9.addAction(self.tinkering_dir_action)
+        self.menu_9.addAction(self.open_hyper_ai_dir_action)
         self.menu_8.addAction(self.shortcut_1_action)
         self.menu_8.addAction(self.shortcut_2_action)
         self.menu_8.addAction(self.shortcut_3_action)
@@ -576,20 +588,23 @@ class Ui_MainWindow(object):
         self.generate_vpk_and_move_action.setShortcut(QCoreApplication.translate("MainWindow", u"F6", None))
 #endif // QT_CONFIG(shortcut)
         self.change_items_action.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u6539\u5546\u5e97\u7269\u54c1", None))
+        self.tinkering_dir_action.setText(QCoreApplication.translate("MainWindow", u"tinkering", None))
+        self.open_hyper_ai_dir_action.setText(QCoreApplication.translate("MainWindow", u"open_hyper_ai", None))
+        self.vscripts_dir_action.setText(QCoreApplication.translate("MainWindow", u"vscripts", None))
         self.search_lineEdit.setText("")
         self.search_lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22...", None))
 
         __sortingEnabled = self.heroFiles_listWidget.isSortingEnabled()
         self.heroFiles_listWidget.setSortingEnabled(False)
         ___qlistwidgetitem = self.heroFiles_listWidget.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"\u672a\u627e\u5230\u6587\u4ef6\u5217\u8868...", None));
+        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"\u672a\u627e\u5230\u6587\u4ef6\u5217\u8868...", None))
         self.heroFiles_listWidget.setSortingEnabled(__sortingEnabled)
 
 
         __sortingEnabled1 = self.content_listWidget.isSortingEnabled()
         self.content_listWidget.setSortingEnabled(False)
         ___qlistwidgetitem1 = self.content_listWidget.item(0)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"\u672a\u52a0\u8f7d\u6587\u4ef6...", None));
+        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"\u672a\u52a0\u8f7d\u6587\u4ef6...", None))
         self.content_listWidget.setSortingEnabled(__sortingEnabled1)
 
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.line_tab), QCoreApplication.translate("MainWindow", u"\u884c\u89c6\u56fe", None))
@@ -610,6 +625,7 @@ class Ui_MainWindow(object):
         self.menu_5.setTitle(QCoreApplication.translate("MainWindow", u"\u4e3b\u9898", None))
         self.menu_6.setTitle(QCoreApplication.translate("MainWindow", u"\u7a97\u53e3", None))
         self.menu_7.setTitle(QCoreApplication.translate("MainWindow", u"\u811a\u672c", None))
+        self.menu_9.setTitle(QCoreApplication.translate("MainWindow", u"\u811a\u672c\u76ee\u5f55", None))
         self.menu_8.setTitle(QCoreApplication.translate("MainWindow", u"\u9884\u8bbe", None))
     # retranslateUi
 
