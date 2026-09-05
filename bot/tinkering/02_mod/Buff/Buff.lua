@@ -243,8 +243,8 @@ function Buff:Init()
                 -- if bBuffFlags.gpm.dire then
                 --     GPM.UpdateBotGold(h, TeamDire)
                 -- end
-                GPM.UpdateBotGold(h, 5)
-				XP.UpdateXP(h, 5)
+                GPM.UpdateBotGold(h, 10)
+				XP.UpdateXP(h, 10)
             end
 
             -- if not Helper.IsTurboMode() then
