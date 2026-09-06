@@ -1,6 +1,6 @@
 {
   "steam_dir": "E:\\GAME",
-  "current_file": "npc_dota_hero_centaur.txt",
+  "current_file": "npc_dota_hero_juggernaut.txt",
   "font": "JetBrains Mono",
   "font_size": 10,
   "theme": "dark",
@@ -68,7 +68,7 @@
   "shortcut_count": {
     "shortcut_7_action": 9,
     "shortcut_ctrl_6_action": 4,
-    "cooldown_action": 9,
+    "cooldown_action": 10,
     "shortcut_5_action": 3,
     "shortcut_1_action": 9,
     "shortcut_ctrl_2_action": 3,
