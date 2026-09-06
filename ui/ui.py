@@ -243,6 +243,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addWidget(self.log_plainTextEdit)
 
         self.view_tabWidget.addTab(self.log_tab, "")
+        self.cmd_tab = QWidget()
+        self.cmd_tab.setObjectName(u"cmd_tab")
+        self.horizontalLayout_7 = QHBoxLayout(self.cmd_tab)
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.cmd_plainTextEdit = QPlainTextEdit(self.cmd_tab)
+        self.cmd_plainTextEdit.setObjectName(u"cmd_plainTextEdit")
+
+        self.horizontalLayout_7.addWidget(self.cmd_plainTextEdit)
+
+        self.view_tabWidget.addTab(self.cmd_tab, "")
 
         self.horizontalLayout_3.addWidget(self.view_tabWidget)
 
@@ -622,6 +632,15 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.log_plainTextEdit.setPlainText("")
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.log_tab), QCoreApplication.translate("MainWindow", u"\u811a\u672c\u65e5\u5fd7", None))
+#if QT_CONFIG(tooltip)
+        self.cmd_plainTextEdit.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.cmd_plainTextEdit.setPlainText(QCoreApplication.translate("MainWindow", u"steam\u542f\u52a8\u9879\uff1a+con_enable 1 -noforcemaccel -noforcemspd -useforcedmparms -windowed -noborder -high -map dota -nod3d9ex -nohltv -novr -nojoy -novid\n"
+"\n"
+"bot\u811a\u672c\u6307\u4ee41\uff1asv_cheats 1; script_reload_code bots/Buff/buff\n"
+"\n"
+"bot\u811a\u672c\u6307\u4ee42\uff1asv_cheats 1; script_reload_code bots/fretbots", None))
+        self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cmd_tab), QCoreApplication.translate("MainWindow", u"\u5e38\u7528\u6307\u4ee4", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u7f16\u8f91", None))
         self.menu_3.setTitle(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
