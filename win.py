@@ -886,6 +886,11 @@ class Win(QMainWindow, Ui_MainWindow):
     def set_light_theme(self):
         """设置亮色主题"""
         QApplication.instance().setStyleSheet(
+            "QListWidget { outline: none; }"
+            "QListWidget::item:selected {"
+            "  border: none; border-left: 2px solid #3d8bd4;"
+            "  background-color: #dfeaf5; color: #2563a6;"
+            "}"
             "QTabWidget::pane {"
             "  border: 1px solid #c8cdd5;"
             "  border-radius: 6px;"
@@ -938,7 +943,11 @@ class Win(QMainWindow, Ui_MainWindow):
         QApplication.instance().setStyleSheet(
             "QWidget { background-color: #21252b; color: #e0e0e0; }"
             "QListWidget, QPlainTextEdit, QLineEdit { background-color: #282c34; color: #98c379; }"
-            "QListWidget::item:selected { background-color: #44474e; color: #98c379; }"
+            "QListWidget { outline: none; }"
+            "QListWidget::item:selected {"
+            "  border: none; border-left: 2px solid #61afef;"
+            "  background-color: #3a414b; color: #b7e18b;"
+            "}"
             "QListWidget::item:hover:!selected { background-color: #44474e; }"
             "QTabWidget::pane {"
             "  border: 1px solid #4b5263;"
