@@ -158,6 +158,27 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="cmd_tab">
+             <attribute name="title">
+              <string>常用指令</string>
+             </attribute>
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <item>
+               <widget class="QPlainTextEdit" name="cmd_plainTextEdit">
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="plainText">
+                 <string>steam启动项：+con_enable 1 -noforcemaccel -noforcemspd -useforcedmparms -windowed -noborder -high -map dota -nod3d9ex -nohltv -novr -nojoy -novid
+
+bot脚本指令1：sv_cheats 1; script_reload_code bots/Buff/buff
+
+bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>
