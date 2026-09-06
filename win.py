@@ -200,7 +200,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.top_cancel_action.triggered.connect(self.top_cancel)
         self.set_win_size_1600x800_action.triggered.connect(self.set_win_size_1600x800)
         self.set_win_size_1800x900_action.triggered.connect(self.set_win_size_1800x900)
-        self.tab_action.triggered.connect(self.tab)
+        self.tab_action.triggered.connect(self.indent_selected_items)
         self.back_action.triggered.connect(self.back)
         self.cut_action.triggered.connect(self.cut)
         self.paste_action.triggered.connect(self.paste)
@@ -251,7 +251,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.tinkering_dir_action.triggered.connect(self.go_to_tinkering_dir)
         self.open_hyper_ai_dir_action.triggered.connect(self.go_to_open_hyper_ai_dir)
         self.config_file_action.triggered.connect(self.config_file)
-        self.save_config_pushButton.triggered.connect(self.save_config)
+        self.save_config_pushButton.clicked.connect(self.save_config)
 
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -303,11 +303,30 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def read_config_when_start(self):
         """启动时，加载配置文件的内容到 config_plainTextEdit """
-        # TODO
+        try:
+            with open(CONFIG_FILE, encoding="utf-8") as fh:
+                config = json.load(fh)
+            if not isinstance(config, dict):
+                raise ValueError("配置文件的根节点必须是 JSON 对象")
+            self.config = config
+            self._refresh_config_editor()
+        except FileNotFoundError:
+            self._refresh_config_editor()
+            self._print(f'配置文件不存在：{CONFIG_FILE}')
+        except (json.JSONDecodeError, ValueError) as e:
+            self._print(f'加载配置文件失败：{e}')
 
     def save_config(self):
         """保存 config_plainTextEdit 的内容到 config.json"""
-        # TODO
+        try:
+            config = json.loads(self.config_plainTextEdit.toPlainText())
+            if not isinstance(config, dict):
+                raise ValueError("配置文件的根节点必须是 JSON 对象")
+            self.config = config
+            self._save_config()
+            self._print(f'保存配置文件：{CONFIG_FILE}')
+        except (json.JSONDecodeError, ValueError) as e:
+            self._print(f'保存配置文件失败：{e}')
 
     
     def go_to_vscripts_dir(self):
@@ -665,7 +684,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self._print(f'粘贴：{len(self.cuts)}')
         self.cuts = []
 
-    def tab(self):
+    def indent_selected_items(self):
         """缩进所有选中行"""
         for item in self._selected_items():
             self._set_item_text(item, '\t' + item.text())
@@ -1175,7 +1194,13 @@ class Win(QMainWindow, Ui_MainWindow):
         """保存config.json文件，并刷新 config_plainTextEdit """
         with open(CONFIG_FILE, "w", encoding="utf-8") as fh:
             json.dump(self.config, fh, ensure_ascii=False, indent=2)
-        # TODO
+        self._refresh_config_editor()
+
+    def _refresh_config_editor(self):
+        """用内存中的配置刷新配置编辑器。"""
+        self.config_plainTextEdit.setPlainText(
+            json.dumps(self.config, ensure_ascii=False, indent=2)
+        )
 
     def _print(self, msg = '', show_in_bar = True):
         """内部打印和状态栏打印"""
