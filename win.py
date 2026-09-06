@@ -285,6 +285,12 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_sidebar_when_start()
         self.find_steam_dir_when_start()
         self.read_config_when_start()
+        self.focus_content_list_when_start()
+
+    def focus_content_list_when_start(self):
+        """启动时，切换到行视图并聚焦内容列表"""
+        self.view_tabWidget.setCurrentWidget(self.line_tab)
+        self.content_listWidget.setFocus()
 
     def config_file(self):
         """打开配置文件"""
