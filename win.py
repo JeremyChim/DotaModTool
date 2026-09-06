@@ -251,6 +251,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.tinkering_dir_action.triggered.connect(self.go_to_tinkering_dir)
         self.open_hyper_ai_dir_action.triggered.connect(self.go_to_open_hyper_ai_dir)
         self.config_file_action.triggered.connect(self.config_file)
+        self.save_config_pushButton.triggered.connect(self.save_config)
 
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -273,6 +274,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.shortcut_ctrl_8_action.setText(self.config.get("shortcut_ctrl_8_action", ""))
         self.shortcut_ctrl_9_action.setText(self.config.get("shortcut_ctrl_9_action", ""))
         self.shortcut_ctrl_0_action.setText(self.config.get("shortcut_ctrl_0_action", ""))
+        
 
         # 启动项
         self.show_content_when_start()
@@ -281,6 +283,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.set_win_size_and_position_when_start()
         self.set_sidebar_when_start()
         self.find_steam_dir_when_start()
+        self.read_config_when_start()
 
     def config_file(self):
         """打开配置文件"""
@@ -297,6 +300,15 @@ class Win(QMainWindow, Ui_MainWindow):
             self._print(f'打开 CONFIG_FILE ：{CONFIG_FILE}')
         except Exception as e:
             self._print(f'异常：{str(e)}')
+
+    def read_config_when_start(self):
+        """启动时，加载配置文件的内容到 config_plainTextEdit """
+        # TODO
+
+    def save_config(self):
+        """保存 config_plainTextEdit 的内容到 config.json"""
+        # TODO
+
     
     def go_to_vscripts_dir(self):
         """打开vscripts目录"""
@@ -1160,9 +1172,10 @@ class Win(QMainWindow, Ui_MainWindow):
             pass
 
     def _save_config(self):
-        """保存config.json文件"""
+        """保存config.json文件，并刷新 config_plainTextEdit """
         with open(CONFIG_FILE, "w", encoding="utf-8") as fh:
             json.dump(self.config, fh, ensure_ascii=False, indent=2)
+        # TODO
 
     def _print(self, msg = '', show_in_bar = True):
         """内部打印和状态栏打印"""
