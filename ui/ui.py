@@ -18,8 +18,8 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLineEdit,
     QListWidget, QListWidgetItem, QMainWindow, QMenu,
-    QMenuBar, QPlainTextEdit, QSizePolicy, QStatusBar,
-    QTabWidget, QVBoxLayout, QWidget)
+    QMenuBar, QPlainTextEdit, QPushButton, QSizePolicy,
+    QStatusBar, QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -253,6 +253,21 @@ class Ui_MainWindow(object):
         self.horizontalLayout_7.addWidget(self.cmd_plainTextEdit)
 
         self.view_tabWidget.addTab(self.cmd_tab, "")
+        self.tab = QWidget()
+        self.tab.setObjectName(u"tab")
+        self.verticalLayout = QVBoxLayout(self.tab)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.config_plainTextEdit = QPlainTextEdit(self.tab)
+        self.config_plainTextEdit.setObjectName(u"config_plainTextEdit")
+
+        self.verticalLayout.addWidget(self.config_plainTextEdit)
+
+        self.save_config_pushButton = QPushButton(self.tab)
+        self.save_config_pushButton.setObjectName(u"save_config_pushButton")
+
+        self.verticalLayout.addWidget(self.save_config_pushButton)
+
+        self.view_tabWidget.addTab(self.tab, "")
 
         self.horizontalLayout_3.addWidget(self.view_tabWidget)
 
@@ -376,7 +391,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.view_tabWidget.setCurrentIndex(0)
+        self.view_tabWidget.setCurrentIndex(4)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -641,6 +656,12 @@ class Ui_MainWindow(object):
 "\n"
 "bot\u811a\u672c\u6307\u4ee42\uff1asv_cheats 1; script_reload_code bots/fretbots", None))
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cmd_tab), QCoreApplication.translate("MainWindow", u"\u5e38\u7528\u6307\u4ee4", None))
+#if QT_CONFIG(tooltip)
+        self.config_plainTextEdit.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.config_plainTextEdit.setPlainText("")
+        self.save_config_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
+        self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u6587\u4ef6", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u7f16\u8f91", None))
         self.menu_3.setTitle(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
