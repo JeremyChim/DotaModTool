@@ -671,7 +671,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
   </action>
   <action name="change_units_action">
    <property name="text">
-    <string>修改金币经验</string>
+    <string>修改单位数据</string>
    </property>
   </action>
   <action name="change_neutral_items_action">

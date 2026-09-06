@@ -537,7 +537,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(shortcut)
         self.generate_vpk_action.setShortcut(QCoreApplication.translate("MainWindow", u"F5", None))
 #endif // QT_CONFIG(shortcut)
-        self.change_units_action.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u6539\u91d1\u5e01\u7ecf\u9a8c", None))
+        self.change_units_action.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u6539\u5355\u4f4d\u6570\u636e", None))
         self.change_neutral_items_action.setText(QCoreApplication.translate("MainWindow", u"\u4fee\u6539\u4e2d\u7acb\u7269\u54c1", None))
         self.game_dir_action.setText(QCoreApplication.translate("MainWindow", u"\u6e38\u620f\u76ee\u5f55", None))
 #if QT_CONFIG(shortcut)
