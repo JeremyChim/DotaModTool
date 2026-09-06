@@ -23,18 +23,18 @@
     "npc_dota_badguys_melee_rax_top|StatusHealthRegen|100",
     "npc_dota_badguys_melee_rax_mid|StatusHealthRegen|100",
     "npc_dota_badguys_melee_rax_bot|StatusHealthRegen|100",
-    "npc_dota_goodguys_tower4|StatusHealthRegen|100",
-    "npc_dota_badguys_tower4|StatusHealthRegen|100",
-    "npc_dota_goodguys_fort|StatusHealthRegen|200",
-    "npc_dota_badguys_fort|StatusHealthRegen|200"
+    "npc_dota_goodguys_tower4|StatusHealthRegen|200",
+    "npc_dota_badguys_tower4|StatusHealthRegen|200",
+    "npc_dota_goodguys_fort|StatusHealthRegen|300",
+    "npc_dota_badguys_fort|StatusHealthRegen|300"
   ],
   "neutral_items": [
     "0:00",
     "5:00",
+    "10:00",
     "15:00",
     "25:00",
-    "35:00",
-    "40:00"
+    "30:00"
   ],
   "items": [
     "item_aghanims_shard|ItemInitialStockTime|690.0",
