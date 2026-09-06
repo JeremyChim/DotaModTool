@@ -332,7 +332,6 @@ class Ui_MainWindow(object):
         self.menu_2.addAction(self.cut_action)
         self.menu_2.addAction(self.paste_action)
         self.menu_2.addAction(self.undo_action)
-        self.menu_2.addAction(self.action_2)
         self.menu_3.addAction(self.menu_4.menuAction())
         self.menu_3.addAction(self.menu_5.menuAction())
         self.menu_3.addAction(self.menu_6.menuAction())
