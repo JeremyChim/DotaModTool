@@ -885,7 +885,32 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def set_light_theme(self):
         """设置亮色主题"""
-        QApplication.instance().setStyleSheet("")
+        QApplication.instance().setStyleSheet(
+            "QTabWidget::pane {"
+            "  border: 1px solid #c8cdd5;"
+            "  border-radius: 6px;"
+            "  background-color: #ffffff;"
+            "  top: -1px;"
+            "}"
+            "QTabBar { background: transparent; }"
+            "QTabBar::tab {"
+            "  min-width: 86px; min-height: 32px;"
+            "  padding: 0 16px; margin-right: 4px;"
+            "  border: 1px solid transparent;"
+            "  border-bottom: 2px solid transparent;"
+            "  border-top-left-radius: 6px; border-top-right-radius: 6px;"
+            "  background-color: #eef1f5; color: #606875;"
+            "}"
+            "QTabBar::tab:hover:!selected {"
+            "  background-color: #e2e7ed; color: #252a31;"
+            "}"
+            "QTabBar::tab:selected {"
+            "  background-color: #ffffff; color: #2563a6;"
+            "  border-color: #c8cdd5; border-bottom-color: #3d8bd4;"
+            "  font-weight: 600;"
+            "}"
+            "QTabBar::tab:disabled { color: #a8adb5; }"
+        )
         self.theme = 'light'
         self._print('设置主题为亮色', show_in_bar=False)
 
@@ -896,6 +921,30 @@ class Win(QMainWindow, Ui_MainWindow):
             "QListWidget, QPlainTextEdit, QLineEdit { background-color: #282c34; color: #98c379; }"
             "QListWidget::item:selected { background-color: #44474e; color: #98c379; }"
             "QListWidget::item:hover:!selected { background-color: #44474e; }"
+            "QTabWidget::pane {"
+            "  border: 1px solid #4b5263;"
+            "  border-radius: 6px;"
+            "  background-color: #282c34;"
+            "  top: -1px;"
+            "}"
+            "QTabBar { background: transparent; }"
+            "QTabBar::tab {"
+            "  min-width: 86px; min-height: 32px;"
+            "  padding: 0 16px; margin-right: 4px;"
+            "  border: 1px solid transparent;"
+            "  border-bottom: 2px solid transparent;"
+            "  border-top-left-radius: 6px; border-top-right-radius: 6px;"
+            "  background-color: #2c313a; color: #9aa2ad;"
+            "}"
+            "QTabBar::tab:hover:!selected {"
+            "  background-color: #353b45; color: #e5e9ef;"
+            "}"
+            "QTabBar::tab:selected {"
+            "  background-color: #282c34; color: #98c379;"
+            "  border-color: #4b5263; border-bottom-color: #61afef;"
+            "  font-weight: 600;"
+            "}"
+            "QTabBar::tab:disabled { color: #59606b; }"
         )
         self.theme = 'dark'
         self._print('设置主题为暗色', show_in_bar=False)
