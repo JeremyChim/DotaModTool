@@ -968,10 +968,12 @@ class Win(QMainWindow, Ui_MainWindow):
         for filename in filenames:
             item = QListWidgetItem(filename)
             if filename.endswith('.txt1'):
-                item.setForeground(QColor('#e06c75'))
+                color = '#b4232c' if self.theme == 'light' else '#e06c75'
+                item.setForeground(QColor(color))
                 item.setToolTip('已禁用，双击启用')
             else:
-                item.setForeground(QColor('#98c379'))
+                color = '#3f7018' if self.theme == 'light' else '#98c379'
+                item.setForeground(QColor(color))
                 item.setToolTip('已启用，双击禁用')
             self.enable_listWidget.addItem(item)
 
@@ -1275,8 +1277,14 @@ class Win(QMainWindow, Ui_MainWindow):
     def set_light_theme(self):
         """设置亮色主题"""
         QApplication.instance().setStyleSheet(
+            "QWidget { background-color: #f4f6f8; color: #353b44; }"
+            "QMainWindow, QWidget#centralwidget, QFrame#frame_3, "
+            "QFrame#sidebar_frame, QFrame#frame_2 {"
+            "  background-color: #f4f6f8;"
+            "}"
             "QMenuBar {"
-            "  border: none; background-color: #f4f6f8; color: #353b44;"
+            "  border: none; border-bottom: 1px solid #dde2e8;"
+            "  background-color: #f8fafc; color: #353b44;"
             "}"
             "QMenuBar::item {"
             "  padding: 6px 10px; margin: 2px 1px; border-radius: 4px;"
@@ -1307,29 +1315,40 @@ class Win(QMainWindow, Ui_MainWindow):
             "QLineEdit#search_lineEdit:focus {"
             "  border: 1px solid #3d8bd4; background-color: #ffffff;"
             "}"
-            "QListWidget#heroFiles_listWidget {"
+            "QListWidget, QPlainTextEdit {"
+            "  border: 1px solid #c8cdd5; border-radius: 6px;"
+            "  background-color: #ffffff; color: #39414b;"
+            "  selection-background-color: #dfeaf5;"
+            "  selection-color: #2563a6;"
+            "}"
+            "QListWidget:focus, QPlainTextEdit:focus {"
+            "  border-color: #3d8bd4;"
+            "}"
+            "QListWidget#heroFiles_listWidget, "
+            "QListWidget#enable_listWidget {"
             "  padding: 4px; border: 1px solid #c8cdd5; border-radius: 6px;"
             "  background-color: #ffffff; color: #39414b;"
             "}"
-            "QListWidget#heroFiles_listWidget::item {"
+            "QListWidget#heroFiles_listWidget::item, "
+            "QListWidget#enable_listWidget::item {"
             "  min-height: 22px; padding: 0 6px; margin: 1px 0;"
             "  border: none; border-radius: 4px;"
             "}"
-            "QListWidget#heroFiles_listWidget::item:hover:!selected {"
+            "QListWidget#heroFiles_listWidget::item:hover:!selected, "
+            "QListWidget#enable_listWidget::item:hover:!selected {"
             "  background-color: #eef2f6; color: #252a31;"
             "}"
-            "QListWidget#heroFiles_listWidget::item:selected {"
+            "QListWidget#heroFiles_listWidget::item:selected, "
+            "QListWidget#enable_listWidget::item:selected {"
             "  border-left: 2px solid #3d8bd4;"
             "  background-color: #dfeaf5; color: #2563a6;"
             "}"
-            "QPlainTextEdit#config_plainTextEdit, "
-            "QPlainTextEdit#cn_name_plainTextEdit {"
+            "QPlainTextEdit {"
             "  padding: 10px; border: 1px solid #c8cdd5; border-radius: 6px;"
             "  background-color: #ffffff; color: #39414b;"
             "  selection-background-color: #3d8bd4;"
             "}"
-            "QPlainTextEdit#config_plainTextEdit:focus, "
-            "QPlainTextEdit#cn_name_plainTextEdit:focus {"
+            "QPlainTextEdit:focus {"
             "  border-color: #3d8bd4;"
             "}"
             "QPushButton#save_config_pushButton, "
@@ -1363,6 +1382,9 @@ class Win(QMainWindow, Ui_MainWindow):
             "  background-color: #ffffff;"
             "  top: -1px;"
             "}"
+            "QWidget#line_tab, QWidget#text_tab, QWidget#log_tab, "
+            "QWidget#cmd_tab, QWidget#tab, QWidget#cn_name_tab, "
+            "QWidget#enable_tab { background-color: #ffffff; }"
             "QTabBar { background: transparent; }"
             "QTabBar::tab {"
             "  min-width: 86px; min-height: 32px;"
@@ -1400,8 +1422,18 @@ class Win(QMainWindow, Ui_MainWindow):
             "QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; }"
             "QScrollBar::add-page, QScrollBar::sub-page { background: transparent; }"
             "QAbstractScrollArea::corner { background: #eef1f5; }"
+            "QStatusBar {"
+            "  border-top: 1px solid #dde2e8;"
+            "  background-color: #f8fafc; color: #606875;"
+            "}"
+            "QToolTip {"
+            "  padding: 5px 8px; border: 1px solid #c8cdd5; border-radius: 4px;"
+            "  background-color: #ffffff; color: #353b44;"
+            "}"
         )
         self.theme = 'light'
+        self._refresh_files()
+        self.refresh_enable_list()
         self._print('设置主题为亮色', show_in_bar=False)
 
     def set_dark_theme(self):
@@ -1537,6 +1569,8 @@ class Win(QMainWindow, Ui_MainWindow):
             "QAbstractScrollArea::corner { background: #20242a; }"
         )
         self.theme = 'dark'
+        self._refresh_files()
+        self.refresh_enable_list()
         self._print('设置主题为暗色', show_in_bar=False)
 
     def _tab_text(self, text):
