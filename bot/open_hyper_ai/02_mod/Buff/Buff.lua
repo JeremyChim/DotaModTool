@@ -88,6 +88,8 @@ function Buff:Init()
             local me = PlayerResource:GetPlayer(0):GetAssignedHero()
             GPM.UpdateBotGold(me, 5)
             XP.UpdateXP(me, 5)
+            
+            -- Gold and Experience For Bot
             for _, h in pairs(TeamRadiant) do
                 --if Helper.IsCore(h, TeamRadiant)
                 --then
@@ -97,6 +99,7 @@ function Buff:Init()
                 GPM.UpdateBotGold(h, 5)
                 XP.UpdateXP(h, 5)
             end
+
             for _, h in pairs(TeamDire) do
                 --if Helper.IsCore(h, TeamDire)
                 --then

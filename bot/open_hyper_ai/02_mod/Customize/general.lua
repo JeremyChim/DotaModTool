@@ -26,7 +26,7 @@ Customize.Enable = true
 -- Set the localization code to make bots speak the specific language when possible (not guaranteed to 100% localized). 
 -- Currently supprot: "en" for "English", "zh" for "中文", "ru" for Russian, "ja" for Japanese
 -- https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
-Customize.Localization = "en"
+Customize.Localization = "zh"
 
 -- To ban some heroes for bots - Set the heroes you DO NOT want the bots to pick. Use hero internal names.
 -- Hero name ref: https://github.com/forest0xia/dota2bot-OpenHyperAI/discussions/71
@@ -106,30 +106,30 @@ Customize.Dire_Team_Name = ''
 -- The desire level that the bots will group up and push the same lane. 
 -- 1 is mild meaning bots will group up only when convenient; 3 is bots will almost always try to push together.
 -- Group pushing may increase the difficulty but can reduce the game experience. 
-Customize.Force_Group_Push_Level = 1
+Customize.Force_Group_Push_Level = 3
 
 -- Set how frequently you want the bots to push. 
 -- 1 is default, bot may choose to farm more in game. 2 is balanced for push vs farm. 3 is almost no farm, all push.
-Customize.Push_Frequency = 1
+Customize.Push_Frequency = 3
 
 -- The Enhanced Fretbots mode settings:
 -- For more about Fretbots mode: https://github.com/forest0xia/dota2bot-OpenHyperAI/discussions/68
 -- Note: these settings below will override the pre-defind settings in Fretbots folder.
 Customize.Fretbots = {
     -- Default difficulty, a number between: [0, 10]
-    Default_Difficulty = 2,
+    Default_Difficulty = 10,
 
     -- Default ally bots bonus scale comparing to enemy bots, a number between: [0, 1]
-    Default_Ally_Scale = 0.5,
+    Default_Ally_Scale = 0,
 
     -- Set whether or not allowing the team to vote for difficulty. If false, will directly apply the default difficulty.
-    Allow_To_Vote = true,
+    Allow_To_Vote = false,
 
     -- Set to false disables all sounds from Fretbots mode
-    Play_Sounds = true,
+    Play_Sounds = false,
 
     -- Set to play chatwheel taunt sounds when human player died
-    Player_Death_Sound = true,
+    Player_Death_Sound = false,
 }
 
 -- Make bots think less, 0: fully think through, 1 to 10: think less and less frequently.
