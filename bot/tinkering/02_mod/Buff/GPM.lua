@@ -49,7 +49,7 @@ function GPM.UpdateBotGold(bot, gold)
     end
 
     if not bot:IsAlive() then
-        gold = gold * 3
+        gold = gold * 2
     end
 
     bot:ModifyGold(gold, true, 0)
