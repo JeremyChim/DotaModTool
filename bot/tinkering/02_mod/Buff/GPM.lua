@@ -42,6 +42,9 @@ end
 --     end
 -- end
 
+
+
+
 -- 每秒，加金钱
 function GPM.UpdateBotGold(bot, gold)
     local gameTime = Helper.DotaTime()
@@ -56,6 +59,9 @@ function GPM.UpdateBotGold(bot, gold)
 
     bot:ModifyGold(gold, true, 0)
 end
+
+
+
 
 -- 死亡时，一次性加金钱
 function GPM.UpdateGoldWhenDeath(bot, gold)

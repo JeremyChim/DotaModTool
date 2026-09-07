@@ -57,6 +57,9 @@ end
 --     end
 -- end
 
+
+
+
 -- 每秒，加经验
 function XP.UpdateXP(bot, xp)
     local gameTime = Helper.DotaTime()
@@ -71,6 +74,9 @@ function XP.UpdateXP(bot, xp)
 
     bot:AddExperience(xp, 0, false, true, bot:GetPlayerOwnerID())
 end
+
+
+
 
 -- 死亡时，一次性加经验
 function XP.UpdateXPWhenDeath(bot, xp)
