@@ -18,10 +18,7 @@
     <item>
      <widget class="QFrame" name="frame_3">
       <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+       <enum>QFrame::NoFrame</enum>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
        <property name="spacing">
@@ -48,10 +45,7 @@
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -79,10 +73,7 @@
        <item>
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+          <enum>QFrame::NoFrame</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
@@ -123,7 +114,7 @@
               <bool>false</bool>
              </property>
              <property name="contextMenuPolicy">
-              <enum>Qt::DefaultContextMenu</enum>
+              <enum>Qt::NoContextMenu</enum>
              </property>
              <attribute name="title">
               <string>文本视图</string>
@@ -199,6 +190,9 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
                 <property name="text">
                  <string>保存</string>
                 </property>
+                <property name="shortcut">
+                 <string>Ctrl+Shift+S</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -219,7 +213,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -280,7 +274,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
       <rect>
        <x>464</x>
        <y>176</y>
-       <width>125</width>
+       <width>120</width>
        <height>200</height>
       </rect>
      </property>
@@ -318,13 +312,16 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
     <addaction name="game_dir_action"/>
     <addaction name="menu_9"/>
     <addaction name="separator"/>
+    <addaction name="ues_tinkering_action"/>
+    <addaction name="ues_open_hyper_ai_action"/>
+    <addaction name="separator"/>
     <addaction name="change_units_action"/>
     <addaction name="change_neutral_items_action"/>
     <addaction name="change_items_action"/>
     <addaction name="separator"/>
+    <addaction name="config_file_action"/>
     <addaction name="generate_vpk_action"/>
     <addaction name="generate_vpk_and_move_action"/>
-    <addaction name="config_file_action"/>
    </widget>
    <widget class="QMenu" name="menu_8">
     <property name="title">
@@ -850,6 +847,16 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
   <action name="config_file_action">
    <property name="text">
     <string>打开配置</string>
+   </property>
+  </action>
+  <action name="ues_tinkering_action">
+   <property name="text">
+    <string>使用：tinkering</string>
+   </property>
+  </action>
+  <action name="ues_open_hyper_ai_action">
+   <property name="text">
+    <string>使用：open_hyper_ai</string>
    </property>
   </action>
  </widget>
