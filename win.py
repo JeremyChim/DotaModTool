@@ -278,6 +278,10 @@ class Win(QMainWindow, Ui_MainWindow):
         self.open_hyper_ai_dir_action.triggered.connect(self.go_to_open_hyper_ai_dir)
         self.config_file_action.triggered.connect(self.config_file)
         self.save_config_pushButton.clicked.connect(self.save_config)
+        self.save_cn_name_pushButton.clicked.connect(self.save_cn_name)
+        self.cn_name_plainTextEdit.textChanged.connect(
+            lambda: self.save_cn_name_pushButton.setEnabled(True)
+        )
         self.ues_open_hyper_ai_action.triggered.connect(self.ues_open_hyper_ai)
         self.ues_tinkering_action.triggered.connect(self.ues_tinkering)
         self.update_gi_action.triggered.connect(self.update_gi)
@@ -328,15 +332,47 @@ class Win(QMainWindow, Ui_MainWindow):
             self.cn_name_plainTextEdit.setPlainText(
                 json.dumps(self.cn_name, ensure_ascii=False, indent=2)
             )
+            self.save_cn_name_pushButton.setEnabled(False)
             self._print(f'加载中文译名：{NAME_FILE}', show_in_bar=False)
         except FileNotFoundError:
             self.cn_name = {}
             self.cn_name_plainTextEdit.clear()
+            self.save_cn_name_pushButton.setEnabled(True)
             self._print(f'中文译名文件不存在：{NAME_FILE}')
         except (json.JSONDecodeError, ValueError) as e:
             self.cn_name = {}
             self.cn_name_plainTextEdit.clear()
+            self.save_cn_name_pushButton.setEnabled(True)
             self._print(f'加载中文译名失败：{e}')
+
+    def save_cn_name(self):
+        """校验并保存中文译名，同时刷新英雄搜索结果。"""
+        try:
+            cn_name = json.loads(self.cn_name_plainTextEdit.toPlainText())
+            if not isinstance(cn_name, dict):
+                raise ValueError("name.json 的根节点必须是 JSON 对象")
+            if not all(
+                isinstance(hero_name, str) and isinstance(display_name, str)
+                for hero_name, display_name in cn_name.items()
+            ):
+                raise ValueError("英雄代码和中文译名必须都是字符串")
+
+            with open(NAME_FILE, "w", encoding="utf-8") as fh:
+                json.dump(cn_name, fh, ensure_ascii=False, indent=2)
+                fh.write("\n")
+
+            self.cn_name = cn_name
+            self.cn_name_plainTextEdit.setPlainText(
+                json.dumps(self.cn_name, ensure_ascii=False, indent=2)
+            )
+            self.save_cn_name_pushButton.setEnabled(False)
+            self._refresh_files()
+            self._print(f'保存中文译名：{NAME_FILE}')
+        except (json.JSONDecodeError, ValueError) as e:
+            self.cn_name_plainTextEdit.setFocus()
+            self._print(f'保存中文译名失败：{e}')
+        except OSError as e:
+            self._print(f'写入中文译名文件失败：{e}')
 
     def open_gi(self):
         """打开gameinfo_branchspecific.gi"""
@@ -1107,19 +1143,34 @@ class Win(QMainWindow, Ui_MainWindow):
             "  border-left: 2px solid #3d8bd4;"
             "  background-color: #dfeaf5; color: #2563a6;"
             "}"
-            "QPushButton#save_config_pushButton {"
+            "QPlainTextEdit#config_plainTextEdit, "
+            "QPlainTextEdit#cn_name_plainTextEdit {"
+            "  padding: 10px; border: 1px solid #c8cdd5; border-radius: 6px;"
+            "  background-color: #ffffff; color: #39414b;"
+            "  selection-background-color: #3d8bd4;"
+            "}"
+            "QPlainTextEdit#config_plainTextEdit:focus, "
+            "QPlainTextEdit#cn_name_plainTextEdit:focus {"
+            "  border-color: #3d8bd4;"
+            "}"
+            "QPushButton#save_config_pushButton, "
+            "QPushButton#save_cn_name_pushButton {"
             "  min-height: 34px; padding: 0 20px;"
             "  border: 1px solid #347fc2; border-radius: 6px;"
             "  background-color: #3d8bd4; color: #ffffff; font-weight: 600;"
             "}"
-            "QPushButton#save_config_pushButton:hover {"
+            "QPushButton#save_config_pushButton:hover, "
+            "QPushButton#save_cn_name_pushButton:hover {"
             "  border-color: #246ba9; background-color: #347fc2;"
             "}"
-            "QPushButton#save_config_pushButton:pressed {"
+            "QPushButton#save_config_pushButton:pressed, "
+            "QPushButton#save_cn_name_pushButton:pressed {"
             "  border-color: #1f5f98; background-color: #286fae;"
             "}"
-            "QPushButton#save_config_pushButton:focus { outline: none; }"
-            "QPushButton#save_config_pushButton:disabled {"
+            "QPushButton#save_config_pushButton:focus, "
+            "QPushButton#save_cn_name_pushButton:focus { outline: none; }"
+            "QPushButton#save_config_pushButton:disabled, "
+            "QPushButton#save_cn_name_pushButton:disabled {"
             "  border-color: #c8cdd5; background-color: #e5e8ec; color: #9aa2ad;"
             "}"
             "QListWidget { outline: none; }"
@@ -1226,19 +1277,34 @@ class Win(QMainWindow, Ui_MainWindow):
             "  border-left: 2px solid #61afef;"
             "  background-color: #3a414b; color: #b7e18b;"
             "}"
-            "QPushButton#save_config_pushButton {"
+            "QPlainTextEdit#config_plainTextEdit, "
+            "QPlainTextEdit#cn_name_plainTextEdit {"
+            "  padding: 10px; border: 1px solid #4b5263; border-radius: 6px;"
+            "  background-color: #282c34; color: #98c379;"
+            "  selection-background-color: #3d78a8;"
+            "}"
+            "QPlainTextEdit#config_plainTextEdit:focus, "
+            "QPlainTextEdit#cn_name_plainTextEdit:focus {"
+            "  border-color: #61afef; background-color: #2c313a;"
+            "}"
+            "QPushButton#save_config_pushButton, "
+            "QPushButton#save_cn_name_pushButton {"
             "  min-height: 34px; padding: 0 20px;"
             "  border: 1px solid #4c9bd9; border-radius: 6px;"
             "  background-color: #3d8bd4; color: #ffffff; font-weight: 600;"
             "}"
-            "QPushButton#save_config_pushButton:hover {"
+            "QPushButton#save_config_pushButton:hover, "
+            "QPushButton#save_cn_name_pushButton:hover {"
             "  border-color: #74b9ee; background-color: #4a9add;"
             "}"
-            "QPushButton#save_config_pushButton:pressed {"
+            "QPushButton#save_config_pushButton:pressed, "
+            "QPushButton#save_cn_name_pushButton:pressed {"
             "  border-color: #327bbb; background-color: #327bbb;"
             "}"
-            "QPushButton#save_config_pushButton:focus { outline: none; }"
-            "QPushButton#save_config_pushButton:disabled {"
+            "QPushButton#save_config_pushButton:focus, "
+            "QPushButton#save_cn_name_pushButton:focus { outline: none; }"
+            "QPushButton#save_config_pushButton:disabled, "
+            "QPushButton#save_cn_name_pushButton:disabled {"
             "  border-color: #444b56; background-color: #343a43; color: #737b87;"
             "}"
             "QListWidget { outline: none; }"

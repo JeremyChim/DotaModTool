@@ -214,11 +214,14 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
               </item>
               <item>
                <widget class="QPushButton" name="save_cn_name_pushButton">
+                <property name="toolTip">
+                 <string>校验并保存中文译名（Ctrl+Alt+S）</string>
+                </property>
                 <property name="text">
-                 <string>保存</string>
+                 <string>保存中文译名</string>
                 </property>
                 <property name="shortcut">
-                 <string>Ctrl+Shift+S</string>
+                 <string>Ctrl+Alt+S</string>
                 </property>
                </widget>
               </item>
