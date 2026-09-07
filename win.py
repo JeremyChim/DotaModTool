@@ -7,8 +7,8 @@ import shutil
 from datetime import datetime
 
 from PySide6.QtCore import QEvent, Qt
-from PySide6.QtGui import QColor, QFont, QTextCursor
-from PySide6.QtWidgets import QListWidget, QListWidgetItem
+from PySide6.QtGui import QColor, QFont, QPalette, QTextCursor
+from PySide6.QtWidgets import QListWidget, QListWidgetItem, QStyledItemDelegate
 
 from ui.ui import *
 
@@ -130,6 +130,16 @@ MOD6 = '''[TAB]"AbilityCharges"
 [TAB]}'''
 
 
+class PreserveForegroundDelegate(QStyledItemDelegate):
+    """让列表项在选中时继续使用自身的前景色。"""
+
+    def initStyleOption(self, option, index):
+        super().initStyleOption(option, index)
+        foreground = index.data(Qt.ForegroundRole)
+        if foreground is not None:
+            option.palette.setBrush(QPalette.HighlightedText, foreground)
+
+
 class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -210,8 +220,14 @@ class Win(QMainWindow, Ui_MainWindow):
         self.search_lineEdit.textChanged.connect(self.search)
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.heroFiles_listWidget.itemDoubleClicked.connect(self.copy_hero_filename)
+        self.heroFiles_listWidget.setItemDelegate(
+            PreserveForegroundDelegate(self.heroFiles_listWidget)
+        )
         self.heroFiles_listWidget.setToolTip("单击打开文件，双击复制文件名")
         self.enable_listWidget.itemDoubleClicked.connect(self.toggle_hero_file)
+        self.enable_listWidget.setItemDelegate(
+            PreserveForegroundDelegate(self.enable_listWidget)
+        )
         self.enable_listWidget.setSelectionMode(QListWidget.ExtendedSelection)
         self.enable_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.enable_listWidget.customContextMenuRequested.connect(
@@ -1378,7 +1394,7 @@ class Win(QMainWindow, Ui_MainWindow):
             "QListWidget#heroFiles_listWidget::item:selected, "
             "QListWidget#enable_listWidget::item:selected {"
             "  border-left: 2px solid #3d8bd4;"
-            "  background-color: #dfeaf5; color: #2563a6;"
+            "  background-color: #dfeaf5;"
             "}"
             "QPlainTextEdit {"
             "  padding: 10px; border: 1px solid #c8cdd5; border-radius: 6px;"
@@ -1409,7 +1425,7 @@ class Win(QMainWindow, Ui_MainWindow):
             "  border-color: #c8cdd5; background-color: #e5e8ec; color: #9aa2ad;"
             "}"
             "QListWidget { outline: none; }"
-            "QListWidget::item:selected {"
+            "QListWidget#content_listWidget::item:selected {"
             "  border: none; border-left: 2px solid #3d8bd4;"
             "  background-color: #dfeaf5; color: #2563a6;"
             "}"
@@ -1510,20 +1526,24 @@ class Win(QMainWindow, Ui_MainWindow):
             "QLineEdit#search_lineEdit:focus {"
             "  border: 1px solid #61afef; background-color: #2c313a;"
             "}"
-            "QListWidget#heroFiles_listWidget {"
+            "QListWidget#heroFiles_listWidget, "
+            "QListWidget#enable_listWidget {"
             "  padding: 4px; border: 1px solid #4b5263; border-radius: 6px;"
             "  background-color: #282c34; color: #d7dce2;"
             "}"
-            "QListWidget#heroFiles_listWidget::item {"
+            "QListWidget#heroFiles_listWidget::item, "
+            "QListWidget#enable_listWidget::item {"
             "  min-height: 22px; padding: 0 6px; margin: 1px 0;"
             "  border: none; border-radius: 4px;"
             "}"
-            "QListWidget#heroFiles_listWidget::item:hover:!selected {"
-            "  background-color: #333943; color: #b7e18b;"
+            "QListWidget#heroFiles_listWidget::item:hover:!selected, "
+            "QListWidget#enable_listWidget::item:hover:!selected {"
+            "  background-color: #333943;"
             "}"
-            "QListWidget#heroFiles_listWidget::item:selected {"
+            "QListWidget#heroFiles_listWidget::item:selected, "
+            "QListWidget#enable_listWidget::item:selected {"
             "  border-left: 2px solid #61afef;"
-            "  background-color: #3a414b; color: #b7e18b;"
+            "  background-color: #3a414b;"
             "}"
             "QPlainTextEdit#config_plainTextEdit, "
             "QPlainTextEdit#cn_name_plainTextEdit {"
@@ -1556,7 +1576,7 @@ class Win(QMainWindow, Ui_MainWindow):
             "  border-color: #444b56; background-color: #343a43; color: #737b87;"
             "}"
             "QListWidget { outline: none; }"
-            "QListWidget::item:selected {"
+            "QListWidget#content_listWidget::item:selected {"
             "  border: none; border-left: 2px solid #61afef;"
             "  background-color: #3a414b; color: #b7e18b;"
             "}"
