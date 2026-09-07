@@ -172,6 +172,8 @@ class Ui_MainWindow(object):
         self.reset_gi_action.setObjectName(u"reset_gi_action")
         self.open_gi_action = QAction(MainWindow)
         self.open_gi_action.setObjectName(u"open_gi_action")
+        self.open_pak01_dir_vpk_file_action = QAction(MainWindow)
+        self.open_pak01_dir_vpk_file_action.setObjectName(u"open_pak01_dir_vpk_file_action")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_5 = QHBoxLayout(self.centralwidget)
@@ -400,6 +402,8 @@ class Ui_MainWindow(object):
         self.menu_7.addAction(self.change_items_action)
         self.menu_7.addSeparator()
         self.menu_7.addAction(self.config_file_action)
+        self.menu_7.addAction(self.open_pak01_dir_vpk_file_action)
+        self.menu_7.addSeparator()
         self.menu_7.addAction(self.generate_vpk_action)
         self.menu_7.addAction(self.generate_vpk_and_move_action)
         self.menu_9.addAction(self.vscripts_dir_action)
@@ -663,6 +667,7 @@ class Ui_MainWindow(object):
         self.update_gi_action.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u65b0gi", None))
         self.reset_gi_action.setText(QCoreApplication.translate("MainWindow", u"\u91cd\u7f6egi", None))
         self.open_gi_action.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00gi", None))
+        self.open_pak01_dir_vpk_file_action.setText(QCoreApplication.translate("MainWindow", u"pak01_dir_vpk_file", None))
         self.search_lineEdit.setText("")
         self.search_lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22...", None))
 
@@ -717,9 +722,9 @@ class Ui_MainWindow(object):
         self.save_cn_name_pushButton.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+S", None))
 #endif // QT_CONFIG(shortcut)
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cn_name_tab), QCoreApplication.translate("MainWindow", u"\u4e2d\u6587\u8bd1\u540d", None))
-
+#if QT_CONFIG(tooltip)
         self.enable_listWidget.setToolTip(QCoreApplication.translate("MainWindow", u"\u53cc\u51fb\u5207\u6362\u542f\u7528\u72b6\u6001\uff1b\u53f3\u952e\u53ef\u542f\u7528\u3001\u7981\u7528\u6216\u5220\u9664\u6587\u4ef6", None))
-
+#endif // QT_CONFIG(tooltip)
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.enable_tab), QCoreApplication.translate("MainWindow", u"\u542f\u7528\u548c\u7981\u7528", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u7f16\u8f91", None))
