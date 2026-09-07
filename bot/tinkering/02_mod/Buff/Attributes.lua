@@ -10,11 +10,11 @@ function Attributes.UpdateAttr(bot, attr)
     if bot.__buff_attr_last_minute == nil then bot.__buff_attr_last_minute = -1 end
     if bot.__buff_attr_last_minute == minute then return end
     if minute < 1 or minute > 20 then return end
-    --if not bot:IsAlive() then attr = attr + 1 end
-    attr = attr + 1
+    --if not bot:IsAlive() then
     bot:ModifyStrength(attr)
     bot:ModifyAgility(attr)
     bot:ModifyIntellect(attr)
+    --end
     bot.__buff_attr_last_minute = minute
 end
 
