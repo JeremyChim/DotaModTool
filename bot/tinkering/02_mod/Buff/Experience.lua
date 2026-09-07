@@ -97,4 +97,7 @@ function XP.UpdateXPWhenDeath(bot, xp)
     bot.__buff_xp_rewarded_for_death = true
 end
 
+
+
+
 return XP

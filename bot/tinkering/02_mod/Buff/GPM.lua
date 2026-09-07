@@ -82,4 +82,7 @@ function GPM.UpdateGoldWhenDeath(bot, gold)
     bot.__buff_gold_rewarded_for_death = true
 end
 
+
+
+
 return GPM

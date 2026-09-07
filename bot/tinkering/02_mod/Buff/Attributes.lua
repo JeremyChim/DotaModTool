@@ -48,4 +48,7 @@ function Attributes.UpdateAttrWhenDeath(bot, attr, max)
     bot.__buff_attr_rewarded_for_death = true
 end
 
+
+
+
 return Attributes
