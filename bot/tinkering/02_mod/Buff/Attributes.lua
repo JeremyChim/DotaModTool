@@ -4,6 +4,9 @@ if Attributes == nil then
     Attributes = {}
 end
 
+
+
+
 -- 每分钟，加经验
 function Attributes.UpdateAttr(bot, attr)
     local gameTime = Helper.DotaTime()
@@ -18,6 +21,9 @@ function Attributes.UpdateAttr(bot, attr)
     --end
     bot.__buff_attr_last_minute = minute
 end
+
+
+
 
 -- 死亡时，一次性加属性
 function Attributes.UpdateAttrWhenDeath(bot, attr, max)
