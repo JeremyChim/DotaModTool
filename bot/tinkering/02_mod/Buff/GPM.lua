@@ -49,7 +49,8 @@ end
 function GPM.UpdateBotGold(bot, gold)
     local gameTime = Helper.DotaTime()
     local minute = math.floor(gameTime / 60)
-    if minute >= 20 then
+
+    if minute >= 25 then
         gold = gold * 2
     end
 
@@ -65,14 +66,10 @@ end
 
 -- 死亡时，一次性加金钱
 function GPM.UpdateGoldWhenDeath(bot, gold)
-    -- local gameTime = Helper.DotaTime()
-    -- local minute = math.floor(gameTime / 60)
-    -- if minute >= 10 then gold = gold * 2
-    -- elseif minute >= 20 then gold = gold * 3
-    -- elseif minute >= 30 then gold = gold * 4
-    -- end
+    local gameTime = Helper.DotaTime()
+    local minute = math.floor(gameTime / 60)
 
-    if minute >= 20 then
+    if minute >= 25 then
         gold = gold * 2
     end
 
