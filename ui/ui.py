@@ -178,7 +178,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.frame_3 = QFrame(self.centralwidget)
         self.frame_3.setObjectName(u"frame_3")
-        self.frame_3.setFrameShape(QFrame.NoFrame)
+        self.frame_3.setFrameShape(QFrame.Shape.NoFrame)
         self.horizontalLayout_4 = QHBoxLayout(self.frame_3)
         self.horizontalLayout_4.setSpacing(0)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
@@ -186,7 +186,7 @@ class Ui_MainWindow(object):
         self.sidebar_frame = QFrame(self.frame_3)
         self.sidebar_frame.setObjectName(u"sidebar_frame")
         self.sidebar_frame.setMaximumSize(QSize(255, 16777215))
-        self.sidebar_frame.setFrameShape(QFrame.NoFrame)
+        self.sidebar_frame.setFrameShape(QFrame.Shape.NoFrame)
         self.verticalLayout_2 = QVBoxLayout(self.sidebar_frame)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.search_lineEdit = QLineEdit(self.sidebar_frame)
@@ -205,7 +205,7 @@ class Ui_MainWindow(object):
 
         self.frame_2 = QFrame(self.frame_3)
         self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setFrameShape(QFrame.NoFrame)
+        self.frame_2.setFrameShape(QFrame.Shape.NoFrame)
         self.horizontalLayout_3 = QHBoxLayout(self.frame_2)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.view_tabWidget = QTabWidget(self.frame_2)
@@ -231,7 +231,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.text_tab.sizePolicy().hasHeightForWidth())
         self.text_tab.setSizePolicy(sizePolicy)
         self.text_tab.setMouseTracking(False)
-        self.text_tab.setContextMenuPolicy(Qt.NoContextMenu)
+        self.text_tab.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.horizontalLayout_2 = QHBoxLayout(self.text_tab)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.content_plainTextEdit = QPlainTextEdit(self.text_tab)
@@ -275,6 +275,16 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.save_config_pushButton)
 
         self.view_tabWidget.addTab(self.tab, "")
+        self.cn_name_tab = QWidget()
+        self.cn_name_tab.setObjectName(u"cn_name_tab")
+        self.horizontalLayout_8 = QHBoxLayout(self.cn_name_tab)
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.cn_name_plainTextEdit = QPlainTextEdit(self.cn_name_tab)
+        self.cn_name_plainTextEdit.setObjectName(u"cn_name_plainTextEdit")
+
+        self.horizontalLayout_8.addWidget(self.cn_name_plainTextEdit)
+
+        self.view_tabWidget.addTab(self.cn_name_tab, "")
 
         self.horizontalLayout_3.addWidget(self.view_tabWidget)
 
@@ -287,7 +297,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1600, 23))
+        self.menubar.setGeometry(QRect(0, 0, 1600, 33))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         self.menu_2 = QMenu(self.menubar)
@@ -300,7 +310,7 @@ class Ui_MainWindow(object):
         self.menu_5.setObjectName(u"menu_5")
         self.menu_6 = QMenu(self.menu_3)
         self.menu_6.setObjectName(u"menu_6")
-        self.menu_6.setGeometry(QRect(464, 176, 120, 200))
+        self.menu_6.setGeometry(QRect(464, 176, 121, 202))
         self.menu_7 = QMenu(self.menubar)
         self.menu_7.setObjectName(u"menu_7")
         self.menu_9 = QMenu(self.menu_7)
@@ -404,7 +414,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.view_tabWidget.setCurrentIndex(4)
+        self.view_tabWidget.setCurrentIndex(5)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -683,6 +693,146 @@ class Ui_MainWindow(object):
         self.save_config_pushButton.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+S", None))
 #endif // QT_CONFIG(shortcut)
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u6587\u4ef6", None))
+#if QT_CONFIG(tooltip)
+        self.cn_name_plainTextEdit.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.cn_name_plainTextEdit.setPlainText(QCoreApplication.translate("MainWindow", u"{\n"
+"    \"npc_dota_hero_abaddon\": \"\u4e9a\u5df4\u987f\",\n"
+"    \"npc_dota_hero_abyssal_underlord\": \"\u5b7d\u4e3b\",\n"
+"    \"npc_dota_hero_alchemist\": \"\u70bc\u91d1\u672f\u58eb\",\n"
+"    \"npc_dota_hero_ancient_apparition\": \"\u8fdc\u53e4\u51b0\u9b44\",\n"
+"    \"npc_dota_hero_antimage\": \"\u654c\u6cd5\u5e08\",\n"
+"    \"npc_dota_hero_arc_warden\": \"\u5929\u7a79\u5b88\u671b\u8005\",\n"
+"    \"npc_dota_hero_axe\": \"\u65a7\u738b\",\n"
+"    \"npc_dota_hero_bane\": \"\u7978\u4e71\u4e4b\u6e90\",\n"
+"    \"npc_dota_hero_batrider\": \"\u8759\u8760\u9a91\u58eb\",\n"
+"    \"npc_dota_hero_beastmaster\": \"\u517d\u738b\",\n"
+"    \"npc_dota_hero_bloodseeker\": \"\u8840\u9b54\",\n"
+"    \"npc_dota_hero_bounty_hunter\": \"\u8d4f\u91d1\u730e\u4eba\",\n"
+"    \"npc_dota_hero_brewmaster\": \"\u9152\u4ed9\",\n"
+"    \"npc_dota_hero_bristleback\": \"\u94a2\u80cc\u517d\",\n"
+"    \"npc_dota_hero_broodmother\": \"\u80b2\u6bcd\u8718\u86db\",\n"
+"    \"npc_dota_hero_centaur\": \"\u534a\u4eba\u9a6c\u6218\u884c\u8005\""
+                        ",\n"
+"    \"npc_dota_hero_chaos_knight\": \"\u6df7\u6c8c\u9a91\u58eb\",\n"
+"    \"npc_dota_hero_chen\": \"\u9648\",\n"
+"    \"npc_dota_hero_clinkz\": \"\u514b\u6797\u514b\u5179\",\n"
+"    \"npc_dota_hero_crystal_maiden\": \"\u6c34\u6676\u5ba4\u5973\",\n"
+"    \"npc_dota_hero_dark_seer\": \"\u9ed1\u6697\u8d24\u8005\",\n"
+"    \"npc_dota_hero_dark_willow\": \"\u90aa\u5f71\u82b3\u7075\",\n"
+"    \"npc_dota_hero_dawnbreaker\": \"\u7834\u6653\u8fb0\u661f\",\n"
+"    \"npc_dota_hero_dazzle\": \"\u6234\u6cfd\",\n"
+"    \"npc_dota_hero_death_prophet\": \"\u6b7b\u4ea1\u5148\u77e5\",\n"
+"    \"npc_dota_hero_disruptor\": \"\u5e72\u6270\u8005\",\n"
+"    \"npc_dota_hero_doom_bringer\": \"\u672b\u65e5\u4f7f\u8005\",\n"
+"    \"npc_dota_hero_dragon_knight\": \"\u9f99\u9a91\u58eb\",\n"
+"    \"npc_dota_hero_drow_ranger\": \"\u5353\u5c14\u6e38\u4fa0\",\n"
+"    \"npc_dota_hero_earth_spirit\": \"\u5927\u5730\u4e4b\u7075\",\n"
+"    \"npc_dota_hero_earthshaker\": \"\u64bc\u5730\u8005\",\n"
+"    \"npc_dota_hero_elder_titan\": \"\u4e0a"
+                        "\u53e4\u5de8\u795e\",\n"
+"    \"npc_dota_hero_ember_spirit\": \"\u7070\u70ec\u4e4b\u7075\",\n"
+"    \"npc_dota_hero_enchantress\": \"\u9b45\u60d1\u9b54\u5973\",\n"
+"    \"npc_dota_hero_enigma\": \"\u8c1c\u56e2\",\n"
+"    \"npc_dota_hero_faceless_void\": \"\u865a\u7a7a\u5047\u9762\",\n"
+"    \"npc_dota_hero_furion\": \"\u5148\u77e5\",\n"
+"    \"npc_dota_hero_grimstroke\": \"\u5929\u6daf\u58a8\u5ba2\",\n"
+"    \"npc_dota_hero_gyrocopter\": \"\u77ee\u4eba\u76f4\u5347\u673a\",\n"
+"    \"npc_dota_hero_hoodwink\": \"\u68ee\u6d77\u98de\u971e\",\n"
+"    \"npc_dota_hero_huskar\": \"\u54c8\u65af\u5361\",\n"
+"    \"npc_dota_hero_invoker\": \"\u7948\u6c42\u8005\",\n"
+"    \"npc_dota_hero_jakiro\": \"\u6770\u5947\u6d1b\",\n"
+"    \"npc_dota_hero_juggernaut\": \"\u4e3b\u5bb0\",\n"
+"    \"npc_dota_hero_keeper_of_the_light\": \"\u5149\u4e4b\u5b88\u536b\",\n"
+"    \"npc_dota_hero_kez\": \"\u51ef\",\n"
+"    \"npc_dota_hero_kunkka\": \"\u6606\u5361\",\n"
+"    \"npc_dota_hero_legion_commander\": \"\u519b\u56e2\u6307\u6325\u5b98\""
+                        ",\n"
+"    \"npc_dota_hero_leshrac\": \"\u62c9\u5e2d\u514b\",\n"
+"    \"npc_dota_hero_lich\": \"\u5deb\u5996\",\n"
+"    \"npc_dota_hero_life_stealer\": \"\u566c\u9b42\u9b3c\",\n"
+"    \"npc_dota_hero_lina\": \"\u8389\u5a1c\",\n"
+"    \"npc_dota_hero_lion\": \"\u83b1\u6069\",\n"
+"    \"npc_dota_hero_lone_druid\": \"\u5fb7\u9c81\u4f0a\",\n"
+"    \"npc_dota_hero_luna\": \"\u9732\u5a1c\",\n"
+"    \"npc_dota_hero_lycan\": \"\u72fc\u4eba\",\n"
+"    \"npc_dota_hero_magnataur\": \"\u9a6c\u683c\u7eb3\u65af\",\n"
+"    \"npc_dota_hero_marci\": \"\u9a6c\u897f\",\n"
+"    \"npc_dota_hero_mars\": \"\u9a6c\u5c14\u65af\",\n"
+"    \"npc_dota_hero_medusa\": \"\u7f8e\u675c\u838e\",\n"
+"    \"npc_dota_hero_meepo\": \"\u7c73\u6ce2\",\n"
+"    \"npc_dota_hero_mirana\": \"\u7c73\u62c9\u5a1c\",\n"
+"    \"npc_dota_hero_monkey_king\": \"\u9f50\u5929\u5927\u5723\",\n"
+"    \"npc_dota_hero_morphling\": \"\u53d8\u4f53\u7cbe\u7075\",\n"
+"    \"npc_dota_hero_muerta\": \"\u743c\u82f1\u78a7\u7075\",\n"
+"    \"npc_dota_hero_naga_siren\": \"\u5a1c"
+                        "\u8fe6\u6d77\u5996\",\n"
+"    \"npc_dota_hero_necrolyte\": \"\u761f\u75ab\u6cd5\u5e08\",\n"
+"    \"npc_dota_hero_nevermore\": \"\u5f71\u9b54\",\n"
+"    \"npc_dota_hero_night_stalker\": \"\u6697\u591c\u9b54\u738b\",\n"
+"    \"npc_dota_hero_nyx_assassin\": \"\u53f8\u591c\u523a\u5ba2\",\n"
+"    \"npc_dota_hero_obsidian_destroyer\": \"\u6b81\u5883\u795e\u8680\u8005\",\n"
+"    \"npc_dota_hero_ogre_magi\": \"\u98df\u4eba\u9b54\u9b54\u6cd5\u5e08\",\n"
+"    \"npc_dota_hero_omniknight\": \"\u5168\u80fd\u9a91\u58eb\",\n"
+"    \"npc_dota_hero_oracle\": \"\u795e\u8c15\u8005\",\n"
+"    \"npc_dota_hero_pangolier\": \"\u77f3\u9cde\u5251\u58eb\",\n"
+"    \"npc_dota_hero_phantom_assassin\": \"\u5e7b\u5f71\u523a\u5ba2\",\n"
+"    \"npc_dota_hero_phantom_lancer\": \"\u5e7b\u5f71\u957f\u77db\u624b\",\n"
+"    \"npc_dota_hero_phoenix\": \"\u51e4\u51f0\",\n"
+"    \"npc_dota_hero_primal_beast\": \"\u517d\",\n"
+"    \"npc_dota_hero_puck\": \"\u5e15\u514b\",\n"
+"    \"npc_dota_hero_pudge\": \"\u5e15\u5409\",\n"
+"    \"npc_dota_hero_pugn"
+                        "a\": \"\u5e15\u683c\u7eb3\",\n"
+"    \"npc_dota_hero_queenofpain\": \"\u75db\u82e6\u5973\u738b\",\n"
+"    \"npc_dota_hero_rattletrap\": \"\u53d1\u6761\u6280\u5e08\",\n"
+"    \"npc_dota_hero_razor\": \"\u5243\u5200\",\n"
+"    \"npc_dota_hero_riki\": \"\u529b\u4e38\",\n"
+"    \"npc_dota_hero_ringmaster\": \"\u767e\u620f\u5927\u738b\",\n"
+"    \"npc_dota_hero_rubick\": \"\u62c9\u6bd4\u514b\",\n"
+"    \"npc_dota_hero_sand_king\": \"\u6c99\u738b\",\n"
+"    \"npc_dota_hero_shadow_demon\": \"\u6697\u5f71\u6076\u9b54\",\n"
+"    \"npc_dota_hero_shadow_shaman\": \"\u6697\u5f71\u8428\u6ee1\",\n"
+"    \"npc_dota_hero_shredder\": \"\u4f10\u6728\u673a\",\n"
+"    \"npc_dota_hero_silencer\": \"\u6c89\u9ed8\u672f\u58eb\",\n"
+"    \"npc_dota_hero_skeleton_king\": \"\u51a5\u9b42\u5927\u5e1d\",\n"
+"    \"npc_dota_hero_skywrath_mage\": \"\u5929\u6012\u6cd5\u5e08\",\n"
+"    \"npc_dota_hero_slardar\": \"\u65af\u62c9\u8fbe\",\n"
+"    \"npc_dota_hero_slark\": \"\u65af\u62c9\u514b\",\n"
+"    \"npc_dota_hero_snapfire\": \"\u7535\u708e\u7edd"
+                        "\u624b\",\n"
+"    \"npc_dota_hero_sniper\": \"\u72d9\u51fb\u624b\",\n"
+"    \"npc_dota_hero_spectre\": \"\u5e7d\u9b3c\",\n"
+"    \"npc_dota_hero_spirit_breaker\": \"\u88c2\u9b42\u4eba\",\n"
+"    \"npc_dota_hero_storm_spirit\": \"\u98ce\u66b4\u4e4b\u7075\",\n"
+"    \"npc_dota_hero_sven\": \"\u65af\u6e29\",\n"
+"    \"npc_dota_hero_target_dummy\": \"\u76ee\u6807\u5047\u4eba\",\n"
+"    \"npc_dota_hero_techies\": \"\u5de5\u7a0b\u5e08\",\n"
+"    \"npc_dota_hero_templar_assassin\": \"\u5723\u5802\u523a\u5ba2\",\n"
+"    \"npc_dota_hero_terrorblade\": \"\u6050\u6016\u5229\u5203\",\n"
+"    \"npc_dota_hero_tidehunter\": \"\u6f6e\u6c50\u730e\u4eba\",\n"
+"    \"npc_dota_hero_tinker\": \"\u4fee\u8865\u5320\",\n"
+"    \"npc_dota_hero_tiny\": \"\u5c0f\u5c0f\",\n"
+"    \"npc_dota_hero_treant\": \"\u6811\u7cbe\u536b\u58eb\",\n"
+"    \"npc_dota_hero_troll_warlord\": \"\u5de8\u9b54\u6218\u5c06\",\n"
+"    \"npc_dota_hero_tusk\": \"\u5de8\u7259\u6d77\u6c11\",\n"
+"    \"npc_dota_hero_undying\": \"\u4e0d\u673d\u5c38\u738b\",\n"
+"    "
+                        "\"npc_dota_hero_ursa\": \"\u718a\u6218\u58eb\",\n"
+"    \"npc_dota_hero_vengefulspirit\": \"\u590d\u4ec7\u4e4b\u9b42\",\n"
+"    \"npc_dota_hero_venomancer\": \"\u5267\u6bd2\u672f\u58eb\",\n"
+"    \"npc_dota_hero_viper\": \"\u51a5\u754c\u4e9a\u9f99\",\n"
+"    \"npc_dota_hero_visage\": \"\u7ef4\u8428\u5409\",\n"
+"    \"npc_dota_hero_void_spirit\": \"\u865a\u65e0\u4e4b\u7075\",\n"
+"    \"npc_dota_hero_warlock\": \"\u672f\u58eb\",\n"
+"    \"npc_dota_hero_weaver\": \"\u7f16\u7ec7\u8005\",\n"
+"    \"npc_dota_hero_windrunner\": \"\u98ce\u884c\u8005\",\n"
+"    \"npc_dota_hero_winter_wyvern\": \"\u5bd2\u51ac\u98de\u9f99\",\n"
+"    \"npc_dota_hero_wisp\": \"\u827e\u6b27\",\n"
+"    \"npc_dota_hero_witch_doctor\": \"\u5deb\u533b\",\n"
+"    \"npc_dota_hero_zuus\": \"\u5b99\u65af\"\n"
+"}", None))
+        self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cn_name_tab), QCoreApplication.translate("MainWindow", u"\u4e2d\u6587\u8bd1\u540d", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u7f16\u8f91", None))
         self.menu_3.setTitle(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
