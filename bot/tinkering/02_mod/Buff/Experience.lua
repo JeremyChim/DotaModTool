@@ -65,7 +65,7 @@ function XP.UpdateXP(bot, xp)
     local gameTime = Helper.DotaTime()
     local minute = math.floor(gameTime / 60)
 
-    if minute >= 25 then
+    if minute >= 15 then
         xp = xp * 2
     end
 
@@ -84,7 +84,7 @@ function XP.UpdateXPWhenDeath(bot, xp)
     local gameTime = Helper.DotaTime()
     local minute = math.floor(gameTime / 60)
 
-    if minute >= 25 then
+    if minute >= 15 then
         xp = xp * 2
     end
 
