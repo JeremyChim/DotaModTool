@@ -940,27 +940,13 @@ class Win(QMainWindow, Ui_MainWindow):
         """展示英雄名、首个中文译名以及启用状态。"""
         self.heroFiles_listWidget.clear()
         for filename in files:
-            hero_key = os.path.splitext(filename)[0]
-            prefix = 'npc_dota_hero_'
-            hero_name = (
-                hero_key[len(prefix):]
-                if hero_key.startswith(prefix)
-                else hero_key
-            )
-            cn_names = str(self.cn_name.get(hero_key, '')).strip()
-            primary_cn_name = cn_names.split('，', 1)[0].strip()
-            display_name = (
-                f'{hero_name} | {primary_cn_name}'
-                if primary_cn_name
-                else hero_name
-            )
-
+            display_name, cn_names = self._hero_display_name(filename)
             item = QListWidgetItem(display_name)
             item.setData(Qt.UserRole, filename)
             enabled_path = os.path.join(HERO_DIR2, filename)
             disabled_path = f'{enabled_path}1'
             if os.path.isfile(enabled_path):
-                color = '#3f7018' if self.theme == 'light' else '#98c379'
+                color = '#08783f' if self.theme == 'light' else '#98c379'
                 status = '已启用'
             elif os.path.isfile(disabled_path):
                 color = '#b4232c' if self.theme == 'light' else '#e06c75'
@@ -974,6 +960,24 @@ class Win(QMainWindow, Ui_MainWindow):
                 tooltip += f'\n中文名：{cn_names}'
             item.setToolTip(tooltip)
             self.heroFiles_listWidget.addItem(item)
+
+    def _hero_display_name(self, filename):
+        """返回“英文名 | 首个中文名”的列表显示文本。"""
+        hero_key = os.path.splitext(filename)[0]
+        prefix = 'npc_dota_hero_'
+        hero_name = (
+            hero_key[len(prefix):]
+            if hero_key.startswith(prefix)
+            else hero_key
+        )
+        cn_names = str(self.cn_name.get(hero_key, '')).strip()
+        primary_cn_name = cn_names.split('，', 1)[0].strip()
+        display_name = (
+            f'{hero_name} | {primary_cn_name}'
+            if primary_cn_name
+            else hero_name
+        )
+        return display_name, cn_names
 
     def search(self, text):
         """按文件名或中文译名模糊搜索。"""
@@ -1019,23 +1023,34 @@ class Win(QMainWindow, Ui_MainWindow):
             key=str.casefold,
         )
         for filename in filenames:
-            item = QListWidgetItem(filename)
+            display_name, cn_names = self._hero_display_name(filename)
+            item = QListWidgetItem(display_name)
+            item.setData(Qt.UserRole, filename)
             if filename.endswith('.txt1'):
                 color = '#b4232c' if self.theme == 'light' else '#e06c75'
                 item.setForeground(QColor(color))
-                item.setToolTip('已禁用，双击启用')
+                status = '已禁用'
             else:
-                color = '#3f7018' if self.theme == 'light' else '#98c379'
+                color = '#08783f' if self.theme == 'light' else '#98c379'
                 item.setForeground(QColor(color))
-                item.setToolTip('已启用，双击禁用')
+                status = '已启用'
+            tooltip = f'{filename}\n状态：{status}'
+            if cn_names:
+                tooltip += f'\n中文名：{cn_names}'
+            item.setToolTip(tooltip)
             self.enable_listWidget.addItem(item)
+
+    def _enabled_filename_from_item(self, item):
+        """从启用列表项获取真实的 .txt 或 .txt1 文件名。"""
+        filename = item.data(Qt.UserRole)
+        return str(filename) if filename else item.text()
 
     def toggle_hero_file(self, item):
         """通过在 .txt 和 .txt1 之间重命名来切换英雄文件状态。"""
         if item is None:
             return
 
-        filename = item.text()
+        filename = self._enabled_filename_from_item(item)
         if filename.endswith('.txt1'):
             target_name = filename[:-1]
             action = '启用'
@@ -1071,7 +1086,7 @@ class Win(QMainWindow, Ui_MainWindow):
 
         deleted = 0
         for item in items:
-            filename = item.text()
+            filename = self._enabled_filename_from_item(item)
             if os.path.basename(filename) != filename or not (
                 filename.endswith('.txt') or filename.endswith('.txt1')
             ):
@@ -1102,7 +1117,7 @@ class Win(QMainWindow, Ui_MainWindow):
         action = '启用' if enabled else '禁用'
         changed = 0
         for item in items:
-            filename = item.text()
+            filename = self._enabled_filename_from_item(item)
             if enabled:
                 if not filename.endswith('.txt1'):
                     continue
@@ -1147,7 +1162,8 @@ class Win(QMainWindow, Ui_MainWindow):
         menu.addSeparator()
         delete_action = menu.addAction('删除')
         selected_names = [
-            item.text() for item in self.enable_listWidget.selectedItems()
+            self._enabled_filename_from_item(item)
+            for item in self.enable_listWidget.selectedItems()
         ]
         enable_action.setEnabled(any(name.endswith('.txt1') for name in selected_names))
         disable_action.setEnabled(any(name.endswith('.txt') for name in selected_names))
