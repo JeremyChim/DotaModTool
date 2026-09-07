@@ -1616,6 +1616,8 @@ class Win(QMainWindow, Ui_MainWindow):
             "}"
         )
         self.theme = 'light'
+        self.config['theme'] = 'light'
+        self._save_config()
         self._refresh_files()
         self.refresh_enable_list()
         self._print('设置主题为亮色', show_in_bar=False)
@@ -1757,6 +1759,8 @@ class Win(QMainWindow, Ui_MainWindow):
             "QAbstractScrollArea::corner { background: #20242a; }"
         )
         self.theme = 'dark'
+        self.config['theme'] = 'dark'
+        self._save_config()
         self._refresh_files()
         self.refresh_enable_list()
         self._print('设置主题为暗色', show_in_bar=False)
