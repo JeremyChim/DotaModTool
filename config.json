@@ -11,6 +11,12 @@
   "xp_gold_mul": 1.0,
   "units_enable": true,
   "units": [
+    "npc_dota_goodguys_tower4|StatusHealthRegen|150",
+    "npc_dota_badguys_tower4|StatusHealthRegen|150",
+    "npc_dota_goodguys_fort|StatusHealthRegen|300",
+    "npc_dota_badguys_fort|StatusHealthRegen|300"
+  ],
+  "units2": [
     "npc_dota_goodguys_tower3_top|StatusHealthRegen|100",
     "npc_dota_goodguys_tower3_mid|StatusHealthRegen|100",
     "npc_dota_goodguys_tower3_bot|StatusHealthRegen|100",
@@ -37,12 +43,13 @@
   "neutral_items": [
     "0:00",
     "5:00",
+    "10:00",
     "15:00",
-    "25:00",
-    "35:00",
-    "40:00"
+    "20:00",
+    "25:00"
   ],
-  "items": [
+  "items": [],
+  "items2": [
     "item_aghanims_shard|ItemInitialStockTime|690.0",
     "item_aghanims_shard|ItemInitialStockTimeTurbo|0.0"
   ],
