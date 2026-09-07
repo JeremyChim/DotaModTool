@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.11.2
+## Created by: Qt User Interface Compiler version 6.6.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -162,14 +162,17 @@ class Ui_MainWindow(object):
         self.vscripts_dir_action.setObjectName(u"vscripts_dir_action")
         self.config_file_action = QAction(MainWindow)
         self.config_file_action.setObjectName(u"config_file_action")
+        self.ues_tinkering_action = QAction(MainWindow)
+        self.ues_tinkering_action.setObjectName(u"ues_tinkering_action")
+        self.ues_open_hyper_ai_action = QAction(MainWindow)
+        self.ues_open_hyper_ai_action.setObjectName(u"ues_open_hyper_ai_action")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_5 = QHBoxLayout(self.centralwidget)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.frame_3 = QFrame(self.centralwidget)
         self.frame_3.setObjectName(u"frame_3")
-        self.frame_3.setFrameShape(QFrame.StyledPanel)
-        self.frame_3.setFrameShadow(QFrame.Raised)
+        self.frame_3.setFrameShape(QFrame.NoFrame)
         self.horizontalLayout_4 = QHBoxLayout(self.frame_3)
         self.horizontalLayout_4.setSpacing(0)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
@@ -177,8 +180,7 @@ class Ui_MainWindow(object):
         self.sidebar_frame = QFrame(self.frame_3)
         self.sidebar_frame.setObjectName(u"sidebar_frame")
         self.sidebar_frame.setMaximumSize(QSize(255, 16777215))
-        self.sidebar_frame.setFrameShape(QFrame.StyledPanel)
-        self.sidebar_frame.setFrameShadow(QFrame.Raised)
+        self.sidebar_frame.setFrameShape(QFrame.NoFrame)
         self.verticalLayout_2 = QVBoxLayout(self.sidebar_frame)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.search_lineEdit = QLineEdit(self.sidebar_frame)
@@ -197,8 +199,7 @@ class Ui_MainWindow(object):
 
         self.frame_2 = QFrame(self.frame_3)
         self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setFrameShape(QFrame.StyledPanel)
-        self.frame_2.setFrameShadow(QFrame.Raised)
+        self.frame_2.setFrameShape(QFrame.NoFrame)
         self.horizontalLayout_3 = QHBoxLayout(self.frame_2)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.view_tabWidget = QTabWidget(self.frame_2)
@@ -224,7 +225,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.text_tab.sizePolicy().hasHeightForWidth())
         self.text_tab.setSizePolicy(sizePolicy)
         self.text_tab.setMouseTracking(False)
-        self.text_tab.setContextMenuPolicy(Qt.DefaultContextMenu)
+        self.text_tab.setContextMenuPolicy(Qt.NoContextMenu)
         self.horizontalLayout_2 = QHBoxLayout(self.text_tab)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.content_plainTextEdit = QPlainTextEdit(self.text_tab)
@@ -280,7 +281,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1600, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1600, 23))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         self.menu_2 = QMenu(self.menubar)
@@ -293,7 +294,7 @@ class Ui_MainWindow(object):
         self.menu_5.setObjectName(u"menu_5")
         self.menu_6 = QMenu(self.menu_3)
         self.menu_6.setObjectName(u"menu_6")
-        self.menu_6.setGeometry(QRect(464, 176, 125, 200))
+        self.menu_6.setGeometry(QRect(464, 176, 120, 200))
         self.menu_7 = QMenu(self.menubar)
         self.menu_7.setObjectName(u"menu_7")
         self.menu_9 = QMenu(self.menu_7)
@@ -356,13 +357,16 @@ class Ui_MainWindow(object):
         self.menu_7.addAction(self.game_dir_action)
         self.menu_7.addAction(self.menu_9.menuAction())
         self.menu_7.addSeparator()
+        self.menu_7.addAction(self.ues_tinkering_action)
+        self.menu_7.addAction(self.ues_open_hyper_ai_action)
+        self.menu_7.addSeparator()
         self.menu_7.addAction(self.change_units_action)
         self.menu_7.addAction(self.change_neutral_items_action)
         self.menu_7.addAction(self.change_items_action)
         self.menu_7.addSeparator()
+        self.menu_7.addAction(self.config_file_action)
         self.menu_7.addAction(self.generate_vpk_action)
         self.menu_7.addAction(self.generate_vpk_and_move_action)
-        self.menu_7.addAction(self.config_file_action)
         self.menu_9.addAction(self.vscripts_dir_action)
         self.menu_9.addAction(self.tinkering_dir_action)
         self.menu_9.addAction(self.open_hyper_ai_dir_action)
@@ -619,20 +623,22 @@ class Ui_MainWindow(object):
         self.open_hyper_ai_dir_action.setText(QCoreApplication.translate("MainWindow", u"open_hyper_ai", None))
         self.vscripts_dir_action.setText(QCoreApplication.translate("MainWindow", u"vscripts", None))
         self.config_file_action.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u914d\u7f6e", None))
+        self.ues_tinkering_action.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528\uff1atinkering", None))
+        self.ues_open_hyper_ai_action.setText(QCoreApplication.translate("MainWindow", u"\u4f7f\u7528\uff1aopen_hyper_ai", None))
         self.search_lineEdit.setText("")
         self.search_lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"\u641c\u7d22...", None))
 
         __sortingEnabled = self.heroFiles_listWidget.isSortingEnabled()
         self.heroFiles_listWidget.setSortingEnabled(False)
         ___qlistwidgetitem = self.heroFiles_listWidget.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"\u672a\u627e\u5230\u6587\u4ef6\u5217\u8868...", None))
+        ___qlistwidgetitem.setText(QCoreApplication.translate("MainWindow", u"\u672a\u627e\u5230\u6587\u4ef6\u5217\u8868...", None));
         self.heroFiles_listWidget.setSortingEnabled(__sortingEnabled)
 
 
         __sortingEnabled1 = self.content_listWidget.isSortingEnabled()
         self.content_listWidget.setSortingEnabled(False)
         ___qlistwidgetitem1 = self.content_listWidget.item(0)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"\u672a\u52a0\u8f7d\u6587\u4ef6...", None))
+        ___qlistwidgetitem1.setText(QCoreApplication.translate("MainWindow", u"\u672a\u52a0\u8f7d\u6587\u4ef6...", None));
         self.content_listWidget.setSortingEnabled(__sortingEnabled1)
 
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.line_tab), QCoreApplication.translate("MainWindow", u"\u884c\u89c6\u56fe", None))
@@ -660,6 +666,9 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.config_plainTextEdit.setPlainText("")
         self.save_config_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
+#if QT_CONFIG(shortcut)
+        self.save_config_pushButton.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+S", None))
+#endif // QT_CONFIG(shortcut)
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.tab), QCoreApplication.translate("MainWindow", u"\u914d\u7f6e\u6587\u4ef6", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u7f16\u8f91", None))

@@ -55,6 +55,14 @@ NEURAL_FILE2 = os.path.join(NPC_DIR2, "neutral_items.txt")
 UNIT_FILE = os.path.join(NPC_DIR, "npc_units.txt")
 UNIT_FILE2 = os.path.join(NPC_DIR2, "npc_units.txt")
 
+BOT_DIR = os.path.join(ROOT_DIR, "bot")
+
+OPEN_HYPER_AI_SRC_DIR = os.path.join(BOT_DIR, "open_hyper_ai", "01_src")
+OPEN_HYPER_AI_MOD_DIR = os.path.join(BOT_DIR, "open_hyper_ai", "02_mod")
+
+TINKERING_SRC_DIR = os.path.join(BOT_DIR, "tinkering", "01_src")
+TINKERING_MOD_DIR = os.path.join(BOT_DIR, "tinkering", "02_mod")
+
 MOD1 = '''[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"
 [TAB]"special_bonus_shard"\t\t"[SA_VALUE]"
 [TAB]"special_bonus_scepter"\t\t"[SP_VALUE]"'''
@@ -253,6 +261,8 @@ class Win(QMainWindow, Ui_MainWindow):
         self.open_hyper_ai_dir_action.triggered.connect(self.go_to_open_hyper_ai_dir)
         self.config_file_action.triggered.connect(self.config_file)
         self.save_config_pushButton.clicked.connect(self.save_config)
+        self.ues_open_hyper_ai_action.triggered.connect(self.ues_open_hyper_ai)
+        self.ues_tinkering_action.triggered.connect(self.ues_tinkering)
 
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -275,7 +285,6 @@ class Win(QMainWindow, Ui_MainWindow):
         self.shortcut_ctrl_8_action.setText(self.config.get("shortcut_ctrl_8_action", ""))
         self.shortcut_ctrl_9_action.setText(self.config.get("shortcut_ctrl_9_action", ""))
         self.shortcut_ctrl_0_action.setText(self.config.get("shortcut_ctrl_0_action", ""))
-        
 
         # 启动项
         self.show_content_when_start()
@@ -287,6 +296,14 @@ class Win(QMainWindow, Ui_MainWindow):
         self.read_config_when_start()
         self.focus_content_list_when_start()
 
+    def ues_tinkering(self):
+        """分别复制 tinkering 的 01_src 和 02_mod"""
+        # TODO: 如果 vscripts_dir 里有 bots 文件夹，给它重命名一下，然后先复制 01_src 里面的东西到 bots，再复制 02_mod 的 东西覆盖一下 
+
+    def ues_open_hyper_ai(self):
+        """分别复制 open_hyper_ai 的 01_src 和 02_mod"""
+        # TODO: 如果 vscripts_dir 里有 bots 文件夹，给它重命名一下，然后先复制 01_src 里面的东西到 bots，再复制 02_mod 的 东西覆盖一下
+
     def focus_content_list_when_start(self):
         """启动时，切换到行视图并聚焦内容列表"""
         self.view_tabWidget.setCurrentWidget(self.line_tab)
@@ -296,7 +313,7 @@ class Win(QMainWindow, Ui_MainWindow):
         """打开配置文件"""
         try:
             if not os.path.exists(CONFIG_FILE):
-                self._print(f'未找到 CONFIG_FILE 目录:{self.CONFIG_FILE}')
+                self._print(f'未找到 CONFIG_FILE 目录:{CONFIG_FILE}')
                 return   
             if os.path.exists(NPP_PATH):
                 subprocess.run([NPP_PATH, CONFIG_FILE])
@@ -405,7 +422,7 @@ class Win(QMainWindow, Ui_MainWindow):
         except Exception as e:
             self._print(f'修改单位数据 | 异常：{e}')
 
-    def _change_gold_and_xp(self, texts: list[str], mul_value):
+    def _change_gold_and_xp(self, texts, mul_value):
         """修改单位数据：金币和经验"""
         texts2 = []
         self._print(f'修改单位数据 | 金币和经验 | mul_value = {mul_value} ', show_in_bar=False)
