@@ -228,33 +228,33 @@ function Buff:Init()
 
             -- Gold and Experience For Player
             local me = PlayerResource:GetPlayer(0):GetAssignedHero()
-            GPM.UpdateBotGold(me, 3)
-            XP.UpdateXP(me, 3)
-            GPM.UpdateGoldWhenDeath(me, 1000)
-            XP.UpdateXPWhenDeath(me, 1000)
-            Attributes.UpdateAttrWhenDeath(me, 20, 20)
+            GPM.UpdateBotGold(me, 2)
+            XP.UpdateXP(me, 2)
+            GPM.UpdateGoldWhenDeath(me, 500)
+            XP.UpdateXPWhenDeath(me, 500)
+            --Attributes.UpdateAttrWhenDeath(me, 20, 20)
 
             -- Gold and Experience
             for _, h in pairs(TeamRadiant) do
                 -- if bBuffFlags.gpm.radiant then
                 --     GPM.UpdateBotGold(h, TeamRadiant)
                 -- end
-                GPM.UpdateBotGold(h, 3)
-				XP.UpdateXP(h, 3)
-                GPM.UpdateGoldWhenDeath(h, 1000)
-                XP.UpdateXPWhenDeath(h, 1000)
-                Attributes.UpdateAttrWhenDeath(h, 20, 20)
+                GPM.UpdateBotGold(h, 2)
+				XP.UpdateXP(h, 2)
+                GPM.UpdateGoldWhenDeath(h, 500)
+                XP.UpdateXPWhenDeath(h, 500)
+                --Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 
             for _, h in pairs(TeamDire) do
                 -- if bBuffFlags.gpm.dire then
                 --     GPM.UpdateBotGold(h, TeamDire)
                 -- end
-                GPM.UpdateBotGold(h, 6)
-				XP.UpdateXP(h, 6)
-                GPM.UpdateGoldWhenDeath(h, 2000)
-                XP.UpdateXPWhenDeath(h, 2000)
-                Attributes.UpdateAttrWhenDeath(h, 20, 20)
+                GPM.UpdateBotGold(h, 4)
+				XP.UpdateXP(h, 4)
+                GPM.UpdateGoldWhenDeath(h, 500)
+                XP.UpdateXPWhenDeath(h, 500)
+                --Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 
             -- if not Helper.IsTurboMode() then
