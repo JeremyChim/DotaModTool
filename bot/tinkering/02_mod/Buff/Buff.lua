@@ -228,10 +228,10 @@ function Buff:Init()
 
             -- Gold and Experience For Player
             local me = PlayerResource:GetPlayer(0):GetAssignedHero()
-            GPM.UpdateBotGold(me, 2)
-            XP.UpdateXP(me, 2)
-            GPM.UpdateGoldWhenDeath(me, 500)
-            XP.UpdateXPWhenDeath(me, 500)
+            GPM.UpdateBotGold(me, 5)
+            XP.UpdateXP(me, 5)
+            -- GPM.UpdateGoldWhenDeath(me, 500)
+            -- XP.UpdateXPWhenDeath(me, 500)
             --Attributes.UpdateAttrWhenDeath(me, 20, 20)
 
             -- Gold and Experience
@@ -239,10 +239,10 @@ function Buff:Init()
                 -- if bBuffFlags.gpm.radiant then
                 --     GPM.UpdateBotGold(h, TeamRadiant)
                 -- end
-                GPM.UpdateBotGold(h, 2)
-				XP.UpdateXP(h, 2)
-                GPM.UpdateGoldWhenDeath(h, 500)
-                XP.UpdateXPWhenDeath(h, 500)
+                GPM.UpdateBotGold(h, 5)
+				XP.UpdateXP(h, 5)
+                -- GPM.UpdateGoldWhenDeath(h, 500)
+                -- XP.UpdateXPWhenDeath(h, 500)
                 --Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 
@@ -250,10 +250,10 @@ function Buff:Init()
                 -- if bBuffFlags.gpm.dire then
                 --     GPM.UpdateBotGold(h, TeamDire)
                 -- end
-                GPM.UpdateBotGold(h, 3)
-				XP.UpdateXP(h, 3)
-                GPM.UpdateGoldWhenDeath(h, 750)
-                XP.UpdateXPWhenDeath(h, 750)
+                GPM.UpdateBotGold(h, 10)
+				XP.UpdateXP(h, 10)
+                -- GPM.UpdateGoldWhenDeath(h, 750)
+                -- XP.UpdateXPWhenDeath(h, 750)
                 --Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 
