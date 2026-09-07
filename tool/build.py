@@ -21,7 +21,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ENTRY_POINT = PROJECT_ROOT / "win.py"
 RELEASE_DIR = PROJECT_ROOT / "release"
 RESOURCE_DIRS = ("bot", "npc", "gi", "vpk")
-RESOURCE_FILES = ("config.json",)
+RESOURCE_FILES = ("config.json", "name.json")
 DEFAULT_NAME = "DotaModTool"
 REPLACE_RETRIES = 10
 
