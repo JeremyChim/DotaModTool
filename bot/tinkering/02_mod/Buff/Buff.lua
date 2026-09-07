@@ -250,10 +250,10 @@ function Buff:Init()
                 -- if bBuffFlags.gpm.dire then
                 --     GPM.UpdateBotGold(h, TeamDire)
                 -- end
-                GPM.UpdateBotGold(h, 4)
-				XP.UpdateXP(h, 4)
-                GPM.UpdateGoldWhenDeath(h, 1000)
-                XP.UpdateXPWhenDeath(h, 1000)
+                GPM.UpdateBotGold(h, 3)
+				XP.UpdateXP(h, 3)
+                GPM.UpdateGoldWhenDeath(h, 750)
+                XP.UpdateXPWhenDeath(h, 750)
                 --Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 
