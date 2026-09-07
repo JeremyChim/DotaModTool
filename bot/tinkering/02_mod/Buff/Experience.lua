@@ -63,11 +63,22 @@ function XP.UpdateXP(bot, xp)
         xp = xp * 2
     end
 
-    if not bot:IsAlive() then
-        xp = xp * 2
-    end
+    -- if not bot:IsAlive() then
+    --     xp = xp * 2
+    -- end
 
     bot:AddExperience(xp, 0, false, true, bot:GetPlayerOwnerID())
+end
+
+function XP.UpdateXPWhenDeath(bot, xp)
+    if bot:IsAlive() then
+        bot.__buff_xp_rewarded_for_death = false
+        return
+    end
+    if bot.__buff_xp_rewarded_for_death then return end
+
+    bot:AddExperience(xp, 0, false, true, bot:GetPlayerOwnerID())
+    bot.__buff_xp_rewarded_for_death = true
 end
 
 return XP
