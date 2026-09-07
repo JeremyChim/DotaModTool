@@ -225,16 +225,10 @@ class Win(QMainWindow, Ui_MainWindow):
         self.search_lineEdit.textChanged.connect(self.search)
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.heroFiles_listWidget.itemDoubleClicked.connect(self.copy_hero_filename)
-        self.heroFiles_listWidget.setItemDelegate(
-            PreserveForegroundDelegate(self.heroFiles_listWidget)
-        )
+        self.heroFiles_listWidget.setItemDelegate(PreserveForegroundDelegate(self.heroFiles_listWidget))
         self.heroFiles_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.heroFiles_listWidget.customContextMenuRequested.connect(
-            self.show_hero_files_context_menu
-        )
-        self.heroFiles_listWidget.setToolTip(
-            "单击打开，双击复制文件名；右键可启用、禁用或重置"
-        )
+        self.heroFiles_listWidget.customContextMenuRequested.connect(self.show_hero_files_context_menu)
+        self.heroFiles_listWidget.setToolTip("单击打开，双击复制文件名；右键可启用、禁用或重置")
         self.enable_listWidget.itemDoubleClicked.connect(self.toggle_hero_file)
         self.enable_listWidget.setItemDelegate(PreserveForegroundDelegate(self.enable_listWidget))
         self.enable_listWidget.setSelectionMode(QListWidget.ExtendedSelection)
@@ -406,9 +400,7 @@ class Win(QMainWindow, Ui_MainWindow):
                 fh.write("\n")
 
             self.cn_name = cn_name
-            self.cn_name_plainTextEdit.setPlainText(
-                json.dumps(self.cn_name, ensure_ascii=False, indent=2)
-            )
+            self.cn_name_plainTextEdit.setPlainText(json.dumps(self.cn_name, ensure_ascii=False, indent=2))
             self.save_cn_name_pushButton.setEnabled(False)
             self._refresh_files()
             self._print(f'保存中文译名：{NAME_FILE}')
@@ -481,10 +473,7 @@ class Win(QMainWindow, Ui_MainWindow):
             backup_dir = None
             if os.path.lexists(self.bots_dir):
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
-                backup_dir = os.path.join(
-                    self.vscripts_dir,
-                    f'bots_backup_{timestamp}',
-                )
+                backup_dir = os.path.join(self.vscripts_dir, f'bots_backup_{timestamp}')
                 os.rename(self.bots_dir, backup_dir)
                 self._print(f'备份原 bots 目录：{backup_dir}', show_in_bar=False)
 
@@ -1081,9 +1070,7 @@ class Win(QMainWindow, Ui_MainWindow):
         if reset_files:
             if self.current_file in reset_files:
                 self.reload_file()
-            self._print(
-                f'已重置英雄文件：{len(reset_files)} 个，删除文件：{deleted} 个'
-            )
+            self._print(f'已重置英雄文件：{len(reset_files)} 个，删除文件：{deleted} 个')
 
     def show_hero_files_context_menu(self, position):
         """显示文件列表的启用、禁用和重置菜单。"""
@@ -1095,10 +1082,7 @@ class Win(QMainWindow, Ui_MainWindow):
             clicked_item.setSelected(True)
             self.heroFiles_listWidget.setCurrentItem(clicked_item)
 
-        filenames = [
-            self._hero_filename_from_item(item)
-            for item in self.heroFiles_listWidget.selectedItems()
-        ]
+        filenames = [self._hero_filename_from_item(item) for item in self.heroFiles_listWidget.selectedItems()]
         enabled_paths = [os.path.join(HERO_DIR2, name) for name in filenames]
         disabled_paths = [f'{path}1' for path in enabled_paths]
 
@@ -1115,13 +1099,9 @@ class Win(QMainWindow, Ui_MainWindow):
             os.path.isfile(enabled_path) and not os.path.exists(disabled_path)
             for enabled_path, disabled_path in zip(enabled_paths, disabled_paths)
         ))
-        reset_action.setEnabled(
-            any(os.path.isfile(path) for path in enabled_paths + disabled_paths)
-        )
+        reset_action.setEnabled(any(os.path.isfile(path) for path in enabled_paths + disabled_paths))
 
-        selected_action = menu.exec(
-            self.heroFiles_listWidget.viewport().mapToGlobal(position)
-        )
+        selected_action = menu.exec(self.heroFiles_listWidget.viewport().mapToGlobal(position))
         if selected_action is enable_action:
             self.set_selected_file_enabled(True)
         elif selected_action is disable_action:
@@ -1283,15 +1263,10 @@ class Win(QMainWindow, Ui_MainWindow):
         disable_action = menu.addAction('禁用')
         menu.addSeparator()
         delete_action = menu.addAction('删除')
-        selected_names = [
-            self._enabled_filename_from_item(item)
-            for item in self.enable_listWidget.selectedItems()
-        ]
+        selected_names = [self._enabled_filename_from_item(item) for item in self.enable_listWidget.selectedItems()]
         enable_action.setEnabled(any(name.endswith('.txt1') for name in selected_names))
         disable_action.setEnabled(any(name.endswith('.txt') for name in selected_names))
-        selected_action = menu.exec(
-            self.enable_listWidget.viewport().mapToGlobal(position)
-        )
+        selected_action = menu.exec(self.enable_listWidget.viewport().mapToGlobal(position))
         if selected_action is enable_action:
             self.set_selected_hero_files_enabled(True)
         elif selected_action is disable_action:
@@ -1943,9 +1918,7 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def _refresh_config_editor(self):
         """用内存中的配置刷新配置编辑器。"""
-        self.config_plainTextEdit.setPlainText(
-            json.dumps(self.config, ensure_ascii=False, indent=2)
-        )
+        self.config_plainTextEdit.setPlainText(json.dumps(self.config, ensure_ascii=False, indent=2))
 
     def _print(self, msg = '', show_in_bar = True):
         """内部打印和状态栏打印"""
