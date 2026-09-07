@@ -718,7 +718,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(shortcut)
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cn_name_tab), QCoreApplication.translate("MainWindow", u"\u4e2d\u6587\u8bd1\u540d", None))
 
-        self.enable_listWidget.setToolTip(QCoreApplication.translate("MainWindow", u"\u53cc\u51fb\u5207\u6362\u542f\u7528\u72b6\u6001\uff1b\u9009\u4e2d\u6587\u4ef6\u540e\u6309 Delete \u5220\u9664", None))
+        self.enable_listWidget.setToolTip(QCoreApplication.translate("MainWindow", u"\u53cc\u51fb\u5207\u6362\u542f\u7528\u72b6\u6001\uff1b\u53f3\u952e\u53ef\u542f\u7528\u3001\u7981\u7528\u6216\u5220\u9664\u6587\u4ef6", None))
 
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.enable_tab), QCoreApplication.translate("MainWindow", u"\u542f\u7528\u548c\u7981\u7528", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))

@@ -213,9 +213,12 @@ class Win(QMainWindow, Ui_MainWindow):
         self.heroFiles_listWidget.setToolTip("单击打开文件，双击复制文件名")
         self.enable_listWidget.itemDoubleClicked.connect(self.toggle_hero_file)
         self.enable_listWidget.setSelectionMode(QListWidget.ExtendedSelection)
-        self.enable_listWidget.installEventFilter(self)
+        self.enable_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.enable_listWidget.customContextMenuRequested.connect(
+            self.show_enable_context_menu
+        )
         self.enable_listWidget.setToolTip(
-            "双击切换启用状态；选中文件后按 Delete 删除"
+            "双击切换启用状态；右键可启用、禁用或删除文件"
         )
         self.content_listWidget.itemClicked.connect(self._remember_row) # 记忆行号
         self.save_file_line_action.triggered.connect(self.save_file_line)
@@ -1035,6 +1038,74 @@ class Win(QMainWindow, Ui_MainWindow):
         if deleted:
             self._print(f'已删除英雄文件：{deleted} 个')
 
+    def set_selected_hero_files_enabled(self, enabled):
+        """批量启用或禁用列表中选中的英雄文件。"""
+        items = self.enable_listWidget.selectedItems()
+        if not items:
+            return
+
+        action = '启用' if enabled else '禁用'
+        changed = 0
+        for item in items:
+            filename = item.text()
+            if enabled:
+                if not filename.endswith('.txt1'):
+                    continue
+                target_name = filename[:-1]
+            else:
+                if not filename.endswith('.txt'):
+                    continue
+                target_name = f'{filename}1'
+
+            source = os.path.join(HERO_DIR2, filename)
+            target = os.path.join(HERO_DIR2, target_name)
+            try:
+                if not os.path.isfile(source):
+                    self._print(f'{action}失败，文件不存在：{source}')
+                    continue
+                if os.path.exists(target):
+                    self._print(f'{action}失败，目标文件已存在：{target}')
+                    continue
+                os.rename(source, target)
+                changed += 1
+            except OSError as e:
+                self._print(f'{action}英雄文件失败：{e}')
+
+        self.refresh_enable_list()
+        self._refresh_files()
+        if changed:
+            self._print(f'已{action}英雄文件：{changed} 个')
+
+    def show_enable_context_menu(self, position):
+        """显示启用和禁用列表的右键菜单。"""
+        clicked_item = self.enable_listWidget.itemAt(position)
+        if clicked_item is None:
+            return
+        if not clicked_item.isSelected():
+            self.enable_listWidget.clearSelection()
+            clicked_item.setSelected(True)
+            self.enable_listWidget.setCurrentItem(clicked_item)
+
+        menu = QMenu(self)
+        enable_action = menu.addAction('启用')
+        disable_action = menu.addAction('禁用')
+        menu.addSeparator()
+        delete_action = menu.addAction('删除')
+        selected_names = [
+            item.text() for item in self.enable_listWidget.selectedItems()
+        ]
+        enable_action.setEnabled(any(name.endswith('.txt1') for name in selected_names))
+        disable_action.setEnabled(any(name.endswith('.txt') for name in selected_names))
+        selected_action = menu.exec(
+            self.enable_listWidget.viewport().mapToGlobal(position)
+        )
+        if selected_action is enable_action:
+            self.set_selected_hero_files_enabled(True)
+        elif selected_action is disable_action:
+            self.set_selected_hero_files_enabled(False)
+        elif selected_action is delete_action:
+            self.delete_enabled_hero_files()
+
     def open_file(self):
         """打开文件"""
         try:
@@ -1589,11 +1660,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.content_listWidget.scrollToItem(item, QListWidget.PositionAtCenter)
 
     def eventFilter(self, obj, event):
-        """处理文本缩进和英雄启用列表的 Delete 键。"""
-        if obj is self.enable_listWidget and event.type() == QEvent.Type.KeyPress:
-            if event.key() == Qt.Key_Delete:
-                self.delete_enabled_hero_files()
-                return True
+        """处理 content_plainTextEdit 的 TAB/Shift+TAB 缩进。"""
         if obj is self.content_plainTextEdit and event.type() == QEvent.Type.KeyPress:
             if event.key() in (Qt.Key_Tab, Qt.Key_Backtab):
                 self._indent_selection(event.modifiers() & Qt.ShiftModifier)
