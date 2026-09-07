@@ -893,7 +893,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
   </action>
   <action name="config_file_action">
    <property name="text">
-    <string>打开配置</string>
+    <string>打开config.json</string>
    </property>
   </action>
   <action name="ues_tinkering_action">
@@ -923,7 +923,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
   </action>
   <action name="open_pak01_dir_vpk_file_action">
    <property name="text">
-    <string>pak01_dir_vpk_file</string>
+    <string>打开pak01_dir.vpk </string>
    </property>
   </action>
  </widget>

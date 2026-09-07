@@ -354,8 +354,15 @@ class Win(QMainWindow, Ui_MainWindow):
         self.refresh_enable_list()
 
     def open_pak01_dir_vpk_file(self):
-        """打开self.pak01_dir.vpk"""
-        # TODO
+        """使用系统关联的程序打开游戏目录中的 pak01_dir.vpk。"""
+        try:
+            if not os.path.isfile(self.pak01_dir_vpk_file):
+                self._print(f'未找到 pak01_dir.vpk：{self.pak01_dir_vpk_file}')
+                return
+            os.startfile(self.pak01_dir_vpk_file)
+            self._print(f'打开 pak01_dir.vpk：{self.pak01_dir_vpk_file}')
+        except OSError as e:
+            self._print(f'打开 pak01_dir.vpk 失败，请确认已安装并关联 GCFScape：{e}')
 
     def load_cn_name_when_start(self):
         """加载 name.json 到 cn_name_plainTextEdit"""
