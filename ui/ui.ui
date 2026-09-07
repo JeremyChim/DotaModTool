@@ -232,7 +232,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
               <item>
                <widget class="QListWidget" name="enable_listWidget">
                 <property name="toolTip">
-                 <string>双击切换启用状态；选中文件后按 Delete 删除</string>
+                 <string>双击切换启用状态；右键可启用、禁用或删除文件</string>
                 </property>
                </widget>
               </item>
