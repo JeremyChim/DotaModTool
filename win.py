@@ -63,6 +63,11 @@ OPEN_HYPER_AI_MOD_DIR = os.path.join(BOT_DIR, "open_hyper_ai", "02_mod")
 TINKERING_SRC_DIR = os.path.join(BOT_DIR, "tinkering", "01_src")
 TINKERING_MOD_DIR = os.path.join(BOT_DIR, "tinkering", "02_mod")
 
+GI_DIR = os.path.join(ROOT_DIR, "gi")
+
+GI_SRC_FILE = os.path.join(GI_DIR, "01_src", "gameinfo_branchspecific.gi")
+GI_MOD_FILE = os.path.join(GI_DIR, "02_mod", "gameinfo_branchspecific.gi")
+
 MOD1 = '''[TAB]"[AB_NAME]"\t\t"[AB_VALUE]"
 [TAB]"special_bonus_shard"\t\t"[SA_VALUE]"
 [TAB]"special_bonus_scepter"\t\t"[SP_VALUE]"'''
@@ -152,6 +157,11 @@ class Win(QMainWindow, Ui_MainWindow):
     def game_dir(self):
         """游戏路径"""
         return os.path.join(self.dota2_dir, "game")
+
+    @property
+    def gi_file(self):
+        """gameinfo_branchspecific.gi文件路径"""
+        return os.path.join(self.game_dir, "dota", "gameinfo_branchspecific.gi")
     
     @property
     def mod_dir(self):
@@ -167,6 +177,11 @@ class Win(QMainWindow, Ui_MainWindow):
     def vscripts_dir(self):
         """vscripts路径"""
         return os.path.join(self.game_dir, "dota", "scripts", "vscripts")
+
+    @property
+    def bots_dir(self):
+        """vscripts路径"""
+        return os.path.join(self.vscripts_dir, "bots")
 
     @property
     def tinkering_dir(self):
@@ -263,6 +278,9 @@ class Win(QMainWindow, Ui_MainWindow):
         self.save_config_pushButton.clicked.connect(self.save_config)
         self.ues_open_hyper_ai_action.triggered.connect(self.ues_open_hyper_ai)
         self.ues_tinkering_action.triggered.connect(self.ues_tinkering)
+        self.update_gi_action.triggered.connect(self.update_gi)
+        self.reset_gi_action.triggered.connect(self.reset_gi)
+        self.open_gi_action.triggered.connect(self.open_gi)
 
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -296,13 +314,81 @@ class Win(QMainWindow, Ui_MainWindow):
         self.read_config_when_start()
         self.focus_content_list_when_start()
 
+    def open_gi(self):
+        """打开gameinfo_branchspecific.gi"""
+        try:
+            if not os.path.isfile(self.gi_file):
+                self._print(f'未找到 gameinfo_branchspecific.gi：{self.gi_file}')
+                return
+            if os.path.exists(NPP_PATH):
+                subprocess.run([NPP_PATH, self.gi_file])
+            elif os.path.exists(NPP_PATH_X86):
+                subprocess.run([NPP_PATH_X86, self.gi_file])
+            else:
+                os.startfile(self.gi_file)
+            self._print(f'打开 gameinfo_branchspecific.gi：{self.gi_file}')
+        except Exception as e:
+            self._print(f'打开 gameinfo_branchspecific.gi 失败：{e}')
+
+    def reset_gi(self):
+        """重置gameinfo_branchspecific.gi"""
+        self._copy_gi(GI_SRC_FILE, '重置')
+
+    def update_gi(self):
+        """更新gameinfo_branchspecific.gi"""
+        self._copy_gi(GI_MOD_FILE, '更新')
+
     def ues_tinkering(self):
         """分别复制 tinkering 的 01_src 和 02_mod"""
-        # TODO: 如果 vscripts_dir 里有 bots 文件夹，给它重命名一下，然后先复制 01_src 里面的东西到 bots，再复制 02_mod 的 东西覆盖一下 
+        self._install_bots(TINKERING_SRC_DIR, TINKERING_MOD_DIR, 'tinkering')
 
     def ues_open_hyper_ai(self):
         """分别复制 open_hyper_ai 的 01_src 和 02_mod"""
-        # TODO: 如果 vscripts_dir 里有 bots 文件夹，给它重命名一下，然后先复制 01_src 里面的东西到 bots，再复制 02_mod 的 东西覆盖一下
+        self._install_bots(OPEN_HYPER_AI_SRC_DIR, OPEN_HYPER_AI_MOD_DIR, 'open_hyper_ai')
+
+    def _copy_gi(self, source, action):
+        """将指定的 GI 文件复制到游戏目录并覆盖原文件。"""
+        try:
+            if not os.path.isfile(source):
+                self._print(f'{action} GI 失败，源文件不存在：{source}')
+                return
+            target_dir = os.path.dirname(self.gi_file)
+            if not os.path.isdir(target_dir):
+                self._print(f'{action} GI 失败，游戏目录不存在：{target_dir}')
+                return
+            shutil.copy2(source, self.gi_file)
+            self._print(f'{action} gameinfo_branchspecific.gi：{self.gi_file}')
+        except Exception as e:
+            self._print(f'{action} gameinfo_branchspecific.gi 失败：{e}')
+
+    def _install_bots(self, source_dir, mod_dir, name):
+        """备份现有 bots 目录，再合并安装原始脚本和本地修改。"""
+        try:
+            if not os.path.isdir(source_dir):
+                self._print(f'安装 {name} 失败，源目录不存在：{source_dir}')
+                return
+            if not os.path.isdir(mod_dir):
+                self._print(f'安装 {name} 失败，修改目录不存在：{mod_dir}')
+                return
+            if not os.path.isdir(self.vscripts_dir):
+                self._print(f'安装 {name} 失败，vscripts 目录不存在：{self.vscripts_dir}')
+                return
+
+            backup_dir = None
+            if os.path.lexists(self.bots_dir):
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+                backup_dir = os.path.join(
+                    self.vscripts_dir,
+                    f'bots_backup_{timestamp}',
+                )
+                os.rename(self.bots_dir, backup_dir)
+                self._print(f'备份原 bots 目录：{backup_dir}', show_in_bar=False)
+
+            shutil.copytree(source_dir, self.bots_dir)
+            shutil.copytree(mod_dir, self.bots_dir, dirs_exist_ok=True)
+            self._print(f'安装 {name} Bot 脚本完成：{self.bots_dir}')
+        except Exception as e:
+            self._print(f'安装 {name} Bot 脚本失败：{e}')
 
     def focus_content_list_when_start(self):
         """启动时，切换到行视图并聚焦内容列表"""
