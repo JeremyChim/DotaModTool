@@ -365,6 +365,8 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
     <addaction name="change_items_action"/>
     <addaction name="separator"/>
     <addaction name="config_file_action"/>
+    <addaction name="open_pak01_dir_vpk_file_action"/>
+    <addaction name="separator"/>
     <addaction name="generate_vpk_action"/>
     <addaction name="generate_vpk_and_move_action"/>
    </widget>
@@ -917,6 +919,11 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
   <action name="open_gi_action">
    <property name="text">
     <string>打开gi</string>
+   </property>
+  </action>
+  <action name="open_pak01_dir_vpk_file_action">
+   <property name="text">
+    <string>pak01_dir_vpk_file</string>
    </property>
   </action>
  </widget>

@@ -171,6 +171,11 @@ class Win(QMainWindow, Ui_MainWindow):
         return os.path.join(self.dota2_dir, "game")
 
     @property
+    def pak01_dir_vpk_file(self):
+        """游戏路径下的 pak01_dir.vpk，里面有最新的npc文件夹数据，需要用 gcfscape 软件才能打开"""
+        return os.path.join(self.game_dir, "dota", "pak01_dir.vpk")
+
+    @property
     def gi_file(self):
         """gameinfo_branchspecific.gi文件路径"""
         return os.path.join(self.game_dir, "dota", "gameinfo_branchspecific.gi")
@@ -231,17 +236,11 @@ class Win(QMainWindow, Ui_MainWindow):
             "单击打开，双击复制文件名；右键可启用、禁用或重置"
         )
         self.enable_listWidget.itemDoubleClicked.connect(self.toggle_hero_file)
-        self.enable_listWidget.setItemDelegate(
-            PreserveForegroundDelegate(self.enable_listWidget)
-        )
+        self.enable_listWidget.setItemDelegate(PreserveForegroundDelegate(self.enable_listWidget))
         self.enable_listWidget.setSelectionMode(QListWidget.ExtendedSelection)
         self.enable_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.enable_listWidget.customContextMenuRequested.connect(
-            self.show_enable_context_menu
-        )
-        self.enable_listWidget.setToolTip(
-            "双击切换启用状态；右键可启用、禁用或删除文件"
-        )
+        self.enable_listWidget.customContextMenuRequested.connect(self.show_enable_context_menu)
+        self.enable_listWidget.setToolTip("双击切换启用状态；右键可启用、禁用或删除文件")
         self.content_listWidget.itemClicked.connect(self._remember_row) # 记忆行号
         self.save_file_line_action.triggered.connect(self.save_file_line)
         self.save_file_text_action.triggered.connect(self.save_file_text)
@@ -312,14 +311,13 @@ class Win(QMainWindow, Ui_MainWindow):
         self.config_file_action.triggered.connect(self.config_file)
         self.save_config_pushButton.clicked.connect(self.save_config)
         self.save_cn_name_pushButton.clicked.connect(self.save_cn_name)
-        self.cn_name_plainTextEdit.textChanged.connect(
-            lambda: self.save_cn_name_pushButton.setEnabled(True)
-        )
+        self.cn_name_plainTextEdit.textChanged.connect(lambda: self.save_cn_name_pushButton.setEnabled(True))
         self.ues_open_hyper_ai_action.triggered.connect(self.ues_open_hyper_ai)
         self.ues_tinkering_action.triggered.connect(self.ues_tinkering)
         self.update_gi_action.triggered.connect(self.update_gi)
         self.reset_gi_action.triggered.connect(self.reset_gi)
         self.open_gi_action.triggered.connect(self.open_gi)
+        self.open_pak01_dir_vpk_file_action.triggered.connect(self.open_pak01_dir_vpk_file)
 
         # 控件改名
         self.shortcut_1_action.setText(self.config.get("shortcut_1_action", ""))
@@ -355,6 +353,10 @@ class Win(QMainWindow, Ui_MainWindow):
         self.load_cn_name_when_start()
         self.refresh_enable_list()
 
+    def open_pak01_dir_vpk_file(self):
+        """打开self.pak01_dir.vpk"""
+        # TODO
+
     def load_cn_name_when_start(self):
         """加载 name.json 到 cn_name_plainTextEdit"""
         try:
@@ -363,9 +365,7 @@ class Win(QMainWindow, Ui_MainWindow):
             if not isinstance(cn_name, dict):
                 raise ValueError("name.json 的根节点必须是 JSON 对象")
             self.cn_name = cn_name
-            self.cn_name_plainTextEdit.setPlainText(
-                json.dumps(self.cn_name, ensure_ascii=False, indent=2)
-            )
+            self.cn_name_plainTextEdit.setPlainText(json.dumps(self.cn_name, ensure_ascii=False, indent=2))
             self.save_cn_name_pushButton.setEnabled(False)
             self._refresh_files()
             self._print(f'加载中文译名：{NAME_FILE}', show_in_bar=False)
