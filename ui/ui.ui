@@ -315,6 +315,10 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
     <addaction name="ues_tinkering_action"/>
     <addaction name="ues_open_hyper_ai_action"/>
     <addaction name="separator"/>
+    <addaction name="update_gi_action"/>
+    <addaction name="reset_gi_action"/>
+    <addaction name="open_gi_action"/>
+    <addaction name="separator"/>
     <addaction name="change_units_action"/>
     <addaction name="change_neutral_items_action"/>
     <addaction name="change_items_action"/>
@@ -857,6 +861,21 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
   <action name="ues_open_hyper_ai_action">
    <property name="text">
     <string>使用：open_hyper_ai</string>
+   </property>
+  </action>
+  <action name="update_gi_action">
+   <property name="text">
+    <string>更新gi</string>
+   </property>
+  </action>
+  <action name="reset_gi_action">
+   <property name="text">
+    <string>重置gi</string>
+   </property>
+  </action>
+  <action name="open_gi_action">
+   <property name="text">
+    <string>打开gi</string>
    </property>
   </action>
  </widget>
