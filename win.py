@@ -223,7 +223,13 @@ class Win(QMainWindow, Ui_MainWindow):
         self.heroFiles_listWidget.setItemDelegate(
             PreserveForegroundDelegate(self.heroFiles_listWidget)
         )
-        self.heroFiles_listWidget.setToolTip("单击打开文件，双击复制文件名")
+        self.heroFiles_listWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.heroFiles_listWidget.customContextMenuRequested.connect(
+            self.show_hero_files_context_menu
+        )
+        self.heroFiles_listWidget.setToolTip(
+            "单击打开，双击复制文件名；右键可启用、禁用或重置"
+        )
         self.enable_listWidget.itemDoubleClicked.connect(self.toggle_hero_file)
         self.enable_listWidget.setItemDelegate(
             PreserveForegroundDelegate(self.enable_listWidget)
@@ -1006,6 +1012,115 @@ class Win(QMainWindow, Ui_MainWindow):
         """从英雄列表项获取不受显示文本影响的真实文件名。"""
         filename = item.data(Qt.UserRole)
         return str(filename) if filename else item.text()
+
+    def set_selected_file_enabled(self, enabled):
+        """从文件列表启用或禁用选中英雄的覆盖文件。"""
+        items = self.heroFiles_listWidget.selectedItems()
+        if not items:
+            return
+
+        action = '启用' if enabled else '禁用'
+        changed_files = []
+        for item in items:
+            filename = self._hero_filename_from_item(item)
+            enabled_path = os.path.join(HERO_DIR2, filename)
+            disabled_path = f'{enabled_path}1'
+            source = disabled_path if enabled else enabled_path
+            target = enabled_path if enabled else disabled_path
+            try:
+                if not os.path.isfile(source):
+                    continue
+                if os.path.exists(target):
+                    self._print(f'{action}失败，目标文件已存在：{target}')
+                    continue
+                os.rename(source, target)
+                changed_files.append(filename)
+            except OSError as e:
+                self._print(f'{action}英雄文件失败：{e}')
+
+        self.refresh_enable_list()
+        self._refresh_files()
+        if changed_files:
+            if self.current_file in changed_files:
+                self.reload_file()
+            self._print(f'已{action}英雄文件：{len(changed_files)} 个')
+
+    def reset_selected_files(self):
+        """删除选中英雄在 HERO_DIR2 中的 .txt 和 .txt1 文件。"""
+        items = self.heroFiles_listWidget.selectedItems()
+        if not items:
+            return
+
+        reset_files = []
+        deleted = 0
+        for item in items:
+            filename = self._hero_filename_from_item(item)
+            enabled_path = os.path.join(HERO_DIR2, filename)
+            disabled_path = f'{enabled_path}1'
+            file_deleted = False
+            for path in (enabled_path, disabled_path):
+                try:
+                    if os.path.isfile(path):
+                        os.remove(path)
+                        deleted += 1
+                        file_deleted = True
+                except OSError as e:
+                    self._print(f'重置英雄文件失败：{e}')
+            if file_deleted:
+                reset_files.append(filename)
+
+        self.refresh_enable_list()
+        self._refresh_files()
+        if reset_files:
+            if self.current_file in reset_files:
+                self.reload_file()
+            self._print(
+                f'已重置英雄文件：{len(reset_files)} 个，删除文件：{deleted} 个'
+            )
+
+    def show_hero_files_context_menu(self, position):
+        """显示文件列表的启用、禁用和重置菜单。"""
+        clicked_item = self.heroFiles_listWidget.itemAt(position)
+        if clicked_item is None:
+            return
+        if not clicked_item.isSelected():
+            self.heroFiles_listWidget.clearSelection()
+            clicked_item.setSelected(True)
+            self.heroFiles_listWidget.setCurrentItem(clicked_item)
+
+        filenames = [
+            self._hero_filename_from_item(item)
+            for item in self.heroFiles_listWidget.selectedItems()
+        ]
+        enabled_paths = [os.path.join(HERO_DIR2, name) for name in filenames]
+        disabled_paths = [f'{path}1' for path in enabled_paths]
+
+        menu = QMenu(self)
+        enable_action = menu.addAction('启用')
+        disable_action = menu.addAction('禁用')
+        menu.addSeparator()
+        reset_action = menu.addAction('重置')
+        enable_action.setEnabled(any(
+            os.path.isfile(disabled_path) and not os.path.exists(enabled_path)
+            for enabled_path, disabled_path in zip(enabled_paths, disabled_paths)
+        ))
+        disable_action.setEnabled(any(
+            os.path.isfile(enabled_path) and not os.path.exists(disabled_path)
+            for enabled_path, disabled_path in zip(enabled_paths, disabled_paths)
+        ))
+        reset_action.setEnabled(
+            any(os.path.isfile(path) for path in enabled_paths + disabled_paths)
+        )
+
+        selected_action = menu.exec(
+            self.heroFiles_listWidget.viewport().mapToGlobal(position)
+        )
+        if selected_action is enable_action:
+            self.set_selected_file_enabled(True)
+        elif selected_action is disable_action:
+            self.set_selected_file_enabled(False)
+        elif selected_action is reset_action:
+            self.reset_selected_files()
 
     def refresh_enable_list(self):
         """显示 HERO_DIR2 中已启用和已禁用的英雄文件。"""
