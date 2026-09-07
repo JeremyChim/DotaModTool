@@ -34,6 +34,7 @@ if getattr(sys, "frozen", False):
 else:
     ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(ROOT_DIR, "config.json")
+NAME_FILE = os.path.join(ROOT_DIR, "name.json")
 
 VPK_DIR = os.path.join(ROOT_DIR, "vpk")
 PAK_DIR = os.path.join(VPK_DIR, "pak01_dir")
@@ -133,6 +134,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.cn_name = {}
         self.steam_dir = 'C:\\Program Files (x86)\\Steam'
         self.selected_row = 0
         self.addrows = []
@@ -313,6 +315,28 @@ class Win(QMainWindow, Ui_MainWindow):
         self.find_steam_dir_when_start()
         self.read_config_when_start()
         self.focus_content_list_when_start()
+        self.load_cn_name_when_start()
+
+    def load_cn_name_when_start(self):
+        """加载 name.json 到 cn_name_plainTextEdit"""
+        try:
+            with open(NAME_FILE, encoding="utf-8") as fh:
+                cn_name = json.load(fh)
+            if not isinstance(cn_name, dict):
+                raise ValueError("name.json 的根节点必须是 JSON 对象")
+            self.cn_name = cn_name
+            self.cn_name_plainTextEdit.setPlainText(
+                json.dumps(self.cn_name, ensure_ascii=False, indent=2)
+            )
+            self._print(f'加载中文译名：{NAME_FILE}', show_in_bar=False)
+        except FileNotFoundError:
+            self.cn_name = {}
+            self.cn_name_plainTextEdit.clear()
+            self._print(f'中文译名文件不存在：{NAME_FILE}')
+        except (json.JSONDecodeError, ValueError) as e:
+            self.cn_name = {}
+            self.cn_name_plainTextEdit.clear()
+            self._print(f'加载中文译名失败：{e}')
 
     def open_gi(self):
         """打开gameinfo_branchspecific.gi"""
