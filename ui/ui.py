@@ -290,6 +290,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addWidget(self.save_cn_name_pushButton)
 
         self.view_tabWidget.addTab(self.cn_name_tab, "")
+        self.enable_tab = QWidget()
+        self.enable_tab.setObjectName(u"enable_tab")
+        self.horizontalLayout_8 = QHBoxLayout(self.enable_tab)
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.enable_listWidget = QListWidget(self.enable_tab)
+        self.enable_listWidget.setObjectName(u"enable_listWidget")
+
+        self.horizontalLayout_8.addWidget(self.enable_listWidget)
+
+        self.view_tabWidget.addTab(self.enable_tab, "")
 
         self.horizontalLayout_3.addWidget(self.view_tabWidget)
 
@@ -419,7 +429,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.view_tabWidget.setCurrentIndex(5)
+        self.view_tabWidget.setCurrentIndex(6)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -702,12 +712,15 @@ class Ui_MainWindow(object):
         self.cn_name_plainTextEdit.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.cn_name_plainTextEdit.setPlainText("")
-        self.save_cn_name_pushButton.setToolTip(QCoreApplication.translate("MainWindow", u"\u6821\u9a8c\u5e76\u4fdd\u5b58\u4e2d\u6587\u8bd1\u540d\uff08Ctrl+Alt+S\uff09", None))
-        self.save_cn_name_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u4e2d\u6587\u8bd1\u540d", None))
+        self.save_cn_name_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
 #if QT_CONFIG(shortcut)
-        self.save_cn_name_pushButton.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Alt+S", None))
+        self.save_cn_name_pushButton.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+S", None))
 #endif // QT_CONFIG(shortcut)
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cn_name_tab), QCoreApplication.translate("MainWindow", u"\u4e2d\u6587\u8bd1\u540d", None))
+
+        self.enable_listWidget.setToolTip(QCoreApplication.translate("MainWindow", u"\u53cc\u51fb\u5207\u6362\u542f\u7528\u72b6\u6001\uff1b\u9009\u4e2d\u6587\u4ef6\u540e\u6309 Delete \u5220\u9664", None))
+
+        self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.enable_tab), QCoreApplication.translate("MainWindow", u"\u542f\u7528\u548c\u7981\u7528", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u7f16\u8f91", None))
         self.menu_3.setTitle(QCoreApplication.translate("MainWindow", u"\u8bbe\u7f6e", None))
