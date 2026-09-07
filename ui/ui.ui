@@ -201,7 +201,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
              <attribute name="title">
               <string>中文译名</string>
              </attribute>
-             <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
                <widget class="QPlainTextEdit" name="cn_name_plainTextEdit">
                 <property name="toolTip">
@@ -209,6 +209,16 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
                 </property>
                 <property name="plainText">
                  <string/>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="save_cn_name_pushButton">
+                <property name="text">
+                 <string>保存</string>
+                </property>
+                <property name="shortcut">
+                 <string>Ctrl+Shift+S</string>
                 </property>
                </widget>
               </item>
