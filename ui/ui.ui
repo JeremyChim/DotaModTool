@@ -79,7 +79,7 @@
           <item>
            <widget class="QTabWidget" name="view_tabWidget">
             <property name="currentIndex">
-             <number>5</number>
+             <number>6</number>
             </property>
             <widget class="QWidget" name="line_tab">
              <property name="enabled">
@@ -214,14 +214,25 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
               </item>
               <item>
                <widget class="QPushButton" name="save_cn_name_pushButton">
-                <property name="toolTip">
-                 <string>校验并保存中文译名（Ctrl+Alt+S）</string>
-                </property>
                 <property name="text">
-                 <string>保存中文译名</string>
+                 <string>保存</string>
                 </property>
                 <property name="shortcut">
-                 <string>Ctrl+Alt+S</string>
+                 <string>Ctrl+Shift+S</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="enable_tab">
+             <attribute name="title">
+              <string>启用和禁用</string>
+             </attribute>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <widget class="QListWidget" name="enable_listWidget">
+                <property name="toolTip">
+                 <string>双击切换启用状态；选中文件后按 Delete 删除</string>
                 </property>
                </widget>
               </item>

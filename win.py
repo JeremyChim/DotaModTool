@@ -211,6 +211,12 @@ class Win(QMainWindow, Ui_MainWindow):
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
         self.heroFiles_listWidget.itemDoubleClicked.connect(self.copy_hero_filename)
         self.heroFiles_listWidget.setToolTip("单击打开文件，双击复制文件名")
+        self.enable_listWidget.itemDoubleClicked.connect(self.toggle_hero_file)
+        self.enable_listWidget.setSelectionMode(QListWidget.ExtendedSelection)
+        self.enable_listWidget.installEventFilter(self)
+        self.enable_listWidget.setToolTip(
+            "双击切换启用状态；选中文件后按 Delete 删除"
+        )
         self.content_listWidget.itemClicked.connect(self._remember_row) # 记忆行号
         self.save_file_line_action.triggered.connect(self.save_file_line)
         self.save_file_text_action.triggered.connect(self.save_file_text)
@@ -322,6 +328,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.read_config_when_start()
         self.focus_content_list_when_start()
         self.load_cn_name_when_start()
+        self.refresh_enable_list()
 
     def load_cn_name_when_start(self):
         """加载 name.json 到 cn_name_plainTextEdit"""
@@ -940,6 +947,94 @@ class Win(QMainWindow, Ui_MainWindow):
         QApplication.clipboard().setText(filename)
         self._print(f'已复制文件名：{filename}')
 
+    def refresh_enable_list(self):
+        """显示 HERO_DIR2 中已启用和已禁用的英雄文件。"""
+        self.enable_listWidget.clear()
+        if not os.path.isdir(HERO_DIR2):
+            return
+
+        filenames = sorted(
+            (
+                entry.name
+                for entry in os.scandir(HERO_DIR2)
+                if entry.is_file()
+                and (entry.name.endswith('.txt') or entry.name.endswith('.txt1'))
+            ),
+            key=str.casefold,
+        )
+        for filename in filenames:
+            item = QListWidgetItem(filename)
+            if filename.endswith('.txt1'):
+                item.setForeground(QColor('#e06c75'))
+                item.setToolTip('已禁用，双击启用')
+            else:
+                item.setForeground(QColor('#98c379'))
+                item.setToolTip('已启用，双击禁用')
+            self.enable_listWidget.addItem(item)
+
+    def toggle_hero_file(self, item):
+        """通过在 .txt 和 .txt1 之间重命名来切换英雄文件状态。"""
+        if item is None:
+            return
+
+        filename = item.text()
+        if filename.endswith('.txt1'):
+            target_name = filename[:-1]
+            action = '启用'
+        elif filename.endswith('.txt'):
+            target_name = f'{filename}1'
+            action = '禁用'
+        else:
+            self._print(f'无法切换，不支持的文件名：{filename}')
+            return
+
+        source = os.path.join(HERO_DIR2, filename)
+        target = os.path.join(HERO_DIR2, target_name)
+        try:
+            if not os.path.isfile(source):
+                self._print(f'{action}失败，文件不存在：{source}')
+                self.refresh_enable_list()
+                return
+            if os.path.exists(target):
+                self._print(f'{action}失败，目标文件已存在：{target}')
+                return
+            os.rename(source, target)
+            self.refresh_enable_list()
+            self._refresh_files()
+            self._print(f'已{action}英雄文件：{target_name}')
+        except OSError as e:
+            self._print(f'{action}英雄文件失败：{e}')
+
+    def delete_enabled_hero_files(self):
+        """删除启用和禁用列表中选中的 HERO_DIR2 文件。"""
+        items = self.enable_listWidget.selectedItems()
+        if not items:
+            return
+
+        deleted = 0
+        for item in items:
+            filename = item.text()
+            if os.path.basename(filename) != filename or not (
+                filename.endswith('.txt') or filename.endswith('.txt1')
+            ):
+                self._print(f'跳过不支持的文件名：{filename}')
+                continue
+
+            path = os.path.join(HERO_DIR2, filename)
+            try:
+                if os.path.isfile(path):
+                    os.remove(path)
+                    deleted += 1
+                else:
+                    self._print(f'删除失败，文件不存在：{path}')
+            except OSError as e:
+                self._print(f'删除英雄文件失败：{e}')
+
+        self.refresh_enable_list()
+        self._refresh_files()
+        if deleted:
+            self._print(f'已删除英雄文件：{deleted} 个')
+
     def open_file(self):
         """打开文件"""
         try:
@@ -970,6 +1065,7 @@ class Win(QMainWindow, Ui_MainWindow):
             os.remove(dst)
         os.rename(path, dst)
         self._change_title(os.path.join(HERO_DIR, self.current_file))
+        self.refresh_enable_list()
         self._print(f'重置文件：{dst}')
         self.reload_file()
 
@@ -1022,6 +1118,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.config['current_file'] = self.current_file
         self._save_config()
         self._refresh_files()
+        self.refresh_enable_list()
         self._print(f'保存文件：{path}')
 
     def save_file_text(self):
@@ -1035,6 +1132,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.config['current_file'] = self.current_file
         self._save_config()
         self._refresh_files()
+        self.refresh_enable_list()
         self._print(f'保存文件：{path}')
 
     def reload_file(self):
@@ -1491,7 +1589,11 @@ class Win(QMainWindow, Ui_MainWindow):
         self.content_listWidget.scrollToItem(item, QListWidget.PositionAtCenter)
 
     def eventFilter(self, obj, event):
-        """content_plainTextEdit 的 TAB/Shift+TAB 缩进所选多行"""
+        """处理文本缩进和英雄启用列表的 Delete 键。"""
+        if obj is self.enable_listWidget and event.type() == QEvent.Type.KeyPress:
+            if event.key() == Qt.Key_Delete:
+                self.delete_enabled_hero_files()
+                return True
         if obj is self.content_plainTextEdit and event.type() == QEvent.Type.KeyPress:
             if event.key() in (Qt.Key_Tab, Qt.Key_Backtab):
                 self._indent_selection(event.modifiers() & Qt.ShiftModifier)
