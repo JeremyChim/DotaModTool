@@ -252,8 +252,8 @@ function Buff:Init()
                 -- end
                 GPM.UpdateBotGold(h, 4)
 				XP.UpdateXP(h, 4)
-                GPM.UpdateGoldWhenDeath(h, 500)
-                XP.UpdateXPWhenDeath(h, 500)
+                GPM.UpdateGoldWhenDeath(h, 1000)
+                XP.UpdateXPWhenDeath(h, 1000)
                 --Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 

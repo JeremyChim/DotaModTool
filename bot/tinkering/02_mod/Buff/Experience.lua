@@ -87,6 +87,10 @@ function XP.UpdateXPWhenDeath(bot, xp)
     -- elseif minute >= 30 then xp = xp * 4
     -- end
 
+    if minute >= 20 then
+        xp = xp * 2
+    end
+
     if bot:IsAlive() then
         bot.__buff_xp_rewarded_for_death = false
         return

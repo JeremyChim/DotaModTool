@@ -72,6 +72,10 @@ function GPM.UpdateGoldWhenDeath(bot, gold)
     -- elseif minute >= 30 then gold = gold * 4
     -- end
 
+    if minute >= 20 then
+        gold = gold * 2
+    end
+
     if bot:IsAlive() then
         bot.__buff_gold_rewarded_for_death = false
         return
