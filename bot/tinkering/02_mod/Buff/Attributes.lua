@@ -25,7 +25,7 @@ end
 
 
 
--- 死亡时，一次性加属性
+-- 死亡时，一次性加属性（有上限）
 function Attributes.UpdateAttrWhenDeath(bot, attr, max)
     if bot:IsAlive() then
         bot.__buff_attr_rewarded_for_death = false
