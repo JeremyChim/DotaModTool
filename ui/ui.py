@@ -277,12 +277,17 @@ class Ui_MainWindow(object):
         self.view_tabWidget.addTab(self.tab, "")
         self.cn_name_tab = QWidget()
         self.cn_name_tab.setObjectName(u"cn_name_tab")
-        self.horizontalLayout_8 = QHBoxLayout(self.cn_name_tab)
-        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.verticalLayout_3 = QVBoxLayout(self.cn_name_tab)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.cn_name_plainTextEdit = QPlainTextEdit(self.cn_name_tab)
         self.cn_name_plainTextEdit.setObjectName(u"cn_name_plainTextEdit")
 
-        self.horizontalLayout_8.addWidget(self.cn_name_plainTextEdit)
+        self.verticalLayout_3.addWidget(self.cn_name_plainTextEdit)
+
+        self.save_cn_name_pushButton = QPushButton(self.cn_name_tab)
+        self.save_cn_name_pushButton.setObjectName(u"save_cn_name_pushButton")
+
+        self.verticalLayout_3.addWidget(self.save_cn_name_pushButton)
 
         self.view_tabWidget.addTab(self.cn_name_tab, "")
 
@@ -697,6 +702,10 @@ class Ui_MainWindow(object):
         self.cn_name_plainTextEdit.setToolTip("")
 #endif // QT_CONFIG(tooltip)
         self.cn_name_plainTextEdit.setPlainText("")
+        self.save_cn_name_pushButton.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58", None))
+#if QT_CONFIG(shortcut)
+        self.save_cn_name_pushButton.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+Shift+S", None))
+#endif // QT_CONFIG(shortcut)
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cn_name_tab), QCoreApplication.translate("MainWindow", u"\u4e2d\u6587\u8bd1\u540d", None))
         self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u6587\u4ef6", None))
         self.menu_2.setTitle(QCoreApplication.translate("MainWindow", u"\u7f16\u8f91", None))

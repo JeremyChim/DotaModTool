@@ -880,9 +880,18 @@ class Win(QMainWindow, Ui_MainWindow):
             self.heroFiles_listWidget.addItem(item)
 
     def search(self, text):
-        """模糊搜索"""
-        text = text.strip().lower()
-        hits = [f for f in self.files if text in f.lower()] if text else self.files
+        """按文件名或中文译名模糊搜索。"""
+        text = text.strip().casefold()
+        if not text:
+            self.show_files(self.files)
+            return
+
+        hits = []
+        for filename in self.files:
+            hero_name = os.path.splitext(filename)[0]
+            cn_name = str(self.cn_name.get(hero_name, '')).casefold()
+            if text in filename.casefold() or text in cn_name:
+                hits.append(filename)
         self.show_files(hits)
 
     def open_file(self):
