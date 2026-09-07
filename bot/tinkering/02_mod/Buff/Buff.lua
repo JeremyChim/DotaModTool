@@ -112,16 +112,16 @@ local bBuffFlags = {
         change  = false,  -- Set to 'false' to disable changing (a) facet/s (See /Facets.lua for the heroes).
     },
     towers = {
-        radiant = true, -- Set to 'false' to disable Radiant towers buff.
-        dire    = true, -- Set to 'false' to disable Dire towers buff.
+        radiant = false, -- Set to 'false' to disable Radiant towers buff.
+        dire    = false, -- Set to 'false' to disable Dire towers buff.
     },
     neutrals = {
         radiant = true, -- Set to 'false' to disable Radiant bots receiving neutral items.
         dire    = true, -- Set to 'false' to disable Dire bots receiving neutral items.
     },
     manga_regen = {
-        radiant = true, -- Set to 'false' to disable aiding Radiant bots' receiving added mana regen.
-        dire    = true, -- Set to 'false' to disable aiding Dire bots' receiving added mana regen.
+        radiant = false, -- Set to 'false' to disable aiding Radiant bots' receiving added mana regen.
+        dire    = false, -- Set to 'false' to disable aiding Dire bots' receiving added mana regen.
     },
     gpm = {
         radiant = true, -- Set to 'false' to disable Radiant bots receiving a Gold boost.
@@ -230,7 +230,9 @@ function Buff:Init()
             local me = PlayerResource:GetPlayer(0):GetAssignedHero()
             GPM.UpdateBotGold(me, 3)
             XP.UpdateXP(me, 3)
-            Attributes.UpdateAttr(me, 1)
+            GPM.UpdateGoldWhenDeath(me, 1000)
+            XP.UpdateXPWhenDeath(me, 1000)
+            Attributes.UpdateAttrWhenDeath(me, 20, 20)
 
             -- Gold and Experience
             for _, h in pairs(TeamRadiant) do
@@ -239,7 +241,9 @@ function Buff:Init()
                 -- end
                 GPM.UpdateBotGold(h, 3)
 				XP.UpdateXP(h, 3)
-                Attributes.UpdateAttr(h, 1)
+                GPM.UpdateGoldWhenDeath(h, 1000)
+                XP.UpdateXPWhenDeath(h, 1000)
+                Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 
             for _, h in pairs(TeamDire) do
@@ -248,7 +252,9 @@ function Buff:Init()
                 -- end
                 GPM.UpdateBotGold(h, 6)
 				XP.UpdateXP(h, 6)
-                Attributes.UpdateAttr(h, 2)
+                GPM.UpdateGoldWhenDeath(h, 2000)
+                XP.UpdateXPWhenDeath(h, 2000)
+                Attributes.UpdateAttrWhenDeath(h, 20, 20)
             end
 
             -- if not Helper.IsTurboMode() then

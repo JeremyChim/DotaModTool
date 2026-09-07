@@ -44,15 +44,27 @@ end
 
 function GPM.UpdateBotGold(bot, gold)
     local gameTime = Helper.DotaTime()
-    if gameTime > 20 * 60 then
+    local minute = math.floor(gameTime / 60)
+    if minute > 20 then
         gold = gold * 2
     end
 
-    if not bot:IsAlive() then
-        gold = gold * 2
-    end
+    -- if not bot:IsAlive() then
+    --     gold = gold * 2
+    -- end
 
     bot:ModifyGold(gold, true, 0)
+end
+
+function GPM.UpdateGoldWhenDeath(bot, gold)
+    if bot:IsAlive() then
+        bot.__buff_gold_rewarded_for_death = false
+        return
+    end
+    if bot.__buff_gold_rewarded_for_death then return end
+
+    bot:ModifyGold(gold, true, 0)
+    bot.__buff_gold_rewarded_for_death = true
 end
 
 return GPM
