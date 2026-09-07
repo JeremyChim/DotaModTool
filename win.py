@@ -209,6 +209,8 @@ class Win(QMainWindow, Ui_MainWindow):
         # 绑定控件
         self.search_lineEdit.textChanged.connect(self.search)
         self.heroFiles_listWidget.itemClicked.connect(self.click_and_show)
+        self.heroFiles_listWidget.itemDoubleClicked.connect(self.copy_hero_filename)
+        self.heroFiles_listWidget.setToolTip("单击打开文件，双击复制文件名")
         self.content_listWidget.itemClicked.connect(self._remember_row) # 记忆行号
         self.save_file_line_action.triggered.connect(self.save_file_line)
         self.save_file_text_action.triggered.connect(self.save_file_text)
@@ -929,6 +931,14 @@ class Win(QMainWindow, Ui_MainWindow):
             if text in filename.casefold() or text in cn_name:
                 hits.append(filename)
         self.show_files(hits)
+
+    def copy_hero_filename(self, item):
+        """双击英雄文件时，将不带 .txt 的文件名复制到剪贴板。"""
+        if item is None:
+            return
+        filename = os.path.splitext(item.text())[0]
+        QApplication.clipboard().setText(filename)
+        self._print(f'已复制文件名：{filename}')
 
     def open_file(self):
         """打开文件"""
