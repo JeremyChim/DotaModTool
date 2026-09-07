@@ -18,7 +18,7 @@
     <item>
      <widget class="QFrame" name="frame_3">
       <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+       <enum>QFrame::Shape::NoFrame</enum>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
        <property name="spacing">
@@ -45,7 +45,7 @@
           </size>
          </property>
          <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::Shape::NoFrame</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -73,13 +73,13 @@
        <item>
         <widget class="QFrame" name="frame_2">
          <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
+          <enum>QFrame::Shape::NoFrame</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QTabWidget" name="view_tabWidget">
             <property name="currentIndex">
-             <number>4</number>
+             <number>5</number>
             </property>
             <widget class="QWidget" name="line_tab">
              <property name="enabled">
@@ -114,7 +114,7 @@
               <bool>false</bool>
              </property>
              <property name="contextMenuPolicy">
-              <enum>Qt::NoContextMenu</enum>
+              <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
              </property>
              <attribute name="title">
               <string>文本视图</string>
@@ -197,6 +197,151 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="cn_name_tab">
+             <attribute name="title">
+              <string>中文译名</string>
+             </attribute>
+             <layout class="QHBoxLayout" name="horizontalLayout_8">
+              <item>
+               <widget class="QPlainTextEdit" name="cn_name_plainTextEdit">
+                <property name="toolTip">
+                 <string/>
+                </property>
+                <property name="plainText">
+                 <string>{
+    &quot;npc_dota_hero_abaddon&quot;: &quot;亚巴顿&quot;,
+    &quot;npc_dota_hero_abyssal_underlord&quot;: &quot;孽主&quot;,
+    &quot;npc_dota_hero_alchemist&quot;: &quot;炼金术士&quot;,
+    &quot;npc_dota_hero_ancient_apparition&quot;: &quot;远古冰魄&quot;,
+    &quot;npc_dota_hero_antimage&quot;: &quot;敌法师&quot;,
+    &quot;npc_dota_hero_arc_warden&quot;: &quot;天穹守望者&quot;,
+    &quot;npc_dota_hero_axe&quot;: &quot;斧王&quot;,
+    &quot;npc_dota_hero_bane&quot;: &quot;祸乱之源&quot;,
+    &quot;npc_dota_hero_batrider&quot;: &quot;蝙蝠骑士&quot;,
+    &quot;npc_dota_hero_beastmaster&quot;: &quot;兽王&quot;,
+    &quot;npc_dota_hero_bloodseeker&quot;: &quot;血魔&quot;,
+    &quot;npc_dota_hero_bounty_hunter&quot;: &quot;赏金猎人&quot;,
+    &quot;npc_dota_hero_brewmaster&quot;: &quot;酒仙&quot;,
+    &quot;npc_dota_hero_bristleback&quot;: &quot;钢背兽&quot;,
+    &quot;npc_dota_hero_broodmother&quot;: &quot;育母蜘蛛&quot;,
+    &quot;npc_dota_hero_centaur&quot;: &quot;半人马战行者&quot;,
+    &quot;npc_dota_hero_chaos_knight&quot;: &quot;混沌骑士&quot;,
+    &quot;npc_dota_hero_chen&quot;: &quot;陈&quot;,
+    &quot;npc_dota_hero_clinkz&quot;: &quot;克林克兹&quot;,
+    &quot;npc_dota_hero_crystal_maiden&quot;: &quot;水晶室女&quot;,
+    &quot;npc_dota_hero_dark_seer&quot;: &quot;黑暗贤者&quot;,
+    &quot;npc_dota_hero_dark_willow&quot;: &quot;邪影芳灵&quot;,
+    &quot;npc_dota_hero_dawnbreaker&quot;: &quot;破晓辰星&quot;,
+    &quot;npc_dota_hero_dazzle&quot;: &quot;戴泽&quot;,
+    &quot;npc_dota_hero_death_prophet&quot;: &quot;死亡先知&quot;,
+    &quot;npc_dota_hero_disruptor&quot;: &quot;干扰者&quot;,
+    &quot;npc_dota_hero_doom_bringer&quot;: &quot;末日使者&quot;,
+    &quot;npc_dota_hero_dragon_knight&quot;: &quot;龙骑士&quot;,
+    &quot;npc_dota_hero_drow_ranger&quot;: &quot;卓尔游侠&quot;,
+    &quot;npc_dota_hero_earth_spirit&quot;: &quot;大地之灵&quot;,
+    &quot;npc_dota_hero_earthshaker&quot;: &quot;撼地者&quot;,
+    &quot;npc_dota_hero_elder_titan&quot;: &quot;上古巨神&quot;,
+    &quot;npc_dota_hero_ember_spirit&quot;: &quot;灰烬之灵&quot;,
+    &quot;npc_dota_hero_enchantress&quot;: &quot;魅惑魔女&quot;,
+    &quot;npc_dota_hero_enigma&quot;: &quot;谜团&quot;,
+    &quot;npc_dota_hero_faceless_void&quot;: &quot;虚空假面&quot;,
+    &quot;npc_dota_hero_furion&quot;: &quot;先知&quot;,
+    &quot;npc_dota_hero_grimstroke&quot;: &quot;天涯墨客&quot;,
+    &quot;npc_dota_hero_gyrocopter&quot;: &quot;矮人直升机&quot;,
+    &quot;npc_dota_hero_hoodwink&quot;: &quot;森海飞霞&quot;,
+    &quot;npc_dota_hero_huskar&quot;: &quot;哈斯卡&quot;,
+    &quot;npc_dota_hero_invoker&quot;: &quot;祈求者&quot;,
+    &quot;npc_dota_hero_jakiro&quot;: &quot;杰奇洛&quot;,
+    &quot;npc_dota_hero_juggernaut&quot;: &quot;主宰&quot;,
+    &quot;npc_dota_hero_keeper_of_the_light&quot;: &quot;光之守卫&quot;,
+    &quot;npc_dota_hero_kez&quot;: &quot;凯&quot;,
+    &quot;npc_dota_hero_kunkka&quot;: &quot;昆卡&quot;,
+    &quot;npc_dota_hero_legion_commander&quot;: &quot;军团指挥官&quot;,
+    &quot;npc_dota_hero_leshrac&quot;: &quot;拉席克&quot;,
+    &quot;npc_dota_hero_lich&quot;: &quot;巫妖&quot;,
+    &quot;npc_dota_hero_life_stealer&quot;: &quot;噬魂鬼&quot;,
+    &quot;npc_dota_hero_lina&quot;: &quot;莉娜&quot;,
+    &quot;npc_dota_hero_lion&quot;: &quot;莱恩&quot;,
+    &quot;npc_dota_hero_lone_druid&quot;: &quot;德鲁伊&quot;,
+    &quot;npc_dota_hero_luna&quot;: &quot;露娜&quot;,
+    &quot;npc_dota_hero_lycan&quot;: &quot;狼人&quot;,
+    &quot;npc_dota_hero_magnataur&quot;: &quot;马格纳斯&quot;,
+    &quot;npc_dota_hero_marci&quot;: &quot;马西&quot;,
+    &quot;npc_dota_hero_mars&quot;: &quot;马尔斯&quot;,
+    &quot;npc_dota_hero_medusa&quot;: &quot;美杜莎&quot;,
+    &quot;npc_dota_hero_meepo&quot;: &quot;米波&quot;,
+    &quot;npc_dota_hero_mirana&quot;: &quot;米拉娜&quot;,
+    &quot;npc_dota_hero_monkey_king&quot;: &quot;齐天大圣&quot;,
+    &quot;npc_dota_hero_morphling&quot;: &quot;变体精灵&quot;,
+    &quot;npc_dota_hero_muerta&quot;: &quot;琼英碧灵&quot;,
+    &quot;npc_dota_hero_naga_siren&quot;: &quot;娜迦海妖&quot;,
+    &quot;npc_dota_hero_necrolyte&quot;: &quot;瘟疫法师&quot;,
+    &quot;npc_dota_hero_nevermore&quot;: &quot;影魔&quot;,
+    &quot;npc_dota_hero_night_stalker&quot;: &quot;暗夜魔王&quot;,
+    &quot;npc_dota_hero_nyx_assassin&quot;: &quot;司夜刺客&quot;,
+    &quot;npc_dota_hero_obsidian_destroyer&quot;: &quot;殁境神蚀者&quot;,
+    &quot;npc_dota_hero_ogre_magi&quot;: &quot;食人魔魔法师&quot;,
+    &quot;npc_dota_hero_omniknight&quot;: &quot;全能骑士&quot;,
+    &quot;npc_dota_hero_oracle&quot;: &quot;神谕者&quot;,
+    &quot;npc_dota_hero_pangolier&quot;: &quot;石鳞剑士&quot;,
+    &quot;npc_dota_hero_phantom_assassin&quot;: &quot;幻影刺客&quot;,
+    &quot;npc_dota_hero_phantom_lancer&quot;: &quot;幻影长矛手&quot;,
+    &quot;npc_dota_hero_phoenix&quot;: &quot;凤凰&quot;,
+    &quot;npc_dota_hero_primal_beast&quot;: &quot;兽&quot;,
+    &quot;npc_dota_hero_puck&quot;: &quot;帕克&quot;,
+    &quot;npc_dota_hero_pudge&quot;: &quot;帕吉&quot;,
+    &quot;npc_dota_hero_pugna&quot;: &quot;帕格纳&quot;,
+    &quot;npc_dota_hero_queenofpain&quot;: &quot;痛苦女王&quot;,
+    &quot;npc_dota_hero_rattletrap&quot;: &quot;发条技师&quot;,
+    &quot;npc_dota_hero_razor&quot;: &quot;剃刀&quot;,
+    &quot;npc_dota_hero_riki&quot;: &quot;力丸&quot;,
+    &quot;npc_dota_hero_ringmaster&quot;: &quot;百戏大王&quot;,
+    &quot;npc_dota_hero_rubick&quot;: &quot;拉比克&quot;,
+    &quot;npc_dota_hero_sand_king&quot;: &quot;沙王&quot;,
+    &quot;npc_dota_hero_shadow_demon&quot;: &quot;暗影恶魔&quot;,
+    &quot;npc_dota_hero_shadow_shaman&quot;: &quot;暗影萨满&quot;,
+    &quot;npc_dota_hero_shredder&quot;: &quot;伐木机&quot;,
+    &quot;npc_dota_hero_silencer&quot;: &quot;沉默术士&quot;,
+    &quot;npc_dota_hero_skeleton_king&quot;: &quot;冥魂大帝&quot;,
+    &quot;npc_dota_hero_skywrath_mage&quot;: &quot;天怒法师&quot;,
+    &quot;npc_dota_hero_slardar&quot;: &quot;斯拉达&quot;,
+    &quot;npc_dota_hero_slark&quot;: &quot;斯拉克&quot;,
+    &quot;npc_dota_hero_snapfire&quot;: &quot;电炎绝手&quot;,
+    &quot;npc_dota_hero_sniper&quot;: &quot;狙击手&quot;,
+    &quot;npc_dota_hero_spectre&quot;: &quot;幽鬼&quot;,
+    &quot;npc_dota_hero_spirit_breaker&quot;: &quot;裂魂人&quot;,
+    &quot;npc_dota_hero_storm_spirit&quot;: &quot;风暴之灵&quot;,
+    &quot;npc_dota_hero_sven&quot;: &quot;斯温&quot;,
+    &quot;npc_dota_hero_target_dummy&quot;: &quot;目标假人&quot;,
+    &quot;npc_dota_hero_techies&quot;: &quot;工程师&quot;,
+    &quot;npc_dota_hero_templar_assassin&quot;: &quot;圣堂刺客&quot;,
+    &quot;npc_dota_hero_terrorblade&quot;: &quot;恐怖利刃&quot;,
+    &quot;npc_dota_hero_tidehunter&quot;: &quot;潮汐猎人&quot;,
+    &quot;npc_dota_hero_tinker&quot;: &quot;修补匠&quot;,
+    &quot;npc_dota_hero_tiny&quot;: &quot;小小&quot;,
+    &quot;npc_dota_hero_treant&quot;: &quot;树精卫士&quot;,
+    &quot;npc_dota_hero_troll_warlord&quot;: &quot;巨魔战将&quot;,
+    &quot;npc_dota_hero_tusk&quot;: &quot;巨牙海民&quot;,
+    &quot;npc_dota_hero_undying&quot;: &quot;不朽尸王&quot;,
+    &quot;npc_dota_hero_ursa&quot;: &quot;熊战士&quot;,
+    &quot;npc_dota_hero_vengefulspirit&quot;: &quot;复仇之魂&quot;,
+    &quot;npc_dota_hero_venomancer&quot;: &quot;剧毒术士&quot;,
+    &quot;npc_dota_hero_viper&quot;: &quot;冥界亚龙&quot;,
+    &quot;npc_dota_hero_visage&quot;: &quot;维萨吉&quot;,
+    &quot;npc_dota_hero_void_spirit&quot;: &quot;虚无之灵&quot;,
+    &quot;npc_dota_hero_warlock&quot;: &quot;术士&quot;,
+    &quot;npc_dota_hero_weaver&quot;: &quot;编织者&quot;,
+    &quot;npc_dota_hero_windrunner&quot;: &quot;风行者&quot;,
+    &quot;npc_dota_hero_winter_wyvern&quot;: &quot;寒冬飞龙&quot;,
+    &quot;npc_dota_hero_wisp&quot;: &quot;艾欧&quot;,
+    &quot;npc_dota_hero_witch_doctor&quot;: &quot;巫医&quot;,
+    &quot;npc_dota_hero_zuus&quot;: &quot;宙斯&quot;
+}</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -213,7 +358,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>23</height>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -274,8 +419,8 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
       <rect>
        <x>464</x>
        <y>176</y>
-       <width>120</width>
-       <height>200</height>
+       <width>121</width>
+       <height>202</height>
       </rect>
      </property>
      <property name="title">
