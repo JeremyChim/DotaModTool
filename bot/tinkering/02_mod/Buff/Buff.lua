@@ -1,6 +1,7 @@
 dofile('bots/Buff/Timers')
 dofile('bots/Buff/Experience')
 dofile('bots/Buff/GPM')
+dofile('bots/Buff/Attributes')
 dofile('bots/Buff/NeutralItems')
 dofile('bots/Buff/Helper')
 dofile('bots/Buff/Towers')
@@ -227,24 +228,27 @@ function Buff:Init()
 
             -- Gold and Experience For Player
             local me = PlayerResource:GetPlayer(0):GetAssignedHero()
-            GPM.UpdateBotGold(me, 5)
-            XP.UpdateXP(me, 5)
+            GPM.UpdateBotGold(me, 3)
+            XP.UpdateXP(me, 3)
+            Attributes.UpdateAttr(me, 1)
 
             -- Gold and Experience
             for _, h in pairs(TeamRadiant) do
                 -- if bBuffFlags.gpm.radiant then
                 --     GPM.UpdateBotGold(h, TeamRadiant)
                 -- end
-                GPM.UpdateBotGold(h, 5)
-				XP.UpdateXP(h, 5)
+                GPM.UpdateBotGold(h, 3)
+				XP.UpdateXP(h, 3)
+                Attributes.UpdateAttr(h, 1)
             end
 
             for _, h in pairs(TeamDire) do
                 -- if bBuffFlags.gpm.dire then
                 --     GPM.UpdateBotGold(h, TeamDire)
                 -- end
-                GPM.UpdateBotGold(h, 10)
-				XP.UpdateXP(h, 10)
+                GPM.UpdateBotGold(h, 6)
+				XP.UpdateXP(h, 6)
+                Attributes.UpdateAttr(h, 2)
             end
 
             -- if not Helper.IsTurboMode() then

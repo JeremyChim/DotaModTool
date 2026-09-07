@@ -64,7 +64,7 @@ function XP.UpdateXP(bot, xp)
     end
 
     if not bot:IsAlive() then
-        xp = xp * 3
+        xp = xp * 2
     end
 
     bot:AddExperience(xp, 0, false, true, bot:GetPlayerOwnerID())
