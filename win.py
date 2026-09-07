@@ -345,16 +345,19 @@ class Win(QMainWindow, Ui_MainWindow):
                 json.dumps(self.cn_name, ensure_ascii=False, indent=2)
             )
             self.save_cn_name_pushButton.setEnabled(False)
+            self._refresh_files()
             self._print(f'加载中文译名：{NAME_FILE}', show_in_bar=False)
         except FileNotFoundError:
             self.cn_name = {}
             self.cn_name_plainTextEdit.clear()
             self.save_cn_name_pushButton.setEnabled(True)
+            self._refresh_files()
             self._print(f'中文译名文件不存在：{NAME_FILE}')
         except (json.JSONDecodeError, ValueError) as e:
             self.cn_name = {}
             self.cn_name_plainTextEdit.clear()
             self.save_cn_name_pushButton.setEnabled(True)
+            self._refresh_files()
             self._print(f'加载中文译名失败：{e}')
 
     def save_cn_name(self):
@@ -918,13 +921,42 @@ class Win(QMainWindow, Ui_MainWindow):
         self.show()
 
     def show_files(self, files):
-        """展示文件列表"""
+        """展示英雄名、首个中文译名以及启用状态。"""
         self.heroFiles_listWidget.clear()
-        for f in files:
-            item = QListWidgetItem(f)
-            if os.path.exists(os.path.join(HERO_DIR2, f)):
-                color = self._get_color(self.theme)
-                item.setForeground(QColor(color))
+        for filename in files:
+            hero_key = os.path.splitext(filename)[0]
+            prefix = 'npc_dota_hero_'
+            hero_name = (
+                hero_key[len(prefix):]
+                if hero_key.startswith(prefix)
+                else hero_key
+            )
+            cn_names = str(self.cn_name.get(hero_key, '')).strip()
+            primary_cn_name = cn_names.split('，', 1)[0].strip()
+            display_name = (
+                f'{hero_name} | {primary_cn_name}'
+                if primary_cn_name
+                else hero_name
+            )
+
+            item = QListWidgetItem(display_name)
+            item.setData(Qt.UserRole, filename)
+            enabled_path = os.path.join(HERO_DIR2, filename)
+            disabled_path = f'{enabled_path}1'
+            if os.path.isfile(enabled_path):
+                color = '#3f7018' if self.theme == 'light' else '#98c379'
+                status = '已启用'
+            elif os.path.isfile(disabled_path):
+                color = '#b4232c' if self.theme == 'light' else '#e06c75'
+                status = '已禁用'
+            else:
+                color = '#39414b' if self.theme == 'light' else '#d7dce2'
+                status = '未修改'
+            item.setForeground(QColor(color))
+            tooltip = f'{filename}\n状态：{status}'
+            if cn_names:
+                tooltip += f'\n中文名：{cn_names}'
+            item.setToolTip(tooltip)
             self.heroFiles_listWidget.addItem(item)
 
     def search(self, text):
@@ -946,9 +978,14 @@ class Win(QMainWindow, Ui_MainWindow):
         """双击英雄文件时，将不带 .txt 的文件名复制到剪贴板。"""
         if item is None:
             return
-        filename = os.path.splitext(item.text())[0]
+        filename = os.path.splitext(self._hero_filename_from_item(item))[0]
         QApplication.clipboard().setText(filename)
         self._print(f'已复制文件名：{filename}')
+
+    def _hero_filename_from_item(self, item):
+        """从英雄列表项获取不受显示文本影响的真实文件名。"""
+        filename = item.data(Qt.UserRole)
+        return str(filename) if filename else item.text()
 
     def refresh_enable_list(self):
         """显示 HERO_DIR2 中已启用和已禁用的英雄文件。"""
@@ -1144,7 +1181,7 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
-        self.current_file = item.text()
+        self.current_file = self._hero_filename_from_item(item)
         path = os.path.join(HERO_DIR2, self.current_file)
         if not os.path.exists(path):
             path = os.path.join(HERO_DIR, self.current_file)
@@ -1475,7 +1512,7 @@ class Win(QMainWindow, Ui_MainWindow):
             "}"
             "QListWidget#heroFiles_listWidget {"
             "  padding: 4px; border: 1px solid #4b5263; border-radius: 6px;"
-            "  background-color: #282c34; color: #98c379;"
+            "  background-color: #282c34; color: #d7dce2;"
             "}"
             "QListWidget#heroFiles_listWidget::item {"
             "  min-height: 22px; padding: 0 6px; margin: 1px 0;"
