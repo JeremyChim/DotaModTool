@@ -31,10 +31,10 @@ local TeamKillsTrackingTable = {
 }
 local TauntModifierTimers = {}
 local TauntTime = 4
-local GoldPenaltyNetworthDiffThreshold = 1000
+local GoldPenaltyNetworthDiffThreshold = 2000
 local GoldPenaltyPercentageMax = 0.85
-local GoldPenaltyAmountMax = -500
-local GoldPenaltyAmountMin = -5
+local GoldPenaltyAmountMax = -5000
+local GoldPenaltyAmountMin = -50
 local GoldPenaltyDiffRatioMultipler = 1.25
 local GoldPenaltyTimeFactor = 30 * 60 -- after 25 mins, use full penalty.
 

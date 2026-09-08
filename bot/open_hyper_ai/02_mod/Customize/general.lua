@@ -72,13 +72,13 @@ Customize.Weak_Hero_Cap = 1
 Customize.Weak_Penalty = { type = "exp", base = 0.6 }
 
 -- Exact match on unit names by default; set Customize.Strict_Ban_Match = false to allow guarded substring matches (length ≥ 6).
-Customize.Strict_Ban_Match = true
+Customize.Strict_Ban_Match = false
 
 -- To allow bots do trash talking in different scenarios: got fb, killing a human, etc. Disable this also disables GPT chat.
-Customize.Allow_Trash_Talk = true
+Customize.Allow_Trash_Talk = false
 
 -- To allow bots response with GPT generated text to your chats in global channel. Disable Allow_Trash_Talk can disable this.
-Customize.Allow_AI_GPT_Response = true
+Customize.Allow_AI_GPT_Response = false
 
 -- Set the level of bots' trash talks. Disable Allow_Trash_Talk can disable this.
 -- 1 => no trash talks from ally bots, no taunt from enemy after it gets a kill. 2 => ally bots also trash talk to you, allow taunt from enemy after it gets a kill.
@@ -100,8 +100,8 @@ Customize.Show_Team_Names = false
 
 -- Set custom team name tags for each side. Leave as '' to use a random pro team name.
 -- Examples: "TEAM1", "OG", "NAVI", etc.
-Customize.Radiant_Team_Name = ''
-Customize.Dire_Team_Name = ''
+Customize.Radiant_Team_Name = 'LGD'
+Customize.Dire_Team_Name = 'OG'
 
 -- The desire level that the bots will group up and push the same lane. 
 -- 1 is mild meaning bots will group up only when convenient; 3 is bots will almost always try to push together.
