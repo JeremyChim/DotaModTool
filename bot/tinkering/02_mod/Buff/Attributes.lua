@@ -7,7 +7,7 @@ end
 
 
 
--- 每分钟，加经验
+-- 每分钟，加属性
 function Attributes.UpdateAttr(bot, attr)
     local gameTime = Helper.DotaTime()
     local minute = math.floor(gameTime / 60)
