@@ -144,7 +144,6 @@
 				"special_bonus_shard"		"-25%"
 				"special_bonus_scepter"		"-25%"
 				"special_bonus_unique_phantom_assassin_7"	"-2.0"
-
 			}
 			"move_slow"
 			{
@@ -408,7 +407,7 @@
 				"value"		"9.5"
 				"special_bonus_shard"		"+50"
 				"special_bonus_scepter"		"+50"
-				"hero_levelup"						"+0.5"
+				"hero_levelup"			"+0.5"
 			}
 			"immediate_cast"
 			{
