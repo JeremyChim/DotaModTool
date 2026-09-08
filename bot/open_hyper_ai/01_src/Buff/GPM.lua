@@ -1,1 +1,37 @@
-require('bots/Buff/Helper')if GPM==nil then GPM={}end;function GPM.TargetGPM(a)if a<=10*60 then return 450 elseif a<=20*60 then return 600 elseif a<=30*60 then return 750 else return RandomInt(900,1000)end end;function GPM.UpdateBotGold(b)local c=Helper.DotaTime()/60;local d=GPM.TargetGPM(c)local e=PlayerResource:GetGoldPerMin(b:GetPlayerID())local f;if e==nil or e==0 then f=1;log('[Buff][GPM] %s currentGPM=0 -- defaulting goldPerTick=1',tostring(b:GetUnitName()))else f=d/e end;if f<1 then f=1 end;if b:IsAlive()and c>0 then local g=1+math.ceil(f)b:ModifyGold(g,true,0)log('[Buff][GPM] %s +%s gold (targetGPM=%s, currentGPM=%s, gameTime=%.1fmin)',tostring(b:GetUnitName()),tostring(g),tostring(d),tostring(e),c)else log('[Buff][GPM] %s skipped (alive=%s, gameTime=%.1fmin)',tostring(b:GetUnitName()),tostring(b:IsAlive()),c)end end;return GPM
+dofile('bots/Buff/Helper')
+
+if GPM == nil
+then
+    GPM = {}
+end
+
+-- Reasonable GPM (XPM later)
+function GPM.TargetGPM(time)
+    if time <= 10 * 60 then
+        return 450
+    elseif time <= 20 * 60 then
+        return 600
+    elseif time <= 30 * 60 then
+        return 750
+    else
+        return RandomInt(900, 1000)
+    end
+end
+
+function GPM.UpdateBotGold(bot)
+    local gameTime = Helper.DotaTime() / 60
+    local targetGPM = GPM.TargetGPM(gameTime)
+
+    local currentGPM = PlayerResource:GetGoldPerMin(bot:GetPlayerID())
+    local goldPerTick = targetGPM / currentGPM
+
+    if goldPerTick < 1 then goldPerTick = 1 end
+
+    if bot:IsAlive()
+    and gameTime > 0
+    then
+        bot:ModifyGold(1 + math.ceil(goldPerTick), true, 0)
+    end
+end
+
+return GPM

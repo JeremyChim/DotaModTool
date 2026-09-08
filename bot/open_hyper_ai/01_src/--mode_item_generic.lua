@@ -1,1 +1,7 @@
-local a=GetBot()local b=a:GetUnitName()if a==nil or a:IsInvulnerable()or not a:IsHero()or not a:IsAlive()or not string.find(b,"hero")or a:IsIllusion()then return end;function GetDesire()return BOT_MODE_DESIRE_NONE end
+local bot = GetBot()
+local botName = bot:GetUnitName()
+if bot == nil or bot:IsInvulnerable() or not bot:IsHero() or not bot:IsAlive() or not string.find(botName, "hero") or bot:IsIllusion() then return end
+
+function GetDesire()
+	return BOT_MODE_DESIRE_NONE
+end

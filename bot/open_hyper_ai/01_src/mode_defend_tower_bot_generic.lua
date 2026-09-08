@@ -1,1 +1,11 @@
-local a=require(GetScriptDirectory()..'/FuncLib/systems/defend')local b=GetBot()local c=b:GetUnitName()function GetDesire()if ShouldSkipBotThink(b)then return 0 end;return a.GetDefendDesire(b,LANE_BOT)end;if SafeCall then local d=GetDesire;local e=Think;if d then GetDesire=SafeCall(d,0,'DEFEND_TOWER_BOT_GetDesire')end;if e then Think=SafeCall(e,nil,'DEFEND_TOWER_BOT_Think')end end
+local Defend = require( GetScriptDirectory()..'/FunLib/aba_defend')
+
+local bot = GetBot()
+local botName = bot:GetUnitName()
+
+if bot:IsInvulnerable() or not bot:IsHero() or not string.find(botName, "hero") or bot:IsIllusion() then
+	return
+end
+
+function GetDesire() return Defend.GetDefendDesire(bot, LANE_BOT) end
+function Think() Defend.DefendThink(bot, LANE_BOT) end

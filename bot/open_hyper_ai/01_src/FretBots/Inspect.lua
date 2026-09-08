@@ -1,4 +1,8 @@
-local a={_VERSION='inspect.lua 3.1.0',_URL='http://github.com/kikito/inspect.lua',_DESCRIPTION='human-readable representations of tables',_LICENSE=[[
+local inspect ={
+	_VERSION = 'inspect.lua 3.1.0',
+	_URL     = 'http://github.com/kikito/inspect.lua',
+	_DESCRIPTION = 'human-readable representations of tables',
+	_LICENSE = [[
 		MIT LICENSE
 		Copyright (c) 2013 Enrique García Cota
 		Permission is hereby granted, free of charge, to any person obtaining a
@@ -17,4 +21,309 @@ local a={_VERSION='inspect.lua 3.1.0',_URL='http://github.com/kikito/inspect.lua
 		CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 		SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-	]]}local tostring=tostring;a.KEY=setmetatable({},{__tostring=function()return'inspect.KEY'end})a.METATABLE=setmetatable({},{__tostring=function()return'inspect.METATABLE'end})local function b(c)return next,c,nil end;local function d(e)if e:match('"')and not e:match("'")then return"'"..e.."'"end;return'"'..e:gsub('"','\\"')..'"'end;local f={["\a"]="\\a",["\b"]="\\b",["\f"]="\\f",["\n"]="\\n",["\r"]="\\r",["\t"]="\\t",["\v"]="\\v"}local g={}for h=0,31 do local i=string.char(h)if not f[i]then f[i]="\\"..h;g[i]=string.format("\\%03d",h)end end;local function j(e)return e:gsub("\\","\\\\"):gsub("(%c)%f[0-9]",g):gsub("%c",f)end;local function k(e)return type(e)=='string'and e:match("^[_%a][_%a%d]*$")end;local function l(m,n)return type(m)=='number'and 1<=m and m<=n and math.floor(m)==m end;local o={['number']=1,['boolean']=2,['string']=3,['table']=4,['function']=5,['userdata']=6,['thread']=7}local function p(q,r)local s,t=type(q),type(r)if s==t and(s=='string'or s=='number')then return q<r end;local u,v=o[s],o[t]if u and v then return o[s]<o[t]elseif u then return true elseif v then return false end;return s<t end;local function w(c)local x=1;local y=rawget(c,x)while y~=nil do x=x+1;y=rawget(c,x)end;return x-1 end;local function z(c)local A,B={},0;local n=w(c)for m,C in b(c)do if not l(m,n)then B=B+1;A[B]=m end end;table.sort(A,p)return A,B,n end;local function D(c,E)E=E or{}if type(c)=='table'then if not E[c]then E[c]=1;for m,y in b(c)do D(m,E)D(y,E)end;D(getmetatable(c),E)else E[c]=E[c]+1 end end;return E end;local F=function(G)local H,x={},#G;for h=1,x do H[h]=G[h]end;return H,x end;local function I(J,...)local A={...}local K,x=F(J)for h=1,#A do K[x+h]=A[h]end;return K end;local function L(M,N,J,O)if N==nil then return nil end;if O[N]then return O[N]end;local P=M(N,J)if type(P)=='table'then local Q={}O[N]=Q;local R;for m,y in b(P)do R=L(M,m,I(J,m,a.KEY),O)if R~=nil then Q[R]=L(M,y,I(J,R),O)end end;local S=L(M,getmetatable(P),I(J,a.METATABLE),O)if type(S)~='table'then S=nil end;setmetatable(Q,S)P=Q end;return P end;local T={}local U={__index=T}function T:puts(...)local V={...}local W=self.buffer;local x=#W;for h=1,#V do x=x+1;W[x]=V[h]end end;function T:down(X)self.level=self.level+1;X()self.level=self.level-1 end;function T:tabify()self:puts(self.newline,string.rep(self.indent,self.level))end;function T:alreadyVisited(y)return self.ids[y]~=nil end;function T:getId(y)local Y=self.ids[y]if not Y then local Z=type(y)Y=(self.maxIds[Z]or 0)+1;self.maxIds[Z]=Y;self.ids[y]=Y end;return tostring(Y)end;function T:putKey(m)if k(m)then return self:puts(m)end;self:puts("[")self:putValue(m)self:puts("]")end;function T:putTable(c)if c==a.KEY or c==a.METATABLE then self:puts(tostring(c))elseif self:alreadyVisited(c)then self:puts('<table ',self:getId(c),'>')elseif self.level>=self.depth then self:puts('{...}')else if self.tableAppearances[c]>1 then self:puts('<',self:getId(c),'>')end;local _,a0,n=z(c)local S=getmetatable(c)self:puts('{')self:down(function()local a1=0;for h=1,n do if a1>0 then self:puts(',')end;self:puts(' ')self:putValue(c[h])a1=a1+1 end;for h=1,a0 do local m=_[h]if a1>0 then self:puts(',')end;self:tabify()self:putKey(m)self:puts(' = ')self:putValue(c[m])a1=a1+1 end;if type(S)=='table'then if a1>0 then self:puts(',')end;self:tabify()self:puts('<metatable> = ')self:putValue(S)end end)if a0>0 or type(S)=='table'then self:tabify()elseif n>0 then self:puts(' ')end;self:puts('}')end end;function T:putValue(y)local Z=type(y)if Z=='string'then self:puts(d(j(y)))elseif Z=='number'or Z=='boolean'or Z=='nil'or Z=='cdata'or Z=='ctype'then self:puts(tostring(y))elseif Z=='table'then self:putTable(y)else self:puts('<',Z,' ',self:getId(y),'>')end end;function a.inspect(a2,a3)a3=a3 or{}local a4=a3.depth or math.huge;local a5=a3.newline or'\n'local a6=a3.indent or'  'local M=a3.process;if M then a2=L(M,a2,{},{})end;local a7=setmetatable({depth=a4,level=0,buffer={},ids={},maxIds={},newline=a5,indent=a6,tableAppearances=D(a2)},U)a7:putValue(a2)return table.concat(a7.buffer)end;setmetatable(a,{__call=function(C,...)return a.inspect(...)end})return a
+	]]
+}
+
+local tostring = tostring
+
+inspect.KEY       = setmetatable({}, {__tostring = function() return 'inspect.KEY' end})
+inspect.METATABLE = setmetatable({}, {__tostring = function() return 'inspect.METATABLE' end})
+
+local function rawpairs(t)
+	return next, t, nil
+end
+
+-- Apostrophizes the string if it has quotes, but not aphostrophes
+-- Otherwise, it returns a regular quoted string
+local function smartQuote(str)
+	if str:match('"') and not str:match("'") then
+		return "'" .. str .. "'"
+	end
+	return '"' .. str:gsub('"', '\\"') .. '"'
+end
+
+-- \a => '\\a', \0 => '\\0', 31 => '\31'
+local shortControlCharEscapes = {
+	["\a"] = "\\a",  ["\b"] = "\\b", ["\f"] = "\\f", ["\n"] = "\\n",
+	["\r"] = "\\r",  ["\t"] = "\\t", ["\v"] = "\\v"
+}
+local longControlCharEscapes = {} -- \a => nil, \0 => \000, 31 => \031
+for i=0, 31 do
+	local ch = string.char(i)
+	if not shortControlCharEscapes[ch] then
+		shortControlCharEscapes[ch] = "\\"..i
+		longControlCharEscapes[ch]  = string.format("\\%03d", i)
+	end
+end
+
+local function escape(str)
+	return (str:gsub("\\", "\\\\")
+	:gsub("(%c)%f[0-9]", longControlCharEscapes)
+	:gsub("%c", shortControlCharEscapes))
+end
+
+local function isIdentifier(str)
+	return type(str) == 'string' and str:match( "^[_%a][_%a%d]*$" )
+end
+
+local function isSequenceKey(k, sequenceLength)
+	return type(k) == 'number'
+		 and 1 <= k
+		 and k <= sequenceLength
+		 and math.floor(k) == k
+end
+
+local defaultTypeOrders = {
+	['number']   = 1, ['boolean']  = 2, ['string'] = 3, ['table'] = 4,
+	['function'] = 5, ['userdata'] = 6, ['thread'] = 7
+}
+
+local function sortKeys(a, b)
+	local ta, tb = type(a), type(b)
+
+	-- strings and numbers are sorted numerically/alphabetically
+	if ta == tb and (ta == 'string' or ta == 'number') then return a < b end
+
+	local dta, dtb = defaultTypeOrders[ta], defaultTypeOrders[tb]
+	-- Two default types are compared according to the defaultTypeOrders table
+	if dta and dtb then return defaultTypeOrders[ta] < defaultTypeOrders[tb]
+	elseif dta     then return true  -- default types before custom ones
+	elseif dtb     then return false -- custom types after default ones
+	end
+
+	-- custom types are sorted out alphabetically
+	return ta < tb
+end
+
+-- For implementation reasons, the behavior of rawlen & # is "undefined" when
+-- tables aren't pure sequences. So we implement our own # operator.
+local function getSequenceLength(t)
+	local len = 1
+	local v = rawget(t,len)
+	while v ~= nil do
+		len = len + 1
+		v = rawget(t,len)
+	end
+	return len - 1
+end
+
+local function getNonSequentialKeys(t)
+	local keys, keysLength = {}, 0
+	local sequenceLength = getSequenceLength(t)
+	for k,_ in rawpairs(t) do
+		if not isSequenceKey(k, sequenceLength) then
+			keysLength = keysLength + 1
+			keys[keysLength] = k
+		end
+	end
+	table.sort(keys, sortKeys)
+	return keys, keysLength, sequenceLength
+end
+
+local function countTableAppearances(t, tableAppearances)
+	tableAppearances = tableAppearances or {}
+
+	if type(t) == 'table' then
+		if not tableAppearances[t] then
+			tableAppearances[t] = 1
+			for k,v in rawpairs(t) do
+				countTableAppearances(k, tableAppearances)
+				countTableAppearances(v, tableAppearances)
+			end
+			countTableAppearances(getmetatable(t), tableAppearances)
+		else
+			tableAppearances[t] = tableAppearances[t] + 1
+		end
+	end
+
+	return tableAppearances
+end
+
+local copySequence = function(s)
+	local copy, len = {}, #s
+	for i=1, len do copy[i] = s[i] end
+	return copy, len
+end
+
+local function makePath(path, ...)
+	local keys = {...}
+	local newPath, len = copySequence(path)
+	for i=1, #keys do
+		newPath[len + i] = keys[i]
+	end
+	return newPath
+end
+
+local function processRecursive(process, item, path, visited)
+	if item == nil then return nil end
+	if visited[item] then return visited[item] end
+
+	local processed = process(item, path)
+	if type(processed) == 'table' then
+		local processedCopy = {}
+		visited[item] = processedCopy
+		local processedKey
+
+		for k,v in rawpairs(processed) do
+			processedKey = processRecursive(process, k, makePath(path, k, inspect.KEY), visited)
+			if processedKey ~= nil then
+				processedCopy[processedKey] = processRecursive(process, v, makePath(path, processedKey), visited)
+			end
+		end
+
+		local mt  = processRecursive(process, getmetatable(processed), makePath(path, inspect.METATABLE), visited)
+		if type(mt) ~= 'table' then mt = nil end -- ignore not nil/table __metatable field
+		setmetatable(processedCopy, mt)
+		processed = processedCopy
+	end
+	return processed
+end
+
+
+
+-------------------------------------------------------------------
+
+local Inspector = {}
+local Inspector_mt = {__index = Inspector}
+
+function Inspector:puts(...)
+	local args   = {...}
+	local buffer = self.buffer
+	local len    = #buffer
+	for i=1, #args do
+		len = len + 1
+		buffer[len] = args[i]
+	end
+end
+
+function Inspector:down(f)
+	self.level = self.level + 1
+	f()
+	self.level = self.level - 1
+end
+
+function Inspector:tabify()
+	self:puts(self.newline, string.rep(self.indent, self.level))
+end
+
+function Inspector:alreadyVisited(v)
+	return self.ids[v] ~= nil
+end
+
+function Inspector:getId(v)
+	local id = self.ids[v]
+	if not id then
+		local tv = type(v)
+		id              = (self.maxIds[tv] or 0) + 1
+		self.maxIds[tv] = id
+		self.ids[v]     = id
+	end
+	return tostring(id)
+end
+
+function Inspector:putKey(k)
+	if isIdentifier(k) then return self:puts(k) end
+	self:puts("[")
+	self:putValue(k)
+	self:puts("]")
+end
+
+function Inspector:putTable(t)
+	if t == inspect.KEY or t == inspect.METATABLE then
+		self:puts(tostring(t))
+	elseif self:alreadyVisited(t) then
+		self:puts('<table ', self:getId(t), '>')
+	elseif self.level >= self.depth then
+		self:puts('{...}')
+	else
+		if self.tableAppearances[t] > 1 then self:puts('<', self:getId(t), '>') end
+
+		local nonSequentialKeys, nonSequentialKeysLength, sequenceLength = getNonSequentialKeys(t)
+		local mt                = getmetatable(t)
+
+		self:puts('{')
+		self:down(function()
+			local count = 0
+			for i=1, sequenceLength do
+				if count > 0 then self:puts(',') end
+				self:puts(' ')
+				self:putValue(t[i])
+				count = count + 1
+			end
+
+			for i=1, nonSequentialKeysLength do
+				local k = nonSequentialKeys[i]
+				if count > 0 then self:puts(',') end
+				self:tabify()
+				self:putKey(k)
+				self:puts(' = ')
+				self:putValue(t[k])
+				count = count + 1
+			end
+
+			if type(mt) == 'table' then
+				if count > 0 then self:puts(',') end
+				self:tabify()
+				self:puts('<metatable> = ')
+				self:putValue(mt)
+			end
+		end)
+
+		if nonSequentialKeysLength > 0 or type(mt) == 'table' then -- result is multi-lined. Justify closing }
+			self:tabify()
+		elseif sequenceLength > 0 then -- array tables have one extra space before closing }
+			self:puts(' ')
+		end
+
+		self:puts('}')
+	end
+end
+
+function Inspector:putValue(v)
+	local tv = type(v)
+
+	if tv == 'string' then
+		self:puts(smartQuote(escape(v)))
+	elseif tv == 'number' or tv == 'boolean' or tv == 'nil' or
+				 tv == 'cdata' or tv == 'ctype' then
+		self:puts(tostring(v))
+	elseif tv == 'table' then
+		self:putTable(v)
+	else
+		self:puts('<', tv, ' ', self:getId(v), '>')
+	end
+end
+
+-------------------------------------------------------------------
+
+function inspect.inspect(root, options)
+	options       = options or {}
+
+	local depth   = options.depth   or math.huge
+	local newline = options.newline or '\n'
+	local indent  = options.indent  or '  '
+	local process = options.process
+
+	if process then
+		root = processRecursive(process, root, {}, {})
+	end
+
+	local inspector = setmetatable({
+		depth            = depth,
+		level            = 0,
+		buffer           = {},
+		ids              = {},
+		maxIds           = {},
+		newline          = newline,
+		indent           = indent,
+		tableAppearances = countTableAppearances(root)
+	}, Inspector_mt)
+
+	inspector:putValue(root)
+
+	return table.concat(inspector.buffer)
+end
+
+setmetatable(inspect, { __call = function(_, ...) return inspect.inspect(...) end })
+
+return inspect

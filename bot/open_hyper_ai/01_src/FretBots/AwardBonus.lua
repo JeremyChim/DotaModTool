@@ -1,1 +1,616 @@
-require'bots.FretBots.Settings'require'bots.FretBots.DataTables'require'bots.FretBots.Debug'require'bots.FretBots.Flags'require'bots.FretBots.GameState'require'bots.FretBots.Utilities'local a=false;local b=Debug.IsDebug()and a;local c=120;if AwardBonus==nil then AwardBonus={}end;local d={0,230,600,1080,1660,2260,2980,3730,4620,5550,6520,7530,8580,9805,11055,12330,13630,14955,16455,18045,19645,21495,23595,25945,28545,32045,36545,42045,48545,56045}function AwardBonus:gold(e,f)if e.stats.awards.gold<Settings.awardCap.gold and f>0 then PlayerResource:ModifyGold(e.stats.id,f,false,0)e.stats.awards.gold=e.stats.awards.gold+f;Debug:Print('Awarding '..tostring(f)..' gold to '..e.stats.name..'.')return true end;return false end;function AwardBonus:stats(e,f)if e.stats.awards.stats<Settings.awardCap.stats and f>0 then local g=AwardBonus:Clamp(f,e.stats.awards.stats,Settings.awardCap.stats)e:ModifyStrength(g)e:ModifyAgility(g)e:ModifyIntellect(g)e.stats.awards.stats=e.stats.awards.stats+g;Debug:Print('Awarding '..tostring(g)..' stats to '..e.stats.name..'.')return true end;return false end;function AwardBonus:armor(e,f)if e.stats.awards.armor<Settings.awardCap.armor and f>0 then local g=AwardBonus:Clamp(f,e.stats.awards.armor,Settings.awardCap.armor)local h=e:GetPhysicalArmorBaseValue()local i=e:GetAgility()*1/6;e:SetPhysicalArmorBaseValue(h-i+g)e.stats.awards.armor=e.stats.awards.armor+g;Debug:Print('Awarding '..tostring(g)..' armor to '..e.stats.name..'.')return true end;return false end;function AwardBonus:magicResist(e,f)if e.stats.awards.magicResist<Settings.awardCap.magicResist and f>0 then local g=AwardBonus:Clamp(f,e.stats.awards.magicResist,Settings.awardCap.magicResist)local j;j=e:GetBaseMagicalResistanceValue()local k=j+g;if k<60 then e:SetBaseMagicalResistanceValue(k)e.stats.awards.magicResist=e.stats.awards.magicResist+g;Debug:Print('Awarding '..tostring(g)..' magic resist to '..e.stats.name..'.')end;return true end;return false end;function AwardBonus:levels(e,l)if e.stats.awards.levels<Settings.awardCap.levels and l>0 then local m=PlayerResource:GetLevel(e.stats.id)if m==30 then Debug:Print(e.stats.name..': Already level 30, cannot award levels.')return end;local n=e:GetCurrentXP()local o=d[m]local p=math.ceil(l)local q=m+p;if q>30 then q=30 end;local r=d[q]local s=(r-o)/p;local t=Utilities:Round(s*l)e:AddExperience(t,0,false,true)e.stats.awards.levels=e.stats.awards.levels+l;Debug:Print('Awarding '..tostring(l)..' levels to '..e.stats.name..'.')return true end;return false end;function AwardBonus:neutral(e,f)if e.stats.awards.neutral<Settings.awardCap.neutral then local u=e.stats.neutralTier+f;local v;e.stats.neutralTiming=e.stats.neutralTiming-f;if e.stats.neutralTiming<0 then e.stats.neutralTiming=0 end;e.stats.awards.neutral=e.stats.awards.neutral+f;return true,f else Debug:Print('Bot has reached the neutral award limit of '..Settings.awardCap.neutral)return false end end;function AwardBonus:Experience(e,f)if f>0 then e:AddExperience(f,0,false,true)Debug:Print('Awarding '..tostring(f)..' experience to '..e.stats.name..'.')end end;function AwardBonus:Death(e)local w={}table.insert(w,e)if not DataTables:IsRealHero(e)then Debug:Print(e:GetName()..' is not a real hero unit. No Death Award given.')return end;local x=e.stats.name..' Death Bonus Awarded:'local y=false;local z=false;AwardBonus:AccruetDeathBonusChances(e)local A=0;for _,B in ipairs(Settings.deathBonus.order)do if not e.stats.isBot and Settings.deathBonus.isBotsOnly[B]then return end;if Settings.deathBonus.enabled[B]then local C=AwardBonus:ShouldAward(e,B)if C then A=A+1 end;if A>Settings.deathBonus.maxAwards then if b then log('%s: Max awards of %s reached.',e.stats.name,Settings.deathBonus.maxAwards)end;break end;if C then local D=0;local E=false;local v;local F;D,E=AwardBonus:GetValue(e,B)if D<=0 then break end;v,F=AwardBonus[B](AwardBonus,e,D)if v then if F==nil then table.insert(w,{B,D})else table.insert(w,{B,F})end;y=true;z=E or z;if F==nil then x=x..' '..B..': '..D else x=x..' '..B..': '..F end;if b then end;if Settings.deathBonus.accrue[B]then e.stats.chance[B]=0 end end end end end;if Settings.deathBonus.announce then if y and not z then Utilities:Print(w,MSG_AWARD,ATTENTION)elseif y and z then Utilities:Print(w,MSG_AWARD,BAD_LIST)end end end;function AwardBonus:AccruetDeathBonusChances(e)for _,B in pairs(Settings.deathBonus.order)do if e.stats.chance[B]~=nil and Settings.deathBonus.chance[B]~=nil then if Settings.deathBonus.accrue[B]then e.stats.chance[B]=e.stats.chance[B]+Settings.deathBonus.chance[B]end end end end;function AwardBonus:GetValue(e,B)local E=false;local G;local H={}H.award=B;H.range={Settings.deathBonus.range[B][1],Settings.deathBonus.range[B][2]}local i=Utilities:RandomDecimal(Settings.deathBonus.range[B][1],Settings.deathBonus.range[B][2])H.baseAward=i;if Settings.deathBonus.isRangeTimeScaleEnable then i=i*Utilities:GetTime()/Settings.deathBonus.rangeTimeScale[B]H.rangeScale=Settings.deathBonus.rangeTimeScale[B]end;local I=Utilities:GetVariance(Settings.deathBonus.variance[B])local J=1;if Settings.deathBonus.scaleEnabled[B]then J=Settings.deathBonus.scale[B][e.stats.role]end;local K=AwardBonus:GetMultiplier(e.stats.skill,J,I)local L=i*K;L=L+Settings.deathBonus.offset[B]H.scaled=L;local M=1;if Settings.difficulty<Settings.diffMaxDenominator/2 then M=0.5 else M=1.5 end;L=L*M;local g=0;if Settings.deathBonus.clampOverride[B]then g=Utilities:Round(L,Settings.deathBonus.round[B])else local N=Settings.deathBonus.clamp[B][2]if Settings.deathBonus.isClampTimeScaleEnable then G=Utilities:GetTime()N=N*Utilities:GetTime()/Settings.deathBonus.clampTimeScale[B]end;N=Utilities:Round(N,Settings.deathBonus.round[B])H.clamps={Settings.deathBonus.clamp[B][1],N}local O=Utilities:Round(L,Settings.deathBonus.round[B])g=Utilities:Clamp(O,Settings.deathBonus.clamp[B][1],N)H.rounded=O end;if Utilities:IsTurboMode()then g=g*1.7 end;if e.stats.awards[B]+g>=Settings.awardCap[B]then g=Settings.awardCap[B]-e.stats.awards[B]end;local P,Q=GameState:GetThrottle()if P~=nil and e.stats.team==Q then local R=g;g=g*P;g=Utilities:Round(g,Settings.deathBonus.round[B])Debug:Print(e.stats.name..': Throttled '..B..' award: '..P..' * '..R)end;if Settings.allyScale~=nil and e.stats.team==Settings.allyScaleTeam then g=g*Settings.allyScale end;H.clamped=g;E=Settings.deathBonus.isClampLoud[B]and g==Settings.deathBonus.clamp[B][2]or Settings.deathBonus.isLoud[B]return g,E end;function AwardBonus:ShouldAward(e,B)if e.stats.chance[B]>=1 then if b then log('%s: Chance for %s was 1 or greater.',e.stats.name,B)end;return true end;local S=Utilities:GetTime()if S<Settings.deathBonus.timeGate[B]then local x=''x=x..e.stats.name..': '..B;x=x..' bonus not given because the time gate has not been met: 'x=x..S..', '..Settings.deathBonus.timeGate[B]Debug:Print(x)return false end;if e.stats.awards[B]>=Settings.awardCap[B]then return false end;if Settings.deathBonus.deathStreakThreshold>=0 then if e.stats.deathStreak>=Settings.deathBonus.deathStreakThreshold then if b then log('%s: automatic %s bonus due to death streak of %s.',e.stats.name,B,e.stats.deathStreak)end;return true end end;local T=math.random()local C=T<e.stats.chance[B]return C end;function AwardBonus:GetMultiplier(U,V,I)local W=1;if Utilities:IsTurboMode()then W=1.5 end;if Settings.isMultiplicative then return U*V*I*Settings.difficultyScale*W else return U+V+I+Settings.difficultyScale+W-3 end end;function AwardBonus:GetPerMinuteBonus(e,X,Y)local Z=Utilities:Round(PlayerResource:GetGoldPerMin(e.stats.id))e.stats.netWorth=PlayerResource:GetNetWorth(e.stats.id)local a0,H=AwardBonus:GetSpecificPerMinuteBonus(e,Z,X,Settings.gpm)local a1=Utilities:Round(PlayerResource:GetXPPerMin(e.stats.id))local a2,H=AwardBonus:GetSpecificPerMinuteBonus(e,a1,Y,Settings.xpm)if e.newDeathXp~=nil and e:GetDeathXP()~=e.newDeathXp then e:SetCustomDeathXP(e.newDeathXp)end;if Settings.difficulty>=1 then if Utilities:IsTurboMode()then e:SetBaseManaRegen((0.4+Settings.difficultyScale*0.5)*0.5*Utilities:GetAbsoluteTime()/60)else e:SetBaseManaRegen((0.2+Settings.difficultyScale*0.5)*0.5*Utilities:GetAbsoluteTime()/60)end end;return a0,a2 end;function AwardBonus:GetSpecificPerMinuteBonus(e,a3,a4,a5)local H={}if a4[e.stats.role]==nil then local a6=1;repeat a4[e.stats.role]=a4[a6]a6=a6+1 until a4[e.stats.role]~=nil or a6>=5 end;local V=a5.scale[e.stats.role]local a7=(c-e.stats.role*10)*V;local a8=Settings.difficulty*a7;if a4[e.stats.role]==nil or a4[e.stats.role]<a8 then a4[e.stats.role]=a8 end;local a9=a4[e.stats.role]local aa=a9+a5.offset;local U=e.stats.skill;local I=Utilities:GetVariance(a5.variance)local K=AwardBonus:GetMultiplier(U,V,I)aa=Utilities:Round(aa*K)if a3>aa then return 0,e.stats.name..' is above the target PM: '..tostring(a3)..', '..tostring(aa)end;local ab=aa-a3;local ac=0;if not a5.clampOverride then local ad=Utilities:Round(Utilities:GetTime()/60)local adjustedClamp=a5.clamp[2]if a5.perMinuteScale~=0 then adjustedClamp=adjustedClamp+a5.perMinuteScale*ad end;ac=Utilities:RoundedClamp(ab,a5.clamp[1],adjustedClamp)else ac=Utilities:Round(ab)end;local f=Utilities:Round(ac*Utilities:GetTime()/60)local P,Q=GameState:GetThrottle()if P~=nil and e.stats.team==Q then f=f*P;f=Utilities:Round(f)Debug:Print(e.stats.name..': Throttled award: '..a3 ..': '..P)end;if Settings.allyScale~=nil and e.stats.team==Settings.allyScaleTeam then f=f*Settings.allyScale end;H.name=e.stats.name;H.role=e.stats.role;H.pmPlayer=a9;H.pmBot=a3;H.pmTarget=aa;H.skill=U;H.scale=V;H.variance=I;H.multiplier=K;H.adjustedClamp=adjustedClamp;H.pmClamped=ac;H.bonus=f;return f,H end;function AwardBonus:PunishForAbuse()local ae=GameRules:State_Get()if ae==DOTA_GAMERULES_STATE_PRE_GAME then local x='Bot rune AI abuse is a bad idea!'Utilities:Print(x,MSG_BAD,BAD_LIST)for af=2,3 do for _,e in ipairs(AllBots[af])do local w={}table.insert(w,e)local v=AwardBonus['levels'](AwardBonus,e,17)if v then table.insert(w,{'levels',17})end;local v=AwardBonus['stats'](AwardBonus,e,25)if v then table.insert(w,{'stats',25})end;Utilities:Print(w,MSG_AWARD,BAD_LIST)end end end end;function AwardBonus:IsAwardCapped(e,B)return Settings.deathBonus.awardCap[B]end;function AwardBonus:GetBaseArmor(e)local ag=e:GetLevel()-1;local ah=e.stats.agilityGain;local ai=ag*ah;local aj=e.stats.BaseAgility;local ak=e.stats.baseArmor;local h=ak+(aj+ai)/6;return h end;function AwardBonus:Clamp(f,al,am)local an=am-al;if f>an then return an end;return f end;function AwardBonus:GetStrength(ao)local ag=ao:GetLevel()-1;local ap=ag*ao.stats.strengthGain;local aq=ao.stats.baseStrength;local A=ao.stats.awards.stats;return aq,ap,A end;function AwardBonus:GetAgility(ao)local ag=ao:GetLevel()-1;local ap=ag*ao.stats.AgilityGain;local aj=ao.stats.baseAgility;local A=ao.stats.awards.stats;return aj,ap,A end;function AwardBonus:GetIntellect(ao)local ag=ao:GetLevel()-1;local ap=ag*ao.stats.intellectGain;local ar=ao.stats.baseIntellect;local A=ao.stats.awards.stats;return ar,ap,A end;function AwardBonus:GetBaseArmor(ao)local as;local at;_,as,at=AwardBonus:GetStrength(ao)local h=ao.stats.baseArmor+(as+at)/6;return h end;function AwardBonus:GetBaseMagicResist(ao)local au;local av;_,au,av=AwardBonus:GetIntellect(ao)local aw=ao.stats.baseMagicResist+(au+av)*0.1+ao.stats.awards.magicResist;local x=''x=x..'Base MR: '..tostring(Utilities:Round(ao.stats.baseMagicResist))..'  'x=x..'MR from Int: '..tostring(Utilities:Round((au+av)*0.1))..'  'x=x..'MR from Awards: '..tostring(Utilities:Round(ao.stats.awards.magicResist))..'  'x=x..'Adjusted MR: '..tostring(Utilities:Round(aw))..'  'Utilities:Print(x,MSG_GOOD)return aw end
+-- Helpers to add bonuses to bots
+
+-- Dependencies
+require 'bots.FretBots.Settings'
+require 'bots.FretBots.DataTables'
+require 'bots.FretBots.Debug'
+require 'bots.FretBots.Flags'
+require 'bots.FretBots.GameState'
+require 'bots.FretBots.Utilities'
+
+-- local debug flag
+local thisDebug = false;
+local isDebug = Debug.IsDebug() and thisDebug;
+
+local baseBonusRef = 120 -- must be greater than 50.
+
+-- Instantiate ourself
+if AwardBonus == nil then
+	AwardBonus = {}
+end
+
+-- constants for leveling
+local xpPerLevel =
+{
+	0,
+	230,
+	600,
+	1080,
+	1660,
+	2260,
+	2980,
+	3730,
+	4620,
+	5550,
+	6520,
+	7530,
+	8580,
+	9805,
+	11055,
+	12330,
+	13630,
+	14955,
+	16455,
+	18045,
+	19645,
+	21495,
+	23595,
+	25945,
+	28545,
+	32045,
+	36545,
+	42045,
+	48545,
+	56045
+}
+
+-- Gold
+function AwardBonus:gold(bot, bonus)
+	if bot.stats.awards.gold < Settings.awardCap.gold and bonus > 0 then
+		PlayerResource:ModifyGold(bot.stats.id, bonus, false, 0)
+		bot.stats.awards.gold = bot.stats.awards.gold + bonus
+		Debug:Print('Awarding '..tostring(bonus)..' gold to '..bot.stats.name..'.')
+		return true
+	end
+	return false
+end
+
+-- All stats
+function AwardBonus:stats(bot, bonus)
+	if bot.stats.awards.stats < Settings.awardCap.stats and bonus > 0 then
+		-- clamp bonus
+		local clamped = AwardBonus:Clamp(bonus, bot.stats.awards.stats, Settings.awardCap.stats)
+		bot:ModifyStrength(clamped)
+		bot:ModifyAgility(clamped)
+		bot:ModifyIntellect(clamped)
+		bot.stats.awards.stats = bot.stats.awards.stats + clamped
+		Debug:Print('Awarding '..tostring(clamped)..' stats to '..bot.stats.name..'.')
+		return true
+	end
+	return false
+end
+
+--Armor
+function AwardBonus:armor(bot, bonus)
+	if bot.stats.awards.armor < Settings.awardCap.armor and bonus > 0 then
+		-- clamp bonus
+		local clamped = AwardBonus:Clamp(bonus, bot.stats.awards.armor, Settings.awardCap.armor)
+		local armor = bot:GetPhysicalArmorBaseValue()
+		local base = bot:GetAgility() * (1/6)
+		bot:SetPhysicalArmorBaseValue(armor - base + clamped)
+		bot.stats.awards.armor = bot.stats.awards.armor + clamped
+		Debug:Print('Awarding '..tostring(clamped)..' armor to '..bot.stats.name..'.')
+		return true
+	end
+	return false
+end
+
+-- Magic Resist
+function AwardBonus:magicResist(bot, bonus)
+	if bot.stats.awards.magicResist < Settings.awardCap.magicResist and bonus > 0 then
+		local clamped = AwardBonus:Clamp(bonus, bot.stats.awards.magicResist, Settings.awardCap.magicResist)
+		local resistance
+		resistance = bot:GetBaseMagicalResistanceValue()
+		local newRes = resistance + clamped
+		if newRes < 60 then
+			bot:SetBaseMagicalResistanceValue(newRes)
+			bot.stats.awards.magicResist = bot.stats.awards.magicResist + clamped
+			Debug:Print('Awarding '..tostring(clamped)..' magic resist to '..bot.stats.name..'.')
+		end
+		return true
+	end
+	return false
+end
+
+-- Levels
+function AwardBonus:levels(bot, levels)
+	if bot.stats.awards.levels < Settings.awardCap.levels and levels > 0 then
+		-- get current level and XP
+		local currentLevel = PlayerResource:GetLevel(bot.stats.id)
+		-- if bot is level 30, exit
+		if currentLevel == 30 then
+			Debug:Print(bot.stats.name..': Already level 30, cannot award levels.')
+			return
+		end
+		local currentXP = bot:GetCurrentXP()
+		local currentLevelXP = xpPerLevel[currentLevel]
+		local targetLevel = math.ceil(levels)
+		-- Sanity check
+		local target = currentLevel + targetLevel
+		if target > 30 then target = 30 end
+		local targetLevelXP = xpPerLevel[target]
+		-- get the average amount of experience per level difference
+		local averageXP = (targetLevelXP - currentLevelXP) / targetLevel
+		-- award average XP per level times levels
+		local awardXP = Utilities:Round(averageXP * levels)
+		bot:AddExperience(awardXP, 0, false, true)
+		bot.stats.awards.levels = bot.stats.awards.levels + levels
+		Debug:Print('Awarding '..tostring(levels)..' levels to '..bot.stats.name..'.')
+		return true
+	end
+	return false
+end
+
+-- neutral
+function AwardBonus:neutral(bot, bonus)
+	if bot.stats.awards.neutral < Settings.awardCap.neutral then
+		local tier = bot.stats.neutralTier + bonus
+		local isSuccess
+		bot.stats.neutralTiming = bot.stats.neutralTiming - bonus
+		if bot.stats.neutralTiming < 0 then
+			bot.stats.neutralTiming = 0
+		end
+		bot.stats.awards.neutral = bot.stats.awards.neutral + bonus
+		--Debug:Print('Awarding neutral to '..bot.stats.name..'.')
+		return true, bonus
+	else
+		Debug:Print('Bot has reached the neutral award limit of '..Settings.awardCap.neutral)
+		return false
+	end
+end
+
+-- XP
+function AwardBonus:Experience(bot, bonus)
+	if bonus > 0 then
+		bot:AddExperience(bonus, 0, false, true)
+		Debug:Print('Awarding '..tostring(bonus)..' experience to '..bot.stats.name..'.')
+	end
+end
+
+-- Gives the bot his death awrds, if there are any
+function AwardBonus:Death(bot)
+	local awardsTable = {}
+	table.insert(awardsTable, bot)
+	-- Drop out for edge cases (LD bear, AW clone)
+	if not DataTables:IsRealHero(bot) then
+		Debug:Print(bot:GetName()..' is not a real hero unit. No Death Award given.')
+		return
+	end
+	-- to be printed to players
+	local msg = bot.stats.name .. ' Death Bonus Awarded:'
+	local isAwarded = false
+	local isLoudWarning = false
+	-- accrue chances
+	AwardBonus:AccruetDeathBonusChances(bot)
+	-- track awards
+	local awards = 0
+	-- loop over bonuses in order
+	for _, award in ipairs(Settings.deathBonus.order) do
+		-- this event gets fired for humans too, so drop out here if we don't want to give rewards to humans
+		if not bot.stats.isBot and Settings.deathBonus.isBotsOnly[award] then
+			return
+		end
+		-- check if enabled
+		if Settings.deathBonus.enabled[award] then
+			local isAward = AwardBonus:ShouldAward(bot,award)
+			-- increment awards if awarded
+			if isAward then
+				awards = awards + 1
+			end
+			-- if this award is greater than max, then break
+			if awards > Settings.deathBonus.maxAwards then
+				if isDebug then print(bot.stats.name..': Max awards of '..Settings.deathBonus.maxAwards..' reached.') end
+				break
+			end
+			-- make the award
+			if isAward then
+				local value = 0
+				local isLoud = false
+				local isSuccess
+				local name
+				-- Get value
+				value, isLoud  = AwardBonus:GetValue(bot, award)
+				-- Sanity check
+				if value <= 0 then break end
+				-- Attempt to assign the award
+				isSuccess, name = AwardBonus[award](AwardBonus, bot, value)
+				-- if success, set isAwarded, isLoudWarning, Clear chance, Update message
+				if isSuccess then
+					if name == nil then
+						table.insert(awardsTable, {award, value})
+					else
+						table.insert(awardsTable, {award, name})
+					end
+					isAwarded = true
+					isLoudWarning = (isLoud or isLoudWarning)
+					if name == nil then
+						msg = msg .. ' '..award..': '..value
+					else
+						-- special case for neutrals, they return the name of the neutral
+						msg = msg .. ' '..award..': '..name
+					end
+					if isDebug then
+						-- print(bot.stats.name..': Awarded '..award..': '..value)
+					end
+					-- Clear the chance for this award (if accrued)
+					if Settings.deathBonus.accrue[award] then
+						bot.stats.chance[award] = 0
+					end
+				end
+			end
+		end
+	end
+	if Settings.deathBonus.announce then
+		if isAwarded and not isLoudWarning then
+			Utilities:Print(awardsTable, MSG_AWARD, ATTENTION)
+			--Utilities:Print(msg, MSG_WARNING, ATTENTION)
+		elseif isAwarded and isLoudWarning then
+			Utilities:Print(awardsTable, MSG_AWARD, BAD_LIST)
+		 --Utilities:Print(msg, MSG_BAD, BAD_LIST)
+		end
+	end
+end
+
+-- Increments the chance of all accruing bonus awards
+function AwardBonus:AccruetDeathBonusChances(bot)
+	for _, award in pairs(Settings.deathBonus.order) do
+		if bot.stats.chance[award] ~= nil and Settings.deathBonus.chance[award] ~= nil then
+			if Settings.deathBonus.accrue[award] then
+				bot.stats.chance[award] = bot.stats.chance[award] + Settings.deathBonus.chance[award]
+			end
+		end
+	end
+end
+
+-- Returns a numerical value to award
+function AwardBonus:GetValue(bot, award)
+	local isLoud = false
+	local dotaTime
+	local debugTable = {}
+	debugTable.award = award
+	debugTable.range = {Settings.deathBonus.range[award][1], Settings.deathBonus.range[award][2]}
+	-- base bonus is always the same
+	local base = Utilities:RandomDecimal(Settings.deathBonus.range[award][1], Settings.deathBonus.range[award][2])
+	debugTable.baseAward = base
+	-- if range scaling is enabled, then scale
+	if Settings.deathBonus.isRangeTimeScaleEnable then
+		base = base * Utilities:GetTime() / Settings.deathBonus.rangeTimeScale[award]
+		debugTable.rangeScale = Settings.deathBonus.rangeTimeScale[award]
+	end
+	--scale base by multiplier
+	local variance = Utilities:GetVariance(Settings.deathBonus.variance[award])
+	local roleScale = 1
+	if Settings.deathBonus.scaleEnabled[award] then
+		roleScale = Settings.deathBonus.scale[award][bot.stats.role]
+	end
+	local multiplier = AwardBonus:GetMultiplier(bot.stats.skill, roleScale, variance)
+	local scaled = base * multiplier
+	-- add offset
+	scaled = scaled + Settings.deathBonus.offset[award]
+	debugTable.scaled = scaled
+
+	local diffMultiplier = 1
+	if Settings.difficulty < Settings.diffMaxDenominator / 2 then
+		diffMultiplier = 0.5
+	else
+		diffMultiplier = 1.5
+	end
+	scaled = scaled * diffMultiplier
+
+	-- Round and maybe clamp
+	local clamped = 0
+	if Settings.deathBonus.clampOverride[award] then
+		clamped = Utilities:Round(scaled, Settings.deathBonus.round[award])
+	else
+		-- base clamp
+		local upperClamp = Settings.deathBonus.clamp[award][2]
+		-- Perhaps scale upper clamp, if enabled
+		if Settings.deathBonus.isClampTimeScaleEnable then
+			dotaTime =  Utilities:GetTime()
+			upperClamp = upperClamp * Utilities:GetTime() / Settings.deathBonus.clampTimeScale[award]
+		end
+		-- round clamp (adjustments are probably dumb decimals)
+		upperClamp = Utilities:Round(upperClamp, Settings.deathBonus.round[award])
+		debugTable.clamps = {Settings.deathBonus.clamp[award][1], upperClamp}
+		local rounded = Utilities:Round(scaled, Settings.deathBonus.round[award])
+		clamped = Utilities:Clamp(rounded, Settings.deathBonus.clamp[award][1], upperClamp)
+		debugTable.rounded = rounded
+	end
+
+	if Utilities:IsTurboMode() then
+		clamped = clamped * 1.7
+	end
+
+	-- Final check: don't award anything that would put them over the cap.
+	if (bot.stats.awards[award] + clamped) >= Settings.awardCap[award] then
+		clamped = Settings.awardCap[award] - bot.stats.awards[award]
+	end
+	-- Great! We did all the work.  Are the bots far enough ahead that we want to throttle?
+	local throttle, botTeam = GameState:GetThrottle()
+	if throttle ~= nil and bot.stats.team == botTeam then
+		local preThrottle = clamped
+		clamped = clamped * throttle
+		clamped = Utilities:Round(clamped, Settings.deathBonus.round[award])
+		Debug:Print(bot.stats.name..': Throttled '..award..' award: '..throttle..' * '..preThrottle)
+	end
+
+	-- nerf human ally bots, if voted.
+	if Settings.allyScale ~= nil and bot.stats.team == Settings.allyScaleTeam then
+		clamped = clamped * Settings.allyScale
+	end
+
+	debugTable.clamped = clamped
+	-- set isLoud
+	isLoud = (Settings.deathBonus.isClampLoud[award] and clamped == Settings.deathBonus.clamp[award][2])
+					 or
+					 Settings.deathBonus.isLoud[award]
+	--Debug:DeepPrint(debugTable)
+	return clamped, isLoud
+end
+
+-- Determines if an award should be given
+function AwardBonus:ShouldAward(bot,award)
+	-- trivial case
+	if bot.stats.chance[award] >= 1 then
+		if isDebug then print(bot.stats.name..': Chance for '..award..' was 1 or greater.') end
+		return true
+	end
+	-- check timeGate
+	local gameTime = Utilities:GetTime()
+	if gameTime < Settings.deathBonus.timeGate[award] then
+		local msg = ''
+		msg = msg..bot.stats.name..': '..award
+		msg = msg..' bonus not given because the time gate has not been met: '
+		msg = msg..gameTime..', '.. Settings.deathBonus.timeGate[award]
+		Debug:Print(msg)
+		return false
+	end
+	-- Don't award if they're already at the cap
+	if bot.stats.awards[award] >= Settings.awardCap[award] then
+	return false
+	end
+	-- almost as trivial case: check if deathStreakThreshold is enabled
+	if Settings.deathBonus.deathStreakThreshold >= 0 then
+		if bot.stats.deathStreak >= Settings.deathBonus.deathStreakThreshold then
+			if isDebug then print(bot.stats.name..': automatic '..award..' bonus due to death streak of '..bot.stats.deathStreak..'.') end
+			return true
+		end
+	end
+	-- otherwise roll for it
+	local roll = math.random()
+	local isAward = roll < bot.stats.chance[award]
+	--Debug:Print('Death Award: '..award..': roll: '..roll..' chance: '..bot.stats.chance[award])
+	return isAward
+end
+
+-- Returns total multiplier for the bonus
+-- this is either strictly multiplicative, or additive
+function AwardBonus:GetMultiplier(skill, scale, variance)
+	local turboMultiplier = 1
+	if Utilities:IsTurboMode() then -- turbo is too ez for players, in fact the higher difficulty in turbo the easier the game becomes. so so be making it harder for players.
+		turboMultiplier = 1.5
+	end
+	if Settings.isMultiplicative then
+		return skill * scale * variance * Settings.difficultyScale * turboMultiplier
+	else
+		return skill + scale + variance + Settings.difficultyScale + turboMultiplier - 3
+	end
+end
+
+-- Returns amounts to award to achieve target GPM/XPM
+function AwardBonus:GetPerMinuteBonus(bot, gpm, xpm)
+	local botGPM = Utilities:Round(PlayerResource:GetGoldPerMin(bot.stats.id))
+	bot.stats.netWorth = PlayerResource:GetNetWorth(bot.stats.id)
+	local gpmBonus, debugTable = AwardBonus:GetSpecificPerMinuteBonus(bot, botGPM, gpm, Settings.gpm)
+	local botXPM = Utilities:Round(PlayerResource:GetXPPerMin(bot.stats.id))
+	local xpmBonus, debugTable = AwardBonus:GetSpecificPerMinuteBonus(bot, botXPM, xpm, Settings.xpm)
+
+	if bot.newDeathXp ~= nil and bot:GetDeathXP() ~= bot.newDeathXp then
+		bot:SetCustomDeathXP(bot.newDeathXp)
+	end
+
+	if Settings.difficulty >= 1 then
+		-- 增加基础回蓝，按照难度和分钟数翻倍
+		-- print('Enabled bots with extra regens for diffculty scale = '..Settings.difficultyScale)
+		if Utilities:IsTurboMode() then
+			bot:SetBaseManaRegen((0.4 + Settings.difficultyScale * 0.5) * 0.5 * Utilities:GetAbsoluteTime() / 60)
+		else
+			bot:SetBaseManaRegen((0.2 + Settings.difficultyScale * 0.5) * 0.5 * Utilities:GetAbsoluteTime() / 60)
+		end
+	end
+
+	return gpmBonus, xpmBonus
+end
+
+-- determines an amount to award to reach a specifc per minute amount
+function AwardBonus:GetSpecificPerMinuteBonus(bot, pmBot, roleTable, settings)
+	local debugTable = {}
+	-- Ensure there is a target amount for this bot
+	if roleTable[bot.stats.role] == nil then
+		-- In case no player with the same role, pick the first available player (first one, highest one)
+		local idx = 1
+		repeat
+			roleTable[bot.stats.role] = roleTable[idx]
+			idx = idx + 1
+		until(roleTable[bot.stats.role] ~= nil or idx >= 5)
+		-- Debug:Print(bot.stats.name..', with role '..bot.stats.role..', does not have a corresponding human player for the same role')
+
+		-- -- return 0, 'No human counterpart for '..bot.stats.name..'.'
+	end
+
+	local scale = settings.scale[bot.stats.role]
+
+	-- In case no human player detected at all or bonus below base line, just base on difficulty scale.
+	local defaultScale = (baseBonusRef - bot.stats.role * 10) * scale -- gpm or xpm
+	local baseLineBonus = Settings.difficulty * defaultScale
+	if roleTable[bot.stats.role] == nil or roleTable[bot.stats.role] < baseLineBonus then
+		-- Debug:Print(bot.stats.name..', with role '..bot.stats.role..' now use default per mins amount: '..pmPlayer..' based on difficulty: '..Settings.difficulty )
+		roleTable[bot.stats.role] = baseLineBonus
+	end
+
+	-- counterparts PM
+	local pmPlayer = roleTable[bot.stats.role]
+	-- add offset to get the target
+	local pmTarget = pmPlayer + settings.offset
+	-- Get individual multipliers
+	local skill = bot.stats.skill
+	local variance = Utilities:GetVariance(settings.variance)
+	-- Get total multiplier
+	local multiplier = AwardBonus:GetMultiplier(skill, scale, variance)
+	-- multiply
+	pmTarget = Utilities:Round(pmTarget * multiplier)
+	-- if the bot is already better than this, do not give award
+	if pmBot > pmTarget then
+		return 0 , bot.stats.name..' is above the target PM: '..tostring(pmBot)..', '..tostring(pmTarget)
+	end
+	-- get PM difference
+	local pmDifference = pmTarget - pmBot
+	-- clamp?
+	local pmClamped = 0
+	if not settings.clampOverride then
+		-- Adjust clamp per mintue
+		local minutes =  Utilities:Round(Utilities:GetTime()/60)
+		local adjustedClamp = settings.clamp[2]
+		if settings.perMinuteScale ~= 0 then
+			adjustedClamp = adjustedClamp + settings.perMinuteScale * minutes
+		end
+		pmClamped = Utilities:RoundedClamp(pmDifference, settings.clamp[1], adjustedClamp)
+	else
+		pmClamped = Utilities:Round(pmDifference)
+	end
+	-- Figure out how much gold this is to provide the bump
+	local bonus = Utilities:Round(pmClamped * (Utilities:GetTime() / 60))
+	-- New and Improved! Throttle if bots are too far ahead
+	local throttle, botTeam = GameState:GetThrottle()
+	if throttle ~= nil and bot.stats.team == botTeam then
+		bonus = bonus * throttle
+		bonus = Utilities:Round(bonus)
+		Debug:Print(bot.stats.name..': Throttled award: '..pmBot..': '..throttle)
+	end
+
+	-- nerf human ally bots, if voted.
+	if Settings.allyScale ~= nil and bot.stats.team == Settings.allyScaleTeam then
+		bonus = bonus * Settings.allyScale
+	end
+
+	-- debug data
+	debugTable.name = bot.stats.name
+	debugTable.role = bot.stats.role
+	debugTable.pmPlayer = pmPlayer
+	debugTable.pmBot = pmBot
+	debugTable.pmTarget = pmTarget
+	debugTable.skill = skill
+	debugTable.scale = scale
+	debugTable.variance = variance
+	debugTable.multiplier = multiplier
+	debugTable.adjustedClamp = adjustedClamp
+	debugTable.pmClamped = pmClamped
+	debugTable.bonus = bonus
+
+	return bonus, debugTable
+end
+
+-- Punishes humans for abusing bot AI to get kills before the horn around runes
+function AwardBonus:PunishForAbuse()
+	local state =  GameRules:State_Get()
+	if state == DOTA_GAMERULES_STATE_PRE_GAME then
+		local msg = 'Bot rune AI abuse is a bad idea!'
+		Utilities:Print(msg, MSG_BAD, BAD_LIST)
+		for team = 2, 3 do
+			for _, bot in ipairs(AllBots[team]) do
+				local awardsTable = {}
+				table.insert(awardsTable, bot)
+				local isSuccess = AwardBonus['levels'](AwardBonus, bot, 17)
+				-- if success, set isAwarded, isLoudWarning, Clear chance, Update message
+				if isSuccess then
+					table.insert(awardsTable, {'levels', 17})
+				end
+				local isSuccess = AwardBonus['stats'](AwardBonus, bot, 25)
+				-- if success, set isAwarded, isLoudWarning, Clear chance, Update message
+				if isSuccess then
+					table.insert(awardsTable, {'stats', 25})
+				end
+				Utilities:Print(awardsTable, MSG_AWARD, BAD_LIST)
+			end
+		end
+	end
+end
+
+-- returns true if the award is at or past the award cap for a given bot
+function AwardBonus:IsAwardCapped(bot, award)
+	return Settings.deathBonus.awardCap[award]
+end
+
+-- returns the base armor value for this hero at their current level
+function AwardBonus:GetBaseArmor(bot)
+	-- obviously they aren't gaining the bonus from level 1
+	local levelsGained = bot:GetLevel() - 1
+	local agilityGain = bot.stats.agilityGain
+	local gainedAgility = levelsGained * agilityGain
+	local baseAgility = bot.stats.BaseAgility
+   	local baseArmor = bot.stats.baseArmor
+   	local armor = baseArmor + ((baseAgility + gainedAgility) / 6)
+   	return armor
+end
+
+-- Clamps a number to a max level
+function AwardBonus:Clamp(bonus, awarded, max)
+	local maxBonus = max - awarded
+	if bonus > maxBonus then
+		return maxBonus
+	end
+	return bonus
+end
+
+-- Returns the base strength, gained strength of this unit at their current level, and strength awarded
+function AwardBonus:GetStrength(unit)
+	local levelsGained = unit:GetLevel() - 1
+	local statGained = levelsGained * unit.stats.strengthGain
+	local baseStrength = unit.stats.baseStrength
+	local awards =  unit.stats.awards.stats
+   	return baseStrength, statGained, awards
+end
+
+-- Returns the base agility, gained agility of this unit at their current level, and agility awarded
+function AwardBonus:GetAgility(unit)
+	local levelsGained = unit:GetLevel() - 1
+	local statGained = levelsGained * unit.stats.AgilityGain
+	local baseAgility = unit.stats.baseAgility
+	local awards =  unit.stats.awards.stats
+   	return baseAgility, statGained, awards
+end
+
+-- Returns the base intellect, gained intellect of this unit at their current level, and intellect awarded
+function AwardBonus:GetIntellect(unit)
+	local levelsGained = unit:GetLevel() - 1
+	local statGained = levelsGained * unit.stats.intellectGain
+   	local baseIntellect = unit.stats.baseIntellect
+   	local awards =  unit.stats.awards.stats
+   	return baseIntellect, statGained, awards
+end
+
+-- returns the base armor value for this unit at their current level
+function AwardBonus:GetBaseArmor(unit)
+	-- unit.stats.baseArmor had the gain from the base already, so only calculate from statGained and awards
+	local strengthGained
+	local strengthAwards
+	_, strengthGained, strengthAwards = AwardBonus:GetStrength(unit)
+   	local armor = unit.stats.baseArmor + ((strengthGained + strengthAwards) / 6)
+   	return armor
+end
+
+-- returns the base armor value for this unit at their current level
+function AwardBonus:GetBaseMagicResist(unit)
+	-- unit.stats.baseMagicResist had the gain from the base already, so only calculate from statGained and awards
+	local intGained
+	local intAwards
+	_, intGained, intAwards = AwardBonus:GetIntellect(unit)
+   	local magicResist = unit.stats.baseMagicResist + ((intGained + intAwards) * 0.1) + unit.stats.awards.magicResist
+    local msg = ''
+    msg = msg..'Base MR: '..tostring(Utilities:Round(unit.stats.baseMagicResist))..'  '
+    msg = msg..'MR from Int: '..tostring(Utilities:Round(((intGained + intAwards) * 0.1)))..'  '
+    msg = msg..'MR from Awards: '..tostring(Utilities:Round(unit.stats.awards.magicResist))..'  '
+    msg = msg..'Adjusted MR: '..tostring(Utilities:Round(magicResist))..'  '
+    Utilities:Print(msg, MSG_GOOD)
+   	return magicResist
+end

@@ -1,1 +1,11 @@
-local a=require(GetScriptDirectory()..'/FuncLib/systems/push')local b=GetBot()if b.PushLaneDesire==nil then b.PushLaneDesire={0,0,0}end;function GetDesire()if ShouldSkipBotThink(b)then return 0 end;return a.GetPushDesire(b,LANE_TOP)end;function Think()if ShouldSkipBotThink(b)then return end;a.PushThink(b,LANE_TOP)end;if SafeCall then local c=GetDesire;local d=Think;if c then GetDesire=SafeCall(c,0,'PUSH_TOWER_TOP_GetDesire')end;if d then Think=SafeCall(d,nil,'PUSH_TOWER_TOP_Think')end end
+local Push = require( GetScriptDirectory()..'/FunLib/aba_push')
+local bot = GetBot()
+local botName = bot:GetUnitName()
+if bot == nil or bot:IsInvulnerable() or not bot:IsHero() or not bot:IsAlive() or not string.find(botName, "hero") or bot:IsIllusion() then return end
+if bot.PushLaneDesire == nil then bot.PushLaneDesire = {0, 0, 0} end
+
+function GetDesire()
+    bot.PushLaneDesire[LANE_TOP] = Push.GetPushDesire(bot, LANE_TOP)
+    return bot.PushLaneDesire[LANE_TOP]
+end
+function Think() Push.PushThink(bot, LANE_TOP) end

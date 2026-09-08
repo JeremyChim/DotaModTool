@@ -1,1 +1,445 @@
-require'bots.FretBots.Debug'require'bots.FretBots.Settings'require'bots.FretBots.Utilities'require'bots.FretBots.Flags'local a=require('bots.FretBots.SettingsNeutralItemTable')local b=true;local c=Debug.IsDebug()and b;local d=c and true;if NeutralItems==nil then NeutralItems={}end;function NeutralItems:NeediestBotForToken(e)for f=2,3 do for g,h in ipairs(AllBots[f])do if e>h.stats.neutralTier then return h end end end;return nil end;function NeutralItems:GetMatchedPairForTier(e)local i={[2]={},[3]={}}for f=2,3 do for g,h in ipairs(AllBots[f])do if h.stats and h.stats.role then i[f][h.stats.role]=h end end end;for j=1,5 do local k=i[2][j]local l=i[3][j]if k and l and e>(k.stats.neutralTier or 0)and e>(l.stats.neutralTier or 0)then return k,l end end;return nil,nil end;function NeutralItems:CreateOnUnit(m,n)if n~=nil then local o=m:GetItemInSlot(16)if o~=nil then Utilities:Print(m.stats.name..': Creating: '..n.realName)m:RemoveItem(o)NeutralItems:RemoveEnhancement(m)end;NeutralItems:CreateAndInsert(m,n.name,n.tier)end end;function NeutralItems:GiveToUnit(m,n)if n~=nil then local p;local o=m:GetItemInSlot(16)if o~=nil then isReplaced=true;p=o:GetName()Debug:Print(m.stats.name..': Replacing: '..p)m:RemoveItem(o)NeutralItems:RemoveEnhancement(m)end;NeutralItems:CreateAndInsert(m,n.name,n.tier)return p end;return nil end;function NeutralItems:RemoveEnhancement(m)for q=1,20 do local o=m:GetItemInSlot(q)if o~=nil then if string.find(o:GetName(),"item_enhancement")then m:RemoveItem(o)return end end end end;function NeutralItems:GetRandomEnhancementByTier(e)local r={}for g,s in ipairs(a.enhancements)do if s.tier==e then table.insert(r,s)end end;if#r==0 then return nil end;return r[math.random(#r)]end;function NeutralItems:CreateAndInsert(h,t,e)if h:HasRoomForItem(t,true,true)then local n=CreateItem(t,h,h)n:SetPurchaseTime(0)h:AddItem(n)local u=NeutralItems:GetRandomEnhancementByTier(e)if u then local v=CreateItem(u.name,h,h)v:SetPurchaseTime(0)h:AddItem(v)end;h.stats.neutralTier=e;return true end;return false end;function NeutralItems:ClearBotItem(h)h.stats.neutralTier=0;h.stats.assignedNeutral=nil end;function NeutralItems:GetTableForTierAndRole(e,m)local w={}local x=0;for g,n in ipairs(AllNeutrals)do if n.ranged>0 and not m.stats.isMelee then if n.tier==e and n.roles[m.stats.role]~=0 then table.insert(w,n)x=x+1 end elseif n.melee>0 and m.stats.isMelee then if n.tier==e and n.roles[m.stats.role]~=0 then table.insert(w,n)x=x+1 end end end;return w,x end;function NeutralItems:GetTableForTier(e)local w={}local x=0;for g,n in ipairs(AllNeutrals)do if n.tier==e then table.insert(w,n)x=x+1 end end;return w,x end;function NeutralItems:GetItemForInternalName(y)for g,n in ipairs(AllNeutrals)do if n.name==y then return n end end;return nil end;function NeutralItems:GetTokenTableForTier(e)local z=5;local w={}local x=0;for g,n in ipairs(AllNeutrals)do if n.tier==e then table.insert(w,n)x=x+1 end end;local A=NeutralItems:Shuffle(w)local B={}for C=1,z,1 do table.insert(B,A[C])end;return B,z end;function NeutralItems:Shuffle(D)local E={}for C=1,#D do E[C]=D[C]end;for C=#E,2,-1 do local F=math.random(C)E[C],E[F]=E[F],E[C]end;return E end;function NeutralItems:SelectRandomItem(e,m)local w,x;if m==nil then w,x=NeutralItems:GetTableForTier(e)else w,x=NeutralItems:GetTableForTierAndRole(e,m)end;if w==nil then return nil end;local n=w[math.random(x)]if n~=nil and Settings.neutralItems.isRemoveUsedItems then for C,g in ipairs(AllNeutrals)do if n==AllNeutrals[C]then table.remove(AllNeutrals,C)break end end end;if n~=nil then return n else return nil end end;function NeutralItems:GetLocalizedItemName(G,t)for g,n in ipairs(G)do if n.name==t then return n.realName end end end;function NeutralItems:GetNeediestBot(e)local H={}for f=2,3 do for C,h in ipairs(AllBots[f])do local I=e>h.stats.neutralTier;local J=e==h.stats.neutralTier and not h.stats.hasSuitableNeutral;if C<=3 and I or J then return h elseif C>3 and I then return h end end end;return nil end;function NeutralItems:GetBotDesireForItem(h,n)if h==nil then return 0 end;local K=0;if not h.stats.isMelee then K=n.ranged or 1 elseif h.stats.isMelee then K=n.melee or 1 end;if K<=0 then return 0 end;local L=n.roles[h.stats.role]local M=n.tier*10;return K+L+M end;function NeutralItems:DoesBotPreferItem(h,n)local N;if h.stats.assignedNeutral~=nil then N=NeutralItems:GetBotDesireForItem(h,h.stats.assignedNeutral)else N=0 end;local O=NeutralItems:GetBotDesireForItem(h,n)return O>N,O,N end;function NeutralItems:CloseBotFindTier(e,f)for g,h in ipairs(AllBots[f])do if h.stats.neutralsFound<e then NeutralItems:SetBotFindTier(h,e+1)end end end;function NeutralItems:InitializeFindTimings()local P={}for j=1,5 do P[j]=Utilities:GetIntegerVariance(Settings.neutralItems.variance)end;for f=2,3 do for g,h in ipairs(AllBots[f])do if type(h)=="table"then local j=h.stats.role or 1;local Q=P[j]or 0;local R=NeutralItems:GetTimingDifficultyScaleShift(1)h.stats.neutralsFound=0;h.stats.neutralTiming=Settings.neutralItems.timings[1]+Q+R;if h.stats.neutralTiming<0 then h.stats.neutralTiming=0 end;local S=h.stats.name..' (pos'..j..'): Initialized Neutral Timing for Tier 1: '..h.stats.neutralTiming..' (shift: '..R..', var: '..Q..')'Debug:Print(S)else log('[ERROR] failed to process bot: %s, team: %s',h,f)end end end end;function NeutralItems:SetBotFindTier(h,e)local T=Settings.neutralItems.timings[e]if T~=nil then T=T+NeutralItems:GetTimingDifficultyScaleShift(e)if T<0 then T=0 end;local U=0;if Settings.neutralItems.timings[e-1]~=nil then U=Settings.neutralItems.timings[e-1]+NeutralItems:GetTimingDifficultyScaleShift(e)end;if U<0 then U=0 end;if h.stats.neutralsFound==e-1 then h.stats.neutralTiming=Settings.neutralItems.timings[e]+Utilities:GetIntegerVariance(Settings.neutralItems.variance)+NeutralItems:GetTimingDifficultyScaleShift(e)if h.stats.neutralTiming<0 then h.stats.neutralTiming=0 end else h.stats.neutralTiming=h.stats.neutralTiming+T-U;h.stats.neutralsFound=e-1 end;if h.stats.neutralTiming<0 then h.stats.neutralTiming=0 end else h.stats.neutralTiming=-1 end;local S=h.stats.name..': Next Neutral Timing for Tier '..e..': '..h.stats.neutralTiming;Debug:Print(S)end;function NeutralItems:GetTimingDifficultyScaleShift(e)local V=(Settings.neutralItems.timingsDefault[e]-Settings.neutralItems.timings[e])*(1-math.min(Settings.difficultyScale,2))return V end
+-- Methods for the creation / removal of neutral items for the bots.
+
+ -- global debug flag
+require 'bots.FretBots.Debug'
+-- Settings
+require 'bots.FretBots.Settings'
+-- Utilities
+require 'bots.FretBots.Utilities'
+-- Flags for tracking status
+require 'bots.FretBots.Flags'
+
+local masterNeutralTable = dofile('bots.FretBots.SettingsNeutralItemTable')
+
+-- local debug flag
+local thisDebug = true;
+local isDebug = Debug.IsDebug() and thisDebug;
+local isDebugChat = isDebug and true
+
+-- Instantiate ourself
+if NeutralItems == nil then
+	NeutralItems = {}
+end
+
+-- Returns the bot that wants an item from this tier the most
+-- This represents the carry wanting to use the token first, etc
+function NeutralItems:NeediestBotForToken(tier)
+	for team = 2, 3 do
+	for _, bot in ipairs(AllBots[team]) do
+		if tier > bot.stats.neutralTier then
+			return bot
+		end
+	end
+end
+	return nil
+end
+
+-- Returns a pair of bots (one per team) that share the same position
+-- and both need an item of the given tier. Used to give items to
+-- mirrored positions simultaneously so neither team gets an advantage.
+function NeutralItems:GetMatchedPairForTier(tier)
+	-- Build lookup: position -> bot, per team
+	local byPos = { [2] = {}, [3] = {} }
+	for team = 2, 3 do
+		for _, bot in ipairs(AllBots[team]) do
+			if bot.stats and bot.stats.role then
+				byPos[team][bot.stats.role] = bot
+			end
+		end
+	end
+	-- Find first position where both sides need this tier (pos 1 = carry first)
+	for pos = 1, 5 do
+		local radBot = byPos[2][pos]
+		local direBot = byPos[3][pos]
+		if radBot and direBot
+		and tier > (radBot.stats.neutralTier or 0)
+		and tier > (direBot.stats.neutralTier or 0) then
+			return radBot, direBot
+		end
+	end
+	return nil, nil
+end
+
+-- Gives a neutral item to a unit, returns name of previous item
+-- if there was one.
+function NeutralItems:CreateOnUnit(unit, item)
+	if item ~= nil then
+		-- determine if the unit already has one (neutrals always in slot 16)
+		local currentItem = unit:GetItemInSlot(16)
+		-- remove if so
+		if currentItem ~= nil then
+			Utilities:Print(unit.stats.name..': Creating: '..item.realName)
+			unit:RemoveItem(currentItem)
+			NeutralItems:RemoveEnhancement(unit)
+		end
+		NeutralItems:CreateAndInsert(unit, item.name, item.tier)
+	end
+end
+
+
+-- Gives a neutral item to a unit, returns name of previous item
+-- if there was one.
+function NeutralItems:GiveToUnit(unit, item)
+	if item ~= nil then
+		local replacedItem
+		-- determine if the unit already has one (neutrals always in slot 16)
+		local currentItem = unit:GetItemInSlot(16)
+		-- remove if so
+		if currentItem ~= nil then
+			isReplaced = true
+			replacedItem = currentItem:GetName()
+			Debug:Print(unit.stats.name..': Replacing: '..replacedItem)
+			unit:RemoveItem(currentItem)
+
+			NeutralItems:RemoveEnhancement(unit)
+		end
+		NeutralItems:CreateAndInsert(unit, item.name, item.tier)
+		return replacedItem
+	end
+	return nil
+end
+
+function NeutralItems:RemoveEnhancement(unit)
+	for idx = 1, 20 do
+		local currentItem = unit:GetItemInSlot(idx)
+		if currentItem ~= nil then
+			if string.find(currentItem:GetName(), "item_enhancement") then
+				unit:RemoveItem(currentItem)
+				return
+			end
+		end
+	end
+end
+
+function NeutralItems:GetRandomEnhancementByTier(tier)
+    local filtered = {}
+    for _, enh in ipairs(masterNeutralTable.enhancements) do
+        if enh.tier == tier then
+            table.insert(filtered, enh)
+        end
+    end
+
+    if #filtered == 0 then
+        return nil  -- No enhancement found for this tier
+    end
+
+    -- Return a random enhancement from the filtered list.
+    return filtered[math.random(#filtered)]
+end
+
+-- Creates a specific item, inserts it into the bot
+function NeutralItems:CreateAndInsert(bot, itemName, tier)
+	if bot:HasRoomForItem(itemName, true, true) then
+		local item = CreateItem(itemName, bot, bot)
+		item:SetPurchaseTime(0)
+		bot:AddItem(item)
+
+		local enhancement = NeutralItems:GetRandomEnhancementByTier(tier)
+		if enhancement then
+			local enha = CreateItem(enhancement.name, bot, bot)
+			enha:SetPurchaseTime(0)
+			bot:AddItem(enha)
+		end
+		bot.stats.neutralTier = tier
+		-- The following has been obviated due to royal jelly rework.
+		-- Special handling if it's royal jelly
+		--if itemName == "item_royal_jelly" then
+		--	Say(bot:GetPlayerOwner(), "Spending royal jelly charge on self.", false)
+		--	bot:CastAbilityOnTarget(bot, item, bot:GetPlayerOwnerID())
+		--	for _, unit in pairs(Bots) do
+		--		if unit.stats.isBot and unit.stats.team == bot.stats.team and unit.stats.name ~= bot.stats.name then
+		--			Say(bot:GetPlayerOwner(), "Spending royal jelly charge on "..unit.stats.name..'.', false)
+		--			bot:CastAbilityOnTarget(unit, item, bot:GetPlayerOwnerID())
+		--			break
+		--		end
+		--	end
+		-- Since jelly was consumed, set hero to not have an item
+		--NeutralItems:ClearBotItem(bot)
+		--end
+		return true
+	end
+	return false
+end
+
+-- Updates a bot's stats so it knows it doesn't have an item
+function NeutralItems:ClearBotItem(bot)
+		bot.stats.neutralTier = 0
+		bot.stats.assignedNeutral = nil
+end
+
+-- Returns valid items for a given tier and role
+function NeutralItems:GetTableForTierAndRole(tier,unit)
+	local items = {}
+	local count = 0
+	for _,item in ipairs(AllNeutrals) do
+		-- Melee / Ranged
+		if item.ranged > 0 and not unit.stats.isMelee then
+			if item.tier == tier and item.roles[unit.stats.role] ~= 0 then
+				table.insert(items,item)
+				count = count + 1
+			end
+		elseif item.melee > 0 and unit.stats.isMelee then
+			if item.tier == tier and item.roles[unit.stats.role] ~= 0 then
+				table.insert(items,item)
+				count = count + 1
+			end
+		end
+	end
+	return items, count
+end
+
+-- Returns valid items for a given tier
+function NeutralItems:GetTableForTier(tier)
+	local items = {}
+	local count = 0
+	for _,item in ipairs(AllNeutrals) do
+		if item.tier == tier then
+			table.insert(items,item)
+			count = count + 1
+		end
+	end
+	return items, count
+end
+
+function NeutralItems:GetItemForInternalName(name)
+	for _,item in ipairs(AllNeutrals) do
+		if item.name == name then
+			return item
+		end
+	end
+	return nil
+end
+
+-- Returns a set of items for a given tier (7.33 token style)
+function NeutralItems:GetTokenTableForTier(tier)
+	local tableCount = 5
+	local items = {}
+	local count = 0
+	for _,item in ipairs(AllNeutrals) do
+		if item.tier == tier then
+			table.insert(items,item)
+			count = count + 1
+		end
+	end
+	-- shuffle this table
+	local shuffled = NeutralItems:Shuffle(items)
+	local choices = {}
+	for i= 1, tableCount, 1 do
+		table.insert(choices, shuffled[i])
+	end
+	return choices, tableCount
+end
+
+function NeutralItems:Shuffle(t)
+	local tbl = {}
+	for i = 1, #t do
+		tbl[i] = t[i]
+	end
+	for i = #tbl, 2, -1 do
+		local j = math.random(i)
+		tbl[i], tbl[j] = tbl[j], tbl[i]
+	end
+	return tbl
+end
+
+-- selects a random item from the list (by tier and role) and returns the item
+function NeutralItems:SelectRandomItem(tier, unit)
+	-- Get items that qualify
+	-- if they didn't pass a unit, go full random
+	local items,count
+	if unit == nil then
+		items,count = NeutralItems:GetTableForTier(tier)
+	else
+		items,count = NeutralItems:GetTableForTierAndRole(tier,unit)
+	end
+	if items == nil then return nil end
+	-- pick one at random
+	local item = items[math.random(count)]
+	-- if there was a valid item, remove it from the table (if settings tell us to)
+	if item ~= nil and Settings.neutralItems.isRemoveUsedItems then
+		-- note that this loop only works because we only want to remove one item
+		for i,_ in ipairs(AllNeutrals) do
+			if item == AllNeutrals[i] then
+				table.remove(AllNeutrals,i)
+				break
+			end
+		end
+	end
+	-- return the selected item
+	if item ~= nil then
+		return item
+	else
+		return nil
+	end
+end
+
+-- returns the pretty item name for a neutral
+function NeutralItems:GetLocalizedItemName(dataTable, itemName)
+	for _,item in ipairs(dataTable) do
+		if item.name == itemName then
+			return item.realName
+		end
+	end
+end
+
+-- Returns the bot that wants a new item the most
+function NeutralItems:GetNeediestBot(tier)
+	local data = {}
+	-- ipairs sorts bots by role 1-5
+	for team = 2, 3 do
+	for i, bot in ipairs(AllBots[team]) do
+		local isUpgrade = tier > bot.stats.neutralTier
+		local isSidegrade = (tier == bot.stats.neutralTier) and (not bot.stats.hasSuitableNeutral)
+		-- for our bots, cores are assholes and always want a new item
+		-- until they get one they like
+		if i <= 3 and isUpgrade or isSidegrade then
+			return bot
+		-- For 4/5, try to prefer pure upgrades
+		elseif i > 3 and isUpgrade then
+			return bot
+		end
+	end
+end
+	-- if we made it this far,
+	-- No one found
+	return nil
+end
+
+-- Returns the 'goodness' of an item for a bot, higher is better
+function NeutralItems:GetBotDesireForItem(bot, item)
+	if bot == nil then return 0 end
+	
+	local attackTypeScore = 0
+	-- Bots are never willing to take an item of the wrong attack type
+	if not bot.stats.isMelee then
+		attackTypeScore = item.ranged or 1
+	elseif bot.stats.isMelee then
+		attackTypeScore = item.melee or 1
+	end
+	if attackTypeScore <= 0 then return 0 end
+	-- Get validity from role
+	local roleScore = item.roles[bot.stats.role]
+	-- ##TODO: Make this less arbitrary
+	-- for now we'll just say each tier is worth 10 points
+	local tierScore = item.tier * 10
+	return attackTypeScore + roleScore + tierScore
+end
+
+-- Returns  true if the bot would prefer a specific item
+-- over what it has
+function NeutralItems:DoesBotPreferItem(bot, item)
+	local currentItemDesire
+	if bot.stats.assignedNeutral ~= nil then
+		currentItemDesire = NeutralItems:GetBotDesireForItem(bot, bot.stats.assignedNeutral)
+	else
+		currentItemDesire = 0
+	end
+	local newItemDesire = NeutralItems:GetBotDesireForItem(bot, item)
+	return newItemDesire > currentItemDesire, newItemDesire, currentItemDesire
+end
+
+-- ensures that all bots are set to find the proper tier when one
+-- has had all of its items found
+-- Yes, there's probably an edge case bug where a bot is somehow
+-- two tiers behind.
+-- This method preserves the previous tier's variance and neutral
+-- award subtractions.
+function NeutralItems:CloseBotFindTier(tier, team)
+	for _, bot in ipairs(AllBots[team]) do
+		-- if this is the case, the bot is behind and needs to be updated to new tier.
+		if bot.stats.neutralsFound < tier then
+			NeutralItems:SetBotFindTier(bot, tier + 1)
+		end
+	end
+end
+
+-- Sets all bots to find tier 1 items.
+-- Matched positions across teams get the SAME variance so they trigger at the same time.
+function NeutralItems:InitializeFindTimings()
+	-- Generate one variance per position (1-5) so both teams share the same timing
+	local posVariance = {}
+	for pos = 1, 5 do
+		posVariance[pos] = Utilities:GetIntegerVariance(Settings.neutralItems.variance)
+	end
+
+	for team = 2, 3 do
+		for _, bot in ipairs(AllBots[team]) do
+			if type(bot) == "table" then
+				local pos = bot.stats.role or 1
+				local variance = posVariance[pos] or 0
+				local difficultyShift = NeutralItems:GetTimingDifficultyScaleShift(1)
+				bot.stats.neutralsFound = 0
+				bot.stats.neutralTiming = Settings.neutralItems.timings[1] + variance + difficultyShift
+				if bot.stats.neutralTiming < 0 then bot.stats.neutralTiming = 0 end
+				local msg = bot.stats.name..' (pos'..pos..'): Initialized Neutral Timing for Tier 1: '..bot.stats.neutralTiming..' (shift: '..difficultyShift..', var: '..variance..')'
+				Debug:Print(msg)
+			else
+				print('[ERROR] failed to process bot: '..tostring(bot)..', team: '..team)
+			end
+		end
+	end
+end
+
+-- sets a particular bot for a timing to find a specific tier
+function NeutralItems:SetBotFindTier(bot, tier)
+	-- Is this a valid tier tier?
+	local nextTiming = Settings.neutralItems.timings[tier]
+	if nextTiming ~= nil then
+		nextTiming = nextTiming + NeutralItems:GetTimingDifficultyScaleShift(tier)
+		if nextTiming < 0 then nextTiming = 0 end -- clamp
+		local previousTiming = 0
+		-- this should normally be the case
+		if Settings.neutralItems.timings[tier - 1] ~= nil then
+			previousTiming = Settings.neutralItems.timings[tier - 1] + NeutralItems:GetTimingDifficultyScaleShift(tier)
+		end
+		if previousTiming < 0 then previousTiming = 0 end
+
+		-- normal case: bot has found an item one tier below what we're setting it to
+		-- meaning we called this function immediately after finding it.  Get new
+		-- variance, don't preserve neutral awards (might change that via setting someday)
+		if bot.stats.neutralsFound == tier - 1 then
+			bot.stats.neutralTiming = Settings.neutralItems.timings[tier]
+										 + Utilities:GetIntegerVariance(Settings.neutralItems.variance)
+										 + NeutralItems:GetTimingDifficultyScaleShift(tier)
+			if bot.stats.neutralTiming < 0 then bot.stats.neutralTiming = 0 end
+		-- if we're further behind, the bot never found an item.  We want to preserve
+		-- the existing randomness for the timing (including neutral awards), so we just
+		-- add the difference
+		else
+			bot.stats.neutralTiming = bot.stats.neutralTiming + nextTiming - previousTiming
+			-- flag them as having found the proper tier of item
+			bot.stats.neutralsFound = tier - 1
+		end
+		-- Sanity check
+		if bot.stats.neutralTiming < 0 then bot.stats.neutralTiming = 0 end
+	-- no next timing: disable the timer.
+	else
+		bot.stats.neutralTiming = -1
+	end
+	local msg = bot.stats.name..': Next Neutral Timing for Tier '..tier..': '..bot.stats.neutralTiming
+	Debug:Print(msg)
+end
+
+-- Computes the neutral item timing offset using the difficulty scale
+-- The value is a linear interpolation of target value at baseline difficulty of 1.0 vs. game default value
+--[[ At baseline of 0 seconds for tier 1 and...
+	(7.41: Tier 1 neutrals now available from 0:00, timingsDefault[1] = 0)
+-            difficulty 0, we'd have (0-0)*(1-0) resulting in a shift of 0 seconds (neutral matching game default)
+			difficulty 1.0, we'd have (0-0)*(1-1) resulting in a shift of 0 seconds
+		At baseline of 3600 for tier 3 and ...
+-            difficulty 0, we'd have (1620-1020)*(1-0) resulting in a shift of 600 seconds (600+1020=1620=game default)
+			difficulty 0.7, we'd have (1620-1020)*(1-0.7) resulting in a shift of 180 seconds (180+1020=1200)
+
+	Rough reference using timings = {0, 420, 1020, 2020, 3600}:
+	| Tier          | 1    | 2    | 3    | 4    | 5    |
+	|---------------|------|------|------|------|------|
+	| 0 (base game) | 0    | 1020 | 1620 | 2020 | 3600 |
+	| 0.5           | 0    | 720  | 1320 | 2020 | 3600 |
+	| 0.7           | 0    | 600  | 1200 | 2020 | 3600 |
+	| 1             | 0    | 420  | 1020 | 2020 | 3600 |
+	| 1.5           | 0    | 120  | 720  | 2020 | 3600 |
+--]]
+function NeutralItems:GetTimingDifficultyScaleShift(tier)
+	local timingDifficultyShift = (Settings.neutralItems.timingsDefault[tier] - Settings.neutralItems.timings[tier]) * (1 - math.min(Settings.difficultyScale, 2))
+	return timingDifficultyShift
+end
