@@ -86,17 +86,25 @@ end
 --     end
 -- end
 
+
+
+-- 每秒，加经验
 function XP.UpdateXP(bot, xp)
     local gameTime = Helper.DotaTime()
-    if gameTime > 20 * 60 then
+    local minute = math.floor(gameTime / 60)
+
+    if minute >= 15 then
         xp = xp * 2
     end
 
     if not bot:IsAlive() then
-        xp = xp * 3
+        xp = xp * 2
     end
 
     bot:AddExperience(xp, 0, false, true, bot:GetPlayerOwnerID())
 end
+
+
+
 
 return XP
