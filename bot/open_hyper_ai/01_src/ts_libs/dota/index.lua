@@ -1,1 +1,19 @@
-local a={}do local b=require(GetScriptDirectory().."/ts_libs/dota/interfaces")for c,d in pairs(b)do if c~="default"then a[c]=d end end end;do local b=require(GetScriptDirectory().."/ts_libs/dota/enums")for c,d in pairs(b)do if c~="default"then a[c]=d end end end;return a
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+do
+    local ____export = require(GetScriptDirectory().."/ts_libs/dota/interfaces")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+do
+    local ____export = require(GetScriptDirectory().."/ts_libs/dota/enums")
+    for ____exportKey, ____exportValue in pairs(____export) do
+        if ____exportKey ~= "default" then
+            ____exports[____exportKey] = ____exportValue
+        end
+    end
+end
+return ____exports

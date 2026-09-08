@@ -1,1 +1,177 @@
-local a=GetBot()local b=a:GetUnitName()if a==nil or a:IsInvulnerable()or not a:IsHero()or not a:IsAlive()or not string.find(b,"hero")or a:IsIllusion()then return end;local c=require(GetScriptDirectory()..'/FuncLib/func_utils')local d=require(GetScriptDirectory()..'/FuncLib/systems/custom_loader')d.ThinkLess=d.Enable and d.ThinkLess or 1;local e=a:GetTeam()local f=e==TEAM_RADIANT and TEAM_DIRE or TEAM_RADIANT;local g={}local h=nil;local i=GetShopLocation(GetTeam(),SHOP_SECRET)local j=GetShopLocation(GetTeam(),SHOP_SECRET2)local k=false;function GetDesire()if ShouldSkipBotThink(GetBot())then return 0 end;local l=GetDesireHelper()return l end;function GetDesireHelper()if c.Utils.IsTeamPushingSecondTierOrHighGround(a)then return BOT_MODE_DESIRE_NONE end;local m=GetAncient(GetTeam())if c.Utils.CountEnemyHeroesOnHighGround(GetTeam())>=2 or m and c.Utils.CountEnemyHeroesNear(m:GetLocation(),2500)>=1 then return BOT_MODE_DESIRE_NONE end;if c.IsFarming(a)and c.IsPushing(a)and c.IsDefending(a)then return BOT_MODE_DESIRE_NONE end;if not g.IsSuitableToBuy()then return BOT_MODE_DESIRE_NONE end;local n=true;for o=0,8 do if a:GetItemInSlot(o)==nil then n=false end end;if n then if a:GetLevel()>11 and a:FindItemSlot("item_aegis")<0 then k,itemSlot=g.HaveItemToSell()if k then h=g.GetPreferedSecretShop()if h~=nil then return RemapValClamped(GetUnitToLocationDistance(a,h),6000,0,0.75,0.95)end end end;return BOT_MODE_DESIRE_NONE end;local p=a.theCourier;local q=GetCourierState(p)if a.SecretShop and q~=COURIER_STATE_MOVING then h=g.GetPreferedSecretShop()if h~=nil and q==COURIER_STATE_DEAD then return RemapValClamped(GetUnitToLocationDistance(a,h),6000,0,0.7,0.85)else if h~=nil and GetUnitToLocationDistance(a,h)<=3200 then return RemapValClamped(GetUnitToLocationDistance(a,h),3200,0,0.7,0.85)end end end;return BOT_MODE_DESIRE_NONE end;function OnStart()end;function OnEnd()end;function Think()if c.CanNotUseAction(a)then return end;if a:IsChanneling()or a:NumQueuedActions()>0 or a:IsCastingAbility()or a:IsUsingAbility()then return end;if h==nil then h=g.GetPreferedSecretShop()end;if a:DistanceFromSecretShop()==0 then a:Action_MoveToLocation(h+RandomVector(200))return end;if a:DistanceFromSecretShop()>0 then a:Action_MoveToLocation(h+RandomVector(20))return end end;function g.HaveItemToSell()local r={"item_clarity","item_faerie_fire","item_tango","item_flask","item_bracer","item_wraith_band","item_null_talisman","item_infused_raindrop","item_bottle"}for s,t in pairs(r)do local u=a:FindItemSlot(t)if u>=0 and u<=8 then return true,u end end;return false,nil end;function g.GetPreferedSecretShop()if GetTeam()==TEAM_RADIANT then if GetUnitToLocationDistance(a,j)<=3800 then return j else return i end end;if GetUnitToLocationDistance(a,i)<=3800 then return i else return j end end;function g.IsSuitableToBuy()local v=a:GetActiveMode()local w=c.GetNearbyHeroes(a,1600,true,BOT_MODE_NONE)if not a:IsAlive()or a:HasModifier("modifier_item_shadow_amulet_fade")or v==BOT_MODE_RETREAT and a:GetActiveModeDesire()>=BOT_MODE_DESIRE_HIGH or v==BOT_MODE_ATTACK or v==BOT_MODE_DEFEND_ALLY or w~=nil and#w>=2 or w[1]~=nil and g.IsStronger(a,w[1])or GetUnitToUnitDistance(a,GetAncient(GetTeam()))<2300 or GetUnitToUnitDistance(a,GetAncient(GetOpposingTeam()))<3500 then return false end;return true end;function g.IsStronger(a,x)local y=a:GetEstimatedDamageToTarget(true,x,4.0,DAMAGE_TYPE_ALL)local z=x:GetEstimatedDamageToTarget(true,a,4.0,DAMAGE_TYPE_ALL)return z>y end;if SafeCall then local A=GetDesire;local B=Think;if A then GetDesire=SafeCall(A,0,'SECRET_SHOP_GetDesire')end;if B then Think=SafeCall(B,nil,'SECRET_SHOP_Think')end end
+local bot = GetBot();
+local botName = bot:GetUnitName();
+if bot == nil or bot:IsInvulnerable() or not bot:IsHero() or not bot:IsAlive() or not string.find(botName, "hero") or bot:IsIllusion() then return end
+
+local J = require(GetScriptDirectory()..'/FunLib/jmz_func')
+local Customize = require(GetScriptDirectory()..'/Customize/general')
+Customize.ThinkLess = Customize.Enable and Customize.ThinkLess or 1
+
+local botTeam = bot:GetTeam()
+local enemyTeam = botTeam == TEAM_RADIANT and TEAM_DIRE or TEAM_RADIANT
+local X = {}
+local preferedShop = nil;
+local RAD_SECRET_SHOP = GetShopLocation(GetTeam(), SHOP_SECRET )
+local DIRE_SECRET_SHOP = GetShopLocation(GetTeam(), SHOP_SECRET2 )
+local hasItemToSell = false;
+
+function GetDesire()
+	-- local cacheKey = 'GetSecretShopDesire'..tostring(bot:GetPlayerID())
+	-- local cachedVar = J.Utils.GetCachedVars(cacheKey, 0.5 * (1 + Customize.ThinkLess))
+	-- if DotaTime() > 30 and cachedVar ~= nil then return cachedVar end
+	local res = GetDesireHelper()
+	-- J.Utils.SetCachedVars(cacheKey, res)
+	return res
+end
+function GetDesireHelper()
+
+	-- 如果在打高地 就别撤退去干别的
+	if J.Utils.IsTeamPushingSecondTierOrHighGround(bot) then
+		return BOT_MODE_DESIRE_NONE
+	end
+
+	if J.IsFarming(bot) and J.IsPushing(bot) and J.IsDefending(bot) then
+		return BOT_MODE_DESIRE_NONE
+	end
+
+	if not X.IsSuitableToBuy()
+	then
+		return BOT_MODE_DESIRE_NONE;
+	end
+
+	local invFull = true;
+
+	for i=0,8 do
+		if bot:GetItemInSlot(i) == nil then
+			invFull = false;
+		end
+	end
+
+	if invFull then
+		if bot:GetLevel() > 11 and bot:FindItemSlot("item_aegis") < 0 then
+			hasItemToSell, itemSlot = X.HaveItemToSell();
+			if hasItemToSell then
+				preferedShop = X.GetPreferedSecretShop();
+				if preferedShop ~= nil then
+					return RemapValClamped(  GetUnitToLocationDistance(bot, preferedShop), 6000, 0, 0.75, 0.95 );
+				end	
+			end
+		end
+		return BOT_MODE_DESIRE_NONE;
+	end
+	
+	local npcCourier = bot.theCourier
+	local cState = GetCourierState( npcCourier );
+	
+	if bot.SecretShop and cState ~= COURIER_STATE_MOVING  then
+		preferedShop = X.GetPreferedSecretShop();
+		if preferedShop ~= nil and cState == COURIER_STATE_DEAD then
+			return RemapValClamped(  GetUnitToLocationDistance(bot, preferedShop), 6000, 0, 0.7, 0.85 );
+		else
+			if preferedShop ~= nil and GetUnitToLocationDistance(bot, preferedShop) <= 3200 then
+				return RemapValClamped(  GetUnitToLocationDistance(bot, preferedShop), 3200, 0, 0.7, 0.85 );
+			end
+		end
+	end
+	
+	return BOT_MODE_DESIRE_NONE
+
+end
+
+function OnStart()
+
+end
+
+function OnEnd()
+
+end
+
+function Think()
+	if J.CanNotUseAction(bot) then return end
+	if bot:IsChanneling() 
+		or bot:NumQueuedActions() > 0
+		or bot:IsCastingAbility()
+		or bot:IsUsingAbility()
+	then 
+		return
+	end
+	if J.Utils.IsBotThinkingMeaningfulAction(bot, Customize.ThinkLess, "secret_shop") then return end
+
+	if preferedShop == nil then
+		preferedShop = X.GetPreferedSecretShop();
+	end
+	if bot:DistanceFromSecretShop() == 0
+	then
+		bot:Action_MoveToLocation(preferedShop + RandomVector(200))
+		return;
+	end
+
+	if bot:DistanceFromSecretShop() > 0
+	then
+		bot:Action_MoveToLocation(preferedShop + RandomVector(20));
+		return;
+	end
+	
+end
+
+--这些是AI会主动走到商店出售的物品
+function X.HaveItemToSell()
+	local earlyGameItem = {
+		 "item_clarity",
+		 "item_faerie_fire",
+		 "item_tango",  
+		 "item_flask", 
+--		 "item_orb_of_frost",
+		 "item_bracer",
+		 "item_wraith_band",
+		 "item_null_talisman",
+		 "item_infused_raindrop",
+		 "item_bottle",  
+	}
+	for _,item in pairs(earlyGameItem) 
+	do
+		local slot = bot:FindItemSlot(item)
+		if slot >= 0 and slot <= 8 then
+			return true, slot;
+		end
+	end
+	return false, nil;
+end
+
+function X.GetPreferedSecretShop()
+	if GetTeam() == TEAM_RADIANT then
+		if GetUnitToLocationDistance(bot, DIRE_SECRET_SHOP) <= 3800 then
+			return DIRE_SECRET_SHOP;
+		else
+			return RAD_SECRET_SHOP;
+		end
+	end
+	if GetUnitToLocationDistance(bot, RAD_SECRET_SHOP) <= 3800 then
+		return RAD_SECRET_SHOP;
+	else
+		return DIRE_SECRET_SHOP;
+	end
+end
+
+function X.IsSuitableToBuy()
+	local mode = bot:GetActiveMode();
+	local Enemies = J.GetNearbyHeroes(bot,1600, true, BOT_MODE_NONE);
+	if not bot:IsAlive() 
+		or bot:HasModifier("modifier_item_shadow_amulet_fade")
+		or ( mode == BOT_MODE_RETREAT and bot:GetActiveModeDesire() >= BOT_MODE_DESIRE_HIGH )
+		or mode == BOT_MODE_ATTACK
+		or mode == BOT_MODE_DEFEND_ALLY
+		or ( Enemies ~= nil and #Enemies >= 2 )
+		or ( Enemies[1] ~= nil and X.IsStronger(bot, Enemies[1]) )
+		or GetUnitToUnitDistance(bot, GetAncient(GetTeam())) < 2300 
+		or GetUnitToUnitDistance(bot, GetAncient(GetOpposingTeam())) < 3500  
+	then
+		return false;
+	end
+	return true;
+end
+
+function X.IsStronger(bot, enemy)
+	local BPower = bot:GetEstimatedDamageToTarget(true, enemy, 4.0, DAMAGE_TYPE_ALL);
+	local EPower = enemy:GetEstimatedDamageToTarget(true, bot, 4.0, DAMAGE_TYPE_ALL);
+	return EPower > BPower;
+end
