@@ -1,11 +1,11 @@
 {
   "steam_dir": "D:\\APP\\Steam",
-  "current_file": "npc_dota_hero_juggernaut.txt",
+  "current_file": "npc_dota_hero_furion.txt",
   "font": "JetBrains Mono",
   "font_size": 10,
   "theme": "dark",
-  "win_size": "1600x800",
-  "win_position": "177,116",
+  "win_size": "1920x1009",
+  "win_position": "0,23",
   "sidebar_expand": true,
   "xp_gold_mul_enable": true,
   "xp_gold_mul": 1.0,
@@ -79,17 +79,18 @@
   "shortcut_ctrl_0_action": "=0",
   "cooldown_action": "-25%",
   "shortcut_count": {
-    "shortcut_7_action": 9,
+    "shortcut_7_action": 14,
     "shortcut_ctrl_6_action": 4,
-    "cooldown_action": 11,
-    "shortcut_5_action": 3,
-    "shortcut_1_action": 9,
+    "cooldown_action": 17,
+    "shortcut_5_action": 6,
+    "shortcut_1_action": 12,
     "shortcut_ctrl_2_action": 3,
-    "shortcut_ctrl_3_action": 5,
-    "shortcut_3_action": 7,
-    "shortcut_6_action": 8,
-    "shortcut_ctrl_5_action": 4,
+    "shortcut_ctrl_3_action": 6,
+    "shortcut_3_action": 14,
+    "shortcut_6_action": 21,
+    "shortcut_ctrl_5_action": 5,
     "shortcut_4_action": 1,
-    "shortcut_9_action": 1
+    "shortcut_9_action": 3,
+    "shortcut_0_action": 3
   }
 }
