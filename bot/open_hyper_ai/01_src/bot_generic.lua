@@ -1,1 +1,21 @@
-local a=GetBot()local b=a:GetUnitName()if a==nil or a:IsInvulnerable()or not a:IsHero()or not string.find(b,"hero")or a:IsIllusion()then return end;local c=require(GetScriptDirectory()..'/FuncLib/systems/utils')local d=dofile(GetScriptDirectory().."/BotsLib/"..string.gsub(b,"npc_dota_",""))if d==nil then log('[ERROR] No build config file found for bot: %s',b)return end;function MinionThink(e)if not c.IsValidUnit(e)then return end;if e.lastMinionFrameProcessTime==nil then e.lastMinionFrameProcessTime=DotaTime()end;if DotaTime()-e.lastMinionFrameProcessTime<0.3 then return end;e.lastMinionFrameProcessTime=DotaTime()d.MinionThink(e)end
+local bot = GetBot()
+local botName = bot:GetUnitName()
+if bot == nil or bot:IsInvulnerable() or not bot:IsHero() or not string.find(botName, "hero") or bot:IsIllusion() then return end
+
+local Utils = require( GetScriptDirectory()..'/FunLib/utils' )
+local BotBuild = dofile(GetScriptDirectory() .. "/BotLib/" .. string.gsub(botName, "npc_dota_", ""));
+
+if BotBuild == nil
+then
+	print('[ERROR] No build config file found for bot: '..botName)
+	return
+end
+
+function MinionThink(hMinionUnit)
+	if not Utils.IsValidUnit(hMinionUnit) then return end
+	if hMinionUnit.lastMinionFrameProcessTime == nil then hMinionUnit.lastMinionFrameProcessTime = DotaTime() end
+	if DotaTime() - hMinionUnit.lastMinionFrameProcessTime < 0.3 then return end
+	hMinionUnit.lastMinionFrameProcessTime = DotaTime()
+
+	BotBuild.MinionThink(hMinionUnit)
+end

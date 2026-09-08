@@ -1,1 +1,228 @@
-require'bots.FretBots.Debug'require'bots.FretBots.Flags'require'bots.FretBots.DataTables'require'bots.FretBots.AwardBonus'require'bots.FretBots.Settings'require'bots.FretBots.GameState'require'bots.FretBots.modifiers.Modifier'local a=require'bots/FuncLib/systems/localization'local b=false;local c=Debug.IsDebug()and b;local d=2;local e=3;local f=5;local g=Utilities:ColorString(a.Get('fret_killer_awards'),"#DAA520")local h="GoldTracking"local i={}local j=false;local k={[d]=0,[e]=0}local l={}local m=4;local n=200;local o=0.85;local p=-5000;local q=-50;local r=1.25;local s=30*60;if EntityKilled==nil then EntityKilled={}end;function EntityKilled:OnEntityKilled(t)local u,v,w=EntityKilled:GetEntityKilledEventData(t)if v==nil then return end;if v:IsTower()or v:IsBuilding()then GameState:Update(v)end;if v.stats==nil then return end;if not u then return end;DataTables:DoDeathUpdate(v,w)if Settings.difficulty>=1 then DynamicDifficulty:Adjust(v)AwardBonus:Death(v)end;if Settings.isPlayerDeathSound then Utilities:RandomSound(BAD_LIST)end;if c then DeepPrintTable(v)end end;function EntityKilled:OnCombatlog(t)end;function EntityKilled:OnLevelUp(t)local x=EntIndexToHScript(t.hero_entindex)if x~=nil and PlayerResource:GetSteamID(t.player_id)==PlayerResource:GetSteamID(100)then if Settings.difficulty>=5 then local y,z=x:GetDeathXP(),0;if Utilities:IsTurboMode()then z=math.floor(x:GetDeathXP()*0.35)else z=math.floor(x:GetDeathXP()*0.55)end;x.newDeathXp=z;x:SetCustomDeathXP(z)Debug:Print("[OnLevelUp: to lvl "..t.level.."] Changed death xp "..x:GetUnitName().." from "..y..' to '..z)end end end;function EntityKilled:TauntModifierTimer()for A,B in pairs(l)do if A and B then if Utilities:GetTime()>=B.time+m then l[A]=nil;Modifier:RemoveHighFiveModifier(B.hero)end end end;return 1 end;function EntityKilled:GetEntityKilledEventData(t)local v=EntIndexToHScript(t.entindex_killed)local w=nil;if t.entindex_attacker~=nil then w=EntIndexToHScript(t.entindex_attacker)end;local u=false;if v:IsHero()and v:IsRealHero()and not v:IsIllusion()and not v:IsClone()then u=true;if w==nil or w.stats==nil or v==nil or v.stats==nil then return end;if not v.stats.isBot and w.stats.isBot and(not l[w.stats.name]or l[w.stats.name].time<Utilities:GetTime()+m)then l[w.stats.name]={time=Utilities:GetTime(),hero=w}Modifier:ApplyHighFiveModifier(w)end;if Settings.difficulty>=f then if v:HasModifier("modifier_skeleton_king_reincarnation")or v:HasModifier("modifier_aegis_regen")then Debug:Print("Entity got killed, but not truly dead yet.")return end;k[w.stats.team]=k[w.stats.team]+1;if not j and not w.stats.isBot then local C=-26;if Utilities:IsTurboMode()then C=C*1.5 end;local D=v:GetLevel()local E=math.floor(C*D/4*Settings.difficultyScale*3-math.random(1,30))w:ModifyGold(E,true,DOTA_ModifyGold_HeroKill)local F=string.format(a.Get('fret_killer_panelty'),PlayerResource:GetPlayerName(w:GetPlayerID()),E)Utilities:Print(F,Utilities:GetPlayerColor(w:GetPlayerID()))end end end;return u,v,w end;function EntityKilled:GoldTracking()j=true;local G=false;local H=false;local I=g;for J,K in pairs(AllHumanPlayers)do local L=k[K.stats.team]local M=K:GetGold()local N=i[K.stats.name]or M;local O=M-N;if O>n then if Settings.difficulty>=f and L>=1 then local P=Utilities:Clamp(Settings.difficulty/Settings.diffMaxDenominator,0,1)local Q=Utilities:RemapValClamped(Utilities:GetTime()/s,0,1,0.5,1)local R=O*(1-Utilities:RemapValClamped(P*r*Q,0,1,0,o))local S=Utilities:Clamp(math.floor(R-O),p,q)Debug:Print('GoldTracking. Player: '..K.stats.name..', team: '..K.stats.team..', gold to reduce: '..S)K.stats.pColor=K.stats.pColor or Utilities:GetPlayerColor(K.stats.id)K.stats.pName=K.stats.pName or PlayerResource:GetPlayerName(K:GetPlayerID())I=I..'. '..Utilities:ColorString(K.stats.pName..': '..tostring(S),K.stats.pColor)K:ModifyGold(S,true,DOTA_ModifyGold_HeroKill)if K.stats.team==d then G=true end;if K.stats.team==e then H=true end elseif not Settings.allowPlayersToCheat and(K.stats.repurcussionTarget>0 and K.stats.repurcussionCount<K.stats.repurcussionTarget)then local S=-math.floor(O)Debug:Print('GoldTracking. Player: '..K.stats.name..' received gold without a kill. gold to reduce: '..S)K:ModifyGold(S,true,DOTA_ModifyGold_HeroKill)end end;i[K.stats.name]=M end;if G then GameRules:SendCustomMessage(I,0,0)k[d]=0 end;if H then GameRules:SendCustomMessage(I,0,0)k[e]=0 end;return 0.3 end;function EntityKilled:RegisterEvents()if not Flags.isEntityKilledRegistered then ListenToGameEvent('entity_killed',Dynamic_Wrap(EntityKilled,'OnEntityKilled'),EntityKilled)ListenToGameEvent("dota_combatlog",Dynamic_Wrap(EntityKilled,'OnCombatlog'),EntityKilled)ListenToGameEvent("dota_player_gained_level",Dynamic_Wrap(EntityKilled,'OnLevelUp'),EntityKilled)Timers:CreateTimer(h,{endTime=1,callback=EntityKilled['GoldTracking']})Debug:Print('Registered Gold Tracking Timer.')Timers:CreateTimer("Taunt-Modifiers",{endTime=1,callback=EntityKilled['TauntModifierTimer']})Debug:Print('Registered Taunt Modifiers Timer.')if Utilities:IsTurboMode()then s=s*0.66 end;Flags.isEntityKilledRegistered=true;if true then log('EntityKilled Event Listener Registered.')end end end
+-- Dependencies
+ -- global debug flag
+require 'bots.FretBots.Debug'
+ -- Global flags
+require 'bots.FretBots.Flags'
+ -- Data Tables and helper functions
+require 'bots.FretBots.DataTables'
+-- Awards for bots
+require 'bots.FretBots.AwardBonus'
+-- Settings
+require 'bots.FretBots.Settings'
+-- Game State Tracker
+require 'bots.FretBots.GameState'
+require 'bots.FretBots.modifiers.Modifier'
+local Localization = require 'bots/FunLib/localization'
+
+-- local debug flag
+local thisDebug = false;
+local isDebug = Debug.IsDebug() and thisDebug;
+local RADIANT			= 2
+local DIRE				= 3
+local KillerAwardMinDifficulty = 5
+local KillerAwardAnnounce = Utilities:ColorString(Localization.Get('fret_killer_awards'), "#DAA520")
+
+local goldTrackingTimer = "GoldTracking"
+local GoldTrackingTable = {}
+local IsGoldTrackingRunning = false
+local TeamKillsTrackingTable = {
+	[RADIANT] = 0,
+	[DIRE] = 0
+}
+local TauntModifierTimers = {}
+local TauntTime = 4
+local GoldPenaltyNetworthDiffThreshold = 200
+local GoldPenaltyPercentageMax = 0.85
+local GoldPenaltyAmountMax = -5000
+local GoldPenaltyAmountMin = -50
+local GoldPenaltyDiffRatioMultipler = 1.25
+local GoldPenaltyTimeFactor = 30 * 60 -- after 25 mins, use full penalty.
+
+-- Instantiate ourself
+if EntityKilled == nil then
+	EntityKilled = {}
+end
+
+-- Event Listener
+function EntityKilled:OnEntityKilled(event)
+	-- Get Event Data
+	local isHero, victim, killer = EntityKilled:GetEntityKilledEventData(event);
+	-- Log Tower/Building kills to track game state
+	if victim == nil then return end
+	if victim:IsTower() or victim:IsBuilding() then
+		GameState:Update(victim)
+	end
+	if victim.stats == nil then return end
+	-- Drop out for non hero kills
+	if not isHero then return end;
+	-- Do Table Update
+	DataTables:DoDeathUpdate(victim, killer);
+	if Settings.difficulty >= 1 then
+		-- print('Enabled bots with bonus on death for diffculty scale = '..Settings.difficultyScale)
+		-- Dynamic Adjustment (maybe)
+		DynamicDifficulty:Adjust(victim)
+		-- Give Awards (maybe)
+		AwardBonus:Death(victim)
+	end
+	-- Sound if it is a player?
+	if Settings.isPlayerDeathSound then
+		Utilities:RandomSound(BAD_LIST)
+	end
+	-- Debug Print
+	if isDebug then
+		DeepPrintTable(victim)
+	end
+end
+
+-- Event Listener
+function EntityKilled:OnCombatlog(event)
+	-- print("[BAREBONES] dota_combatlog")
+	-- DeepPrintTable(event)
+end
+
+-- Event Listener
+function EntityKilled:OnLevelUp(event)
+	local hero = EntIndexToHScript(event.hero_entindex)
+	if hero ~= nil and PlayerResource:GetSteamID(event.player_id) == PlayerResource:GetSteamID(100) then
+		if Settings.difficulty >= 5 then
+			local orig, new = hero:GetDeathXP(), 0
+			-- 减少死亡经验奖励
+			if Utilities:IsTurboMode() then
+				new = math.floor(hero:GetDeathXP() * 0.35)
+			else
+				new = math.floor(hero:GetDeathXP() * 0.55)
+			end
+			hero.newDeathXp = new
+			hero:SetCustomDeathXP(new)
+			Debug:Print("[OnLevelUp: to lvl "..event.level.."] Changed death xp "..hero:GetUnitName().." from ".. orig .. ' to ' .. new)
+		end
+	end
+end
+
+function EntityKilled:TauntModifierTimer()
+	for k, v in pairs(TauntModifierTimers) do
+		if k and v then
+			if Utilities:GetTime() >= v.time + TauntTime
+			then
+				TauntModifierTimers[k] = nil
+				Modifier:RemoveHighFiveModifier(v.hero)
+			end
+			-- if v.hero:HasModifier("modifier_taunt") and Utilities:IsEnemyHeroNearby(v.hero, 1600)
+			-- then
+			-- 	v.hero:RemoveModifierByName("modifier_taunt")
+			-- end
+		end
+	end
+	return 1
+end
+
+-- returns useful data about the kill event
+function EntityKilled:GetEntityKilledEventData(event)
+	-- Victim
+	local victim = EntIndexToHScript(event.entindex_killed);
+	-- Killer
+	local killer = nil;
+	if event.entindex_attacker ~= nil then
+		killer = EntIndexToHScript( event.entindex_attacker )
+	end
+	-- IsHero
+	local isHero = false;
+	if victim:IsHero() and victim:IsRealHero() and not victim:IsIllusion() and not victim:IsClone() then
+		isHero = true;
+		if killer == nil or killer.stats == nil or victim == nil or victim.stats == nil then return end
+		if not victim.stats.isBot and killer.stats.isBot and (not TauntModifierTimers[killer.stats.name] or TauntModifierTimers[killer.stats.name].time < Utilities:GetTime() + TauntTime) then
+			TauntModifierTimers[killer.stats.name] = {time = Utilities:GetTime(), hero = killer}
+			Modifier:ApplyHighFiveModifier(killer)
+		end
+
+		if Settings.difficulty >= KillerAwardMinDifficulty then
+			if victim:HasModifier("modifier_skeleton_king_reincarnation") or victim:HasModifier("modifier_aegis_regen") then
+				Debug:Print("Entity got killed, but not truly dead yet.")
+				return
+			end
+			TeamKillsTrackingTable[killer.stats.team] = TeamKillsTrackingTable[killer.stats.team] + 1
+			-- 当击杀者是人类玩家时，给与击杀惩罚
+			if not IsGoldTrackingRunning and not killer.stats.isBot then
+				local goldPerLevel = -26
+				if Utilities:IsTurboMode() then
+					goldPerLevel = goldPerLevel * 1.5
+				end
+				local heroLevel = victim:GetLevel()
+				-- 基于基础惩罚，死亡单位的等级，和难度来确定惩罚额度
+				local goldBounty = math.floor(goldPerLevel * heroLevel/4 * (Settings.difficultyScale * 3) - math.random(1, 30))
+				-- 给予击杀者赏金
+				killer:ModifyGold(goldBounty, true, DOTA_ModifyGold_HeroKill)
+				local msg = string.format(Localization.Get('fret_killer_panelty'), PlayerResource:GetPlayerName(killer:GetPlayerID()), goldBounty)
+				Utilities:Print(msg, Utilities:GetPlayerColor(killer:GetPlayerID()))
+			end
+		end
+	end
+
+	return isHero, victim, killer;
+end
+
+function EntityKilled:GoldTracking()
+	IsGoldTrackingRunning = true
+	local canClearRadiantTracking = false
+	local canClearDireTracking = false
+	local killerAwardAnnounce = KillerAwardAnnounce
+	-- print("player count" .. tostring(#AllHumanPlayers))
+	for i, player in pairs(AllHumanPlayers) do
+		local teamKills = TeamKillsTrackingTable[player.stats.team]
+		local netWorth = player:GetGold() -- PlayerResource:GetNetWorth(player.stats.id)
+		-- Debug:Print('GoldTracking. Player: '.. player.stats.name .. ', netWorth: ' .. netWorth)
+		local oldNetworth = GoldTrackingTable[player.stats.name] or netWorth
+		local netWorthDiff = netWorth - oldNetworth
+		-- Debug:Print('GoldTracking. Player: '.. player.stats.name .. ', netWorth diff vs previous: ' .. netWorthDiff .. ', team kills: ' .. teamKills .. ', difficulty: ' .. Settings.difficulty)
+
+		if netWorthDiff > GoldPenaltyNetworthDiffThreshold then
+			if Settings.difficulty >= KillerAwardMinDifficulty
+			and teamKills >= 1  -- 因为timer有执行间隔，同时击杀太多的话可能会有一些 edge cases 导致漏算或者多算人头，但是以后再改吧
+			then
+				local diffRatio = Utilities:Clamp(Settings.difficulty / Settings.diffMaxDenominator, 0, 1)
+				local timeRatio = Utilities:RemapValClamped(Utilities:GetTime() / GoldPenaltyTimeFactor, 0, 1, 0.5, 1)
+				local netWorthDiffAfterReduction = netWorthDiff * (1 - Utilities:RemapValClamped(diffRatio * GoldPenaltyDiffRatioMultipler * timeRatio, 0, 1, 0, GoldPenaltyPercentageMax))
+				local goldToReduce = Utilities:Clamp(math.floor(netWorthDiffAfterReduction - netWorthDiff), GoldPenaltyAmountMax, GoldPenaltyAmountMin)
+				Debug:Print('GoldTracking. Player: '.. player.stats.name .. ', team: ' .. player.stats.team .. ', gold to reduce: ' .. goldToReduce)
+
+				player.stats.pColor = player.stats.pColor or Utilities:GetPlayerColor(player.stats.id)
+				player.stats.pName = player.stats.pName or PlayerResource:GetPlayerName(player:GetPlayerID())
+				killerAwardAnnounce = killerAwardAnnounce .. '. ' .. Utilities:ColorString(player.stats.pName .. ': ' .. tostring(goldToReduce), player.stats.pColor)
+				player:ModifyGold(goldToReduce, true, DOTA_ModifyGold_HeroKill)
+				if player.stats.team == RADIANT then canClearRadiantTracking = true end
+				if player.stats.team == DIRE then canClearDireTracking = true end
+			elseif not Settings.allowPlayersToCheat and (player.stats.repurcussionTarget > 0 and player.stats.repurcussionCount < player.stats.repurcussionTarget) then
+				local goldToReduce = -math.floor(netWorthDiff)
+				Debug:Print('GoldTracking. Player: '.. player.stats.name .. ' received gold without a kill. gold to reduce: ' .. goldToReduce)
+				player:ModifyGold(goldToReduce, true, DOTA_ModifyGold_HeroKill)
+			end
+		end
+		GoldTrackingTable[player.stats.name] = netWorth
+	end
+	if canClearRadiantTracking then GameRules:SendCustomMessage(killerAwardAnnounce, 0, 0); TeamKillsTrackingTable[RADIANT] = 0 end
+	if canClearDireTracking then GameRules:SendCustomMessage(killerAwardAnnounce, 0, 0); TeamKillsTrackingTable[DIRE] = 0 end
+	return 0.3
+end
+
+-- Registers Event Listener
+function EntityKilled:RegisterEvents()
+	if not Flags.isEntityKilledRegistered then
+		ListenToGameEvent('entity_killed', Dynamic_Wrap(EntityKilled, 'OnEntityKilled'), EntityKilled)
+		ListenToGameEvent("dota_combatlog", Dynamic_Wrap(EntityKilled, 'OnCombatlog'), EntityKilled)
+		ListenToGameEvent("dota_player_gained_level", Dynamic_Wrap(EntityKilled, 'OnLevelUp'), EntityKilled)
+
+		Timers:CreateTimer(goldTrackingTimer, {endTime = 1, callback = EntityKilled['GoldTracking']} )
+		Debug:Print('Registered Gold Tracking Timer.')
+		Timers:CreateTimer("Taunt-Modifiers", {endTime = 1, callback = EntityKilled['TauntModifierTimer']} )
+		Debug:Print('Registered Taunt Modifiers Timer.')
+
+		if Utilities:IsTurboMode() then
+			GoldPenaltyTimeFactor = GoldPenaltyTimeFactor * 0.66
+		end
+		Flags.isEntityKilledRegistered = true;
+		if true then
+			print('EntityKilled Event Listener Registered.')
+		end
+	end
+end
+

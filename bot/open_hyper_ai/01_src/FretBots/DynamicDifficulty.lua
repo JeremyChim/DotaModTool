@@ -1,1 +1,191 @@
-require'bots.FretBots.Debug'require'bots.FretBots.Flags'require'bots.FretBots.Settings'require'bots.FretBots.Utilities'local a=true;local b=Debug.IsDebug()and a;local c=b and true;local d=true;local e='settingsCacheTimerName'if DynamicDifficulty==nil then DynamicDifficulty={}end;if cache==nil then local cache={}end;function DynamicDifficulty:Adjust(victim)if not Flags.isDynamicDifficultyFinalized then return end;if not Settings.dynamicDifficulty.enabled then return end;if not victim.stats.isBot then return end;for f,g in ipairs(Settings.dynamicDifficulty.knobs)do if g=='xpm'or g=='gpm'and Settings.dynamicDifficulty[g].enabled then DynamicDifficulty:MakeAdjustment('gpm')DynamicDifficulty:MakeAdjustment('xpm')else if Settings.dynamicDifficulty[g].enabled then DynamicDifficulty:AdjustDeathBonus(g,victim)end end end end;function DynamicDifficulty:MakeAdjustment(g)local h,i,j=DynamicDifficulty:GetCurrentAdjustment(Settings.dynamicDifficulty[g],victim)if h>=0 then Settings[g].offset=cache[g].offset+h;Settings[g].clamp[2]=cache[g].clamp[2]+h;if Settings.dynamicDifficulty[g].announce and h>0 then local k='Bots are behind! Human advantage: '..i..' kills. 'local k=k..'Adjusting Bot '..string.upper(g)..' Offset: '..h..' ('..j+1 ..' deficit increments)'Utilities:Print(k,MSG_WARNING)end else Utilities:DeepCopy(cache[g],Settings[g])end end;function DynamicDifficulty:GetCurrentAdjustment(l,victim)if not l.enabled then return 0 end;local h=0;local m=victim.stats.humanKillAdvantage;local n=l.advantageThreshold;local o=l.base;local p=l.incrementEvery;local q=l.increment;local i=victim.stats.humanKillAdvantage;if i>l.advantageThreshold then h=h+l.base;local j;if p>0 then j=math.floor((m-n)/p)else j=0 end;h=h+j*q;if h>l.cap then h=l.cap end;return h,i,j else return 0 end end;function DynamicDifficulty:AdjustDeathBonus(g,r)local h,i,j=DynamicDifficulty:GetCurrentAdjustment(Settings.dynamicDifficulty[g],victim)if h>=0 then Settings.deathBonus.offset[g]=cache.deathBonus.offset[g]+h;Settings.deathBonus.clamp[g][2]=cache.deathBonus.clamp[g][2]+h;if Settings.dynamicDifficulty[g].announce and h>0 then local k='Bots are behind! Human advantage: '..i..' kills. 'local k=k..'Adjusting Bot Death Bonus: '..g..' offset: '..h..' ('..j+1 ..' deficit increments)'Utilities:Print(k,MSG_WARNING)end else Settings.deathBonus.offset[g]=cache.deathBonus.offset[g]Settings.deathBonus.clamp[g][2]=cache.deathBonus.clamp[g][2]end;if Settings.dynamicDifficulty[g].chanceAdjust~=nil then h,i,j=DynamicDifficulty:GetCurrentAdjustment(Settings.dynamicDifficulty[g].chanceAdjust,victim)if h>0 then r.stats.chance[g]=r.stats.chance[g]+h;if Settings.dynamicDifficulty[g].announce then local k='Bots are behind! Human advantage: '..i..' kills. 'local k=k..'Adjusting Bot Death Bonus: '..g..' chance: '..h..' ('..j+1 ..' deficit increments)'Utilities:Print(k,MSG_WARNING)end else r.stats.chance[g]=cache.deathBonus.chance[g]end end end;function DynamicDifficulty:Suspend()Settings.dynamicDifficulty.enabled=false end;function DynamicDifficulty:Enable()Settings.dynamicDifficulty.enabled=true end;function DynamicDifficulty:Reset()Utilities:DeepCopy(cache.gpm,Settings.gpm)Utilities:DeepCopy(cache.xpm,Settings.xpm)end;function DynamicDifficulty:Toggle()Settings.dynamicDifficulty.enabled=not Settings.dynamicDifficulty.enabled end;function DynamicDifficulty:SettingsCacheTimer()if not Flags.isSettingsFinalized then return 1 end;cache=Utilities:CloneTable(Settings)Debug:Print('Dynamic Difficulty Settings Cache Timer Complete. Exiting.')Timers:RemoveTimer(e)Flags.isDynamicDifficultyFinalized=true;return nil end;if not Flags.isDynamicDifficultyInitialized then Debug:Print('Registering Dynamic Difficulty Settings Cache Timer')Timers:CreateTimer(e,{endTime=1,callback=DynamicDifficulty['SettingsCacheTimer']})Flags.isDynamicDifficultyInitialized=true end
+-- Functions for dynamically adjusting bot diffculty
+
+-- Global Debug flag
+require 'bots.FretBots.Debug';
+ -- Other Flags
+require 'bots.FretBots.Flags'
+-- Settings
+require 'bots.FretBots.Settings'
+-- Convenience Utilities
+require 'bots.FretBots.Utilities'
+
+-- local debug flag
+local thisDebug = true;
+local isDebug = Debug.IsDebug() and thisDebug;
+local isDebugChat = isDebug and true
+
+-- announce bonuses to chat?
+local isChat = true;
+
+-- timer names
+local settingsCacheTimerName = 'settingsCacheTimerName'
+
+-- Instantiate ourself
+if DynamicDifficulty == nil then
+	DynamicDifficulty = {}
+end
+
+-- this represents the settings prior to any adjustments
+if cache == nil then
+	local cache = {}
+end
+
+-- Dynamically adjusts settings values to adjust difficulty dynamically.
+-- argument is always the victim of a kill, since this is called from within
+-- the OnEntityKilled() event handler
+function DynamicDifficulty:Adjust(victim)
+	-- don't attempt this before it's ready
+	if not Flags.isDynamicDifficultyFinalized then return end
+	-- ensure we're enabled
+	if not Settings.dynamicDifficulty.enabled then return end
+	-- do not do anything for humans
+	if not victim.stats.isBot then return end
+	for _, knob in ipairs(Settings.dynamicDifficulty.knobs) do
+		if knob == 'xpm' or knob == 'gpm' and Settings.dynamicDifficulty[knob].enabled then
+			-- GPM
+			DynamicDifficulty:MakeAdjustment('gpm')
+			-- XPM
+			DynamicDifficulty:MakeAdjustment('xpm')
+		else
+			if Settings.dynamicDifficulty[knob].enabled then
+				DynamicDifficulty:AdjustDeathBonus(knob, victim)
+			end
+		end
+	end
+end
+
+-- Makes an adjustment to one of the two knobs (gpm / xpm)
+function DynamicDifficulty:MakeAdjustment(knob)
+	local bonus, advantage, increments =
+			DynamicDifficulty:GetCurrentAdjustment(Settings.dynamicDifficulty[knob], victim)
+	if bonus >= 0 then
+		Settings[knob].offset = cache[knob].offset + bonus
+		-- adjust upper clamp as well
+		Settings[knob].clamp[2] = cache[knob].clamp[2] + bonus
+		if Settings.dynamicDifficulty[knob].announce and bonus > 0 then
+			local msg = 'Bots are behind! Human advantage: '..advantage..' kills. '
+			local msg = msg..'Adjusting Bot '..string.upper(knob)..
+									' Offset: '..bonus..' ('..(increments+1)..' deficit increments)'
+			Utilities:Print(msg,MSG_WARNING)
+		end
+	-- if bonus drops to zero, reapply cached values
+	else
+		Utilities:DeepCopy(cache[knob], Settings[knob])
+	end
+end
+
+-- Returns current scaling data for a given dynamic adjustment
+function DynamicDifficulty:GetCurrentAdjustment(settings, victim)
+	--if this adjustment is not enabled, return 0
+	if not settings.enabled then
+		return 0
+	end
+	local bonus = 0
+	local kills = victim.stats.humanKillAdvantage
+	local threshold = settings.advantageThreshold
+	local base = settings.base
+	local incrementEvery = settings.incrementEvery
+	local incrementValue = settings.increment
+	-- get human advantage
+	local advantage = victim.stats.humanKillAdvantage
+	if advantage > settings.advantageThreshold then
+		-- determine actual value
+		bonus = bonus + settings.base
+		local increments
+		if incrementEvery > 0 then
+			increments = math.floor((kills - threshold) / incrementEvery)
+		else
+			increments = 0
+		end
+		bonus = bonus + (increments * incrementValue)
+		if bonus > settings.cap then
+			bonus = settings.cap
+		end
+		return bonus, advantage, increments
+	-- below threshold, return 0
+	else
+		return 0
+	end
+end
+
+-- Makes dynamic death bonus adjustments
+function DynamicDifficulty:AdjustDeathBonus(knob, bot)
+	-- offset
+	local bonus, advantage, increments =
+			DynamicDifficulty:GetCurrentAdjustment(Settings.dynamicDifficulty[knob], victim)
+	if bonus >= 0 then
+		Settings.deathBonus.offset[knob] = cache.deathBonus.offset[knob] + bonus
+		Settings.deathBonus.clamp[knob][2] = cache.deathBonus.clamp[knob][2] + bonus
+		if Settings.dynamicDifficulty[knob].announce and bonus > 0 then
+			local msg = 'Bots are behind! Human advantage: '..advantage..' kills. '
+			local msg = msg..'Adjusting Bot Death Bonus: '..knob..
+									' offset: '..bonus..' ('..(increments+1)..' deficit increments)'
+			Utilities:Print(msg,MSG_WARNING)
+		end
+	-- if bonus drops to zero, reapply cached values
+	else
+		Settings.deathBonus.offset[knob] = cache.deathBonus.offset[knob]
+		Settings.deathBonus.clamp[knob][2] = cache.deathBonus.clamp[knob][2]
+	end
+	-- chance (if applicable)
+	if Settings.dynamicDifficulty[knob].chanceAdjust ~= nil then
+		bonus, advantage, increments =
+				DynamicDifficulty:GetCurrentAdjustment(Settings.dynamicDifficulty[knob].chanceAdjust, victim)
+		if bonus > 0 then
+			bot.stats.chance[knob] = bot.stats.chance[knob] + bonus
+			if Settings.dynamicDifficulty[knob].announce then
+				local msg = 'Bots are behind! Human advantage: '..advantage..' kills. '
+				local msg = msg..'Adjusting Bot Death Bonus: '..knob..
+										' chance: '..bonus..' ('..(increments+1)..' deficit increments)'
+				Utilities:Print(msg,MSG_WARNING)
+			end
+		-- if bonus drops to zero, reapply cached values
+		else
+			bot.stats.chance[knob] = cache.deathBonus.chance[knob]
+		end
+	end
+end
+
+-- Disables dynamic difficulty (without adjusting current offsets)
+function DynamicDifficulty:Suspend()
+	Settings.dynamicDifficulty.enabled = false
+end
+
+-- Enables dynamic difficulty
+function DynamicDifficulty:Enable()
+	Settings.dynamicDifficulty.enabled = true
+end
+
+-- Restores GPM/XPM offsets to default
+function DynamicDifficulty:Reset()
+	Utilities:DeepCopy(cache.gpm,Settings.gpm)
+	Utilities:DeepCopy(cache.xpm,Settings.xpm)
+end
+
+-- Toggles the enable state of DynamicDifficulty
+function DynamicDifficulty:Toggle()
+	Settings.dynamicDifficulty.enabled = not Settings.dynamicDifficulty.enabled
+end
+
+-- Waits until settings are chosen and then cache them
+function DynamicDifficulty:SettingsCacheTimer()
+	-- check if settings are ready, try again later if not
+	if not Flags.isSettingsFinalized then
+		return 1
+	end
+	-- otherwise, cache values and stop the timer
+	cache = Utilities:CloneTable(Settings)
+	Debug:Print('Dynamic Difficulty Settings Cache Timer Complete. Exiting.')
+	Timers:RemoveTimer(settingsCacheTimerName)
+	Flags.isDynamicDifficultyFinalized = true
+	return nil
+end
+
+-- This file depends on caching the default offset values when the settings
+-- are initialized.  Start a timer that watches for the isSettingsFinalized
+-- flag and caches when it sets to true.
+if not Flags.isDynamicDifficultyInitialized then
+	Debug:Print('Registering Dynamic Difficulty Settings Cache Timer')
+	Timers:CreateTimer(settingsCacheTimerName, {endTime = 1, callback =  DynamicDifficulty['SettingsCacheTimer']} )
+	Flags.isDynamicDifficultyInitialized = true
+end

@@ -1,1 +1,169 @@
-local a=GetBot()local b=a:GetUnitName()if a==nil or a:IsInvulnerable()or not a:IsHero()or not a:IsAlive()or not string.find(b,"hero")or a:IsIllusion()then return end;local c=require(GetScriptDirectory()..'/FuncLib/func_utils')local d=require(GetScriptDirectory()..'/FuncLib/systems/custom_loader')local e=0.0;local f=false;local g=DotaTime()c.Utils.GameStates=c.Utils.GameStates or{}c.Utils.GameStates.roshHandle=c.Utils.GameStates.roshHandle or nil;local h=0;local i=false;local j=false;local k;local l=nil;local m=0;local n=0;local o=15;local p=3*60;local q=2*60;local r=0;local s=0;local t=1.5;local u=8;local function v(w)if w<=0 then return w end;if b=="npc_dota_hero_huskar"then return w end;local x=c.GetHP(a)local y=c.Utils.IsValidUnit(k)and c.GetHP(k)<0.9;if a:WasRecentlyDamagedByAnyHero(2.0)and x<0.4 and not y then return w*RemapValClamped(x,0.1,0.4,0.0,0.5)end;local z=c.Utils.IsValidUnit(k)and k:GetAttackTarget()==a;local A=c.Utils.IsValidUnit(k)and GetUnitToUnitDistance(a,k)<600;if x<0.5 and z and DotaTime()>s then r=DotaTime()+t;s=DotaTime()+u end;a._roshDipActive=DotaTime()<r;if y and(a._roshDipActive or A)then return math.max(w,BOT_MODE_DESIRE_HIGH)end;return w end;local B=0;local C=0;function GetDesire()if ShouldSkipBotThink(GetBot())then return 0 end;local D=GetDesireHelper()if DotaTime()>3*60 and DotaTime()>C+15 then C=DotaTime()local E=Clamp(v(D),0,BOT_MODE_DESIRE_VERYHIGH)log(string.format('[ROSH] t=%.0f %s raw=%.2f final=%.2f alive=%s dps=%s kill=%s hg=%s eA=%d aA=%d',DotaTime(),string.gsub(a:GetUnitName(),'npc_dota_hero_',''),D,E,tostring(c.IsRoshanAlive()),tostring(j),tostring(f),tostring(c.Utils.IsTeamPushingSecondTierOrHighGround(a)),c.GetNumOfAliveHeroes(true),c.GetNumOfAliveHeroes(false)))end;D=v(D)if D>0.4 then c.ModeAnnounce(a,'say_roshan',30)end;return Clamp(D,0,BOT_MODE_DESIRE_VERYHIGH)end;local function F()if c.IsLateGame()then return c.IsCore(a)and 1 or 2 elseif c.IsMidGame()then return 3 else return 4 end end;local function G()local H=c.Utils.GameStates.roshHandle;if c.Utils.IsValidUnit(H)then k=H;return end;local I=a:GetNearbyNeutralCreeps(1600)for J,K in pairs(I)do if K:GetUnitName()=="npc_dota_roshan"then k=K;c.Utils.GameStates.roshHandle=K;return end end end;function GetDesireHelper()if a:IsInvulnerable()or not a:IsHero()or not a:IsAlive()or not string.find(b,"hero")or a:IsIllusion()then return BOT_MODE_DESIRE_NONE end;local L=GetAncient(GetTeam())if c.Utils.CountEnemyHeroesOnHighGround(GetTeam())>=2 or L and c.Utils.CountEnemyHeroesNear(L:GetLocation(),2500)>=1 then return BOT_MODE_DESIRE_NONE end;if not c.Utils.IsValidUnit(k)then G()end;local M=c.GetCurrentRoshanLocation()local N=GetTeam()local O=c.GetNumOfAliveHeroes(false)local P=c.GetNumOfAliveHeroes(true)local Q={}for J,R in pairs(GetUnitList(UNIT_LIST_ALLIED_HEROES))do if R:IsAlive()then table.insert(Q,R)end end;f=c.IsRoshanAlive()if f and not i then h=DotaTime()i=true elseif not f then h=0;i=false end;if c.HasEnoughDPSForRoshan(Q)then j=true end;if c.GetEnemiesAroundAncient(a,2000)>2 or c.GetHP(GetAncient(a:GetTeam()))<0.6 then return BOT_MODE_DESIRE_NONE end;if c.Utils.IsValidUnit(k)then local S=k:GetHealth()/k:GetMaxHealth()if S<0.8 then return RemapValClamped(S,0.8,0.0,0.9,1.0)end end;if O<P then return BOT_ACTION_DESIRE_NONE end;if l==nil then l=c.Utils.IsHumanPlayerInTeam(GetTeam())end;if l then if c.IsEarlyGame()then return BOT_ACTION_DESIRE_NONE end;if DotaTime()<n then return BOT_ACTION_DESIRE_NONE end;local T,U=c.GetHumanPing()local V=T~=nil and U~=nil and U.normal_ping and c.GetDistance(U.location,c.GetCurrentRoshanLocation())<600 and DotaTime()<U.time+5.0;if not V then if c.IsRoshanAlive()and j then if m==0 then m=DotaTime()end;local W=DotaTime()-m;if W<o then c.ModeAnnounce(a,'say_roshan',10)return BOT_MODE_DESIRE_MODERATE else m=0;n=DotaTime()+(c.IsModeTurbo()and q or p)return BOT_MODE_DESIRE_NONE end else m=0 end else m=0;n=0 end end;if f and j then local T,U=c.GetHumanPing()if T~=nil and DotaTime()>5.0 then if U~=nil and U.normal_ping and GetUnitToLocationDistance(T,M)<4500 and c.GetDistance(U.location,M)<600 and DotaTime()<U.time+5.0 then return 0.95 end end;if DotaTime()<(c.IsModeTurbo()and 15*60 or 20*60)then return BOT_MODE_DESIRE_NONE end;local X=RemapValClamped(DotaTime(),h,h+2.5*60,1,2)local Y=RemapValClamped(GetRoshanDesire()*X,0,1,0,BOT_MODE_DESIRE_ABSOLUTE)local Z=c.GetAlliesNearLoc(M,1600)if#Z>=4 then Y=0.9 end;local _=c.Utils.IsTeamPushingSecondTierOrHighGround(a)if _ and#Z<3 then Y=Y*0.6 end;return Clamp(Y,0,BOT_MODE_DESIRE_VERYHIGH)end;return BOT_ACTION_DESIRE_NONE end;local a0=1000;local a1=900;local a2=300;function Think()if not a:IsAlive()or c.CanNotUseAction(a)then return end;local M=c.GetCurrentRoshanLocation()if M==nil then return end;if a._roshDipActive then local a3=c.AdjustLocationWithOffsetTowardsFountain(M,300)a:Action_MoveToLocation(a3)return end;if not c.Utils.IsValidUnit(k)then G()end;local a4=GetUnitToLocationDistance(a,M)local a5=a4<=a2;local a6=c.Utils.IsValidUnit(k)and c.GetHP(k)<0.9;local function a7()a:Action_MoveToLocation(M)end;local function a8()if a5 and c.Utils.IsValidUnit(k)and c.CanBeAttacked(k)then a:Action_AttackUnit(k,true)else a7()end end;if a6 then a8()return end;local a9=c.AdjustLocationWithOffsetTowardsFountain(M,a1)local aa=c.GetAlliesNearLoc(a9,a0)local ab=0;for J,ac in pairs(aa)do if c.IsValidHero(ac)and ac:IsAlive()and not ac:IsIllusion()then ab=ab+1 end end;local ad=F()local ae=GetUnitToLocationDistance(a,a9)if ab<ad then if ae>50 then a:Action_MoveToLocation(a9+RandomVector(100))end;if DotaTime()>(a._lastRoshGatherPing or 0)+8 then a._lastRoshGatherPing=DotaTime()c.ModeAnnounce(a,'say_roshan',8)end;return end;if not a5 then a7()return end;if c.Utils.IsValidUnit(k)and c.CanBeAttacked(k)then a:Action_AttackUnit(k,true)else a:Action_MoveToLocation(M+RandomVector(50))end end
+local bot = GetBot()
+local botName = bot:GetUnitName();
+if bot == nil or bot:IsInvulnerable() or not bot:IsHero() or not bot:IsAlive() or not string.find(botName, "hero") or bot:IsIllusion() then return end
+
+local J = require( GetScriptDirectory()..'/FunLib/jmz_func' )
+local Customize = require( GetScriptDirectory()..'/Customize/general' )
+
+local killTime = 0.0
+local shouldKillRoshan = false
+local DoingRoshanMessage = DotaTime()
+
+-- local rTwinGate = nil
+-- local dTwinGate = nil
+-- local rTwinGateLoc = Vector(5888, -7168, 256)
+-- local dTwinGateLoc = Vector(6144, 7552, 256)
+
+local sinceRoshAliveTime = 0
+local roshTimeFlag = false
+local initDPSFlag = false
+
+local Roshan
+
+function GetDesire()
+	local res = GetDesireHelper()
+	if res > 0.6 then J.ModeAnnounce(bot, 'say_roshan', 30) end
+	return res
+end
+function GetDesireHelper()
+	if bot:IsInvulnerable() or not bot:IsHero() or not bot:IsAlive() or not string.find(botName, "hero") or bot:IsIllusion() then return BOT_MODE_DESIRE_NONE end
+    if Roshan == nil then
+        local nCreeps = bot:GetNearbyNeutralCreeps(700)
+        for _, creepOrRoshan in pairs(nCreeps)
+        do
+            if creepOrRoshan:GetUnitName() == "npc_dota_roshan"
+            then
+                Roshan = creepOrRoshan
+            end
+        end
+    end
+
+	-- 如果在打高地 就别撤退去干别的
+	if J.Utils.IsTeamPushingSecondTierOrHighGround(bot) then
+		return BOT_MODE_DESIRE_NONE
+	end
+
+	if J.GetEnemiesAroundAncient(bot, 3200) > 0 or J.GetHP(GetAncient(bot:GetTeam())) < 0.8 then
+		return BOT_MODE_DESIRE_NONE
+	end
+
+    local timeOfDay = J.CheckTimeOfDay()
+
+    local nTeamFightLocation = J.GetTeamFightLocation(bot)
+    if nTeamFightLocation ~= nil
+    then
+        if timeOfDay == 'day'
+        and GetUnitToLocationDistance(bot, J.Utils.RadiantRoshanLoc) < 1600
+        and GetUnitToLocationDistance(bot, nTeamFightLocation) < 2000
+        then
+            return BOT_ACTION_DESIRE_NONE
+        else
+            if timeOfDay == 'night'
+            and GetUnitToLocationDistance(bot, J.Utils.DireRoshanLoc) < 1600
+            and GetUnitToLocationDistance(bot, nTeamFightLocation) < 2000
+            then
+                return BOT_ACTION_DESIRE_NONE
+            end
+        end
+    end
+
+    local lEnemyHeroesAroundLoc = J.GetLastSeenEnemiesNearLoc(bot:GetLocation(), 1200)
+    if #lEnemyHeroesAroundLoc >= 2 then
+        return BOT_ACTION_DESIRE_NONE
+    end
+
+    -- if Roshan is about to get killed, kill it unless there are other absolute actions.
+    if J.Utils.IsValidUnit(Roshan) then
+        local roshHP = Roshan:GetHealth() / Roshan:GetMaxHealth()
+        if roshHP < 0.5 and #lEnemyHeroesAroundLoc == 0 then
+            return RemapValClamped(roshHP, 100, 0, BOT_MODE_DESIRE_MODERATE, BOT_MODE_DESIRE_ABSOLUTE )
+        end
+    end
+
+    local aliveAlly = J.GetNumOfAliveHeroes(false)
+    local aliveEnemy = J.GetNumOfAliveHeroes(true)
+    local hasSameOrMoreHero = aliveAlly >= aliveEnemy
+
+    if not hasSameOrMoreHero then
+        return BOT_ACTION_DESIRE_NONE
+    end
+
+    local nCoreWithNoEmptySlot = 0
+    local aliveHeroesList = {}
+    for _, h in pairs(GetUnitList(UNIT_LIST_ALLIED_HEROES)) do
+        if h:IsAlive()
+        then
+            if J.Utils.CountBackpackEmptySpace(h) <= 0 and J.IsCore(h) then
+                nCoreWithNoEmptySlot = nCoreWithNoEmptySlot + 1
+            end
+
+            -- do not take rosh if the cores do not have any empty slot, it may get dropped on ground.
+            if nCoreWithNoEmptySlot >= 2 then
+                return BOT_ACTION_DESIRE_NONE
+            end
+            table.insert(aliveHeroesList, h)
+        end
+    end
+
+    shouldKillRoshan = J.IsRoshanAlive()
+
+    if shouldKillRoshan
+    and not roshTimeFlag
+    then
+        sinceRoshAliveTime = DotaTime()
+        roshTimeFlag = true
+    else
+        if not shouldKillRoshan
+        then
+            sinceRoshAliveTime = 0
+            roshTimeFlag = false
+        end
+    end
+
+    if J.HasEnoughDPSForRoshan(aliveHeroesList)
+    then
+        initDPSFlag = true
+    end
+
+    if J.IsRoshanCloseToChangingSides()
+    then
+        local botTarget = J.GetProperTarget(bot)
+        if J.IsRoshan(botTarget) then
+            return RemapValClamped(J.GetHP(botTarget), 1, 0, BOT_ACTION_DESIRE_NONE, BOT_ACTION_DESIRE_VERYHIGH )
+        end
+        if not J.IsValid(botTarget) or not J.IsRoshan(botTarget) then
+            return BOT_ACTION_DESIRE_NONE
+        end
+    end
+
+    local nEnemyHeroes = J.GetEnemiesNearLoc(bot:GetLocation(), 1300)
+    if nEnemyHeroes ~= nil and #nEnemyHeroes > 0
+    then
+        return BOT_ACTION_DESIRE_NONE
+    end
+
+    if shouldKillRoshan
+    and initDPSFlag
+    then
+        local human, humanPing = J.GetHumanPing()
+        if human ~= nil and DotaTime() > 5.0 then
+            if humanPing ~= nil
+            and humanPing.normal_ping
+            and GetUnitToLocationDistance(human, J.GetCurrentRoshanLocation()) < 4500
+            and J.GetDistance(humanPing.location, J.GetCurrentRoshanLocation()) < 600
+            and DotaTime() < humanPing.time + 5.0
+            then
+                return 0.95
+            end
+        end
+
+        local mul = RemapValClamped(DotaTime(), sinceRoshAliveTime, sinceRoshAliveTime + (2.5 * 60), 1, 2)
+        local nRoshanDesire = (GetRoshanDesire() * mul)
+
+        if hasSameOrMoreHero or (not hasSameOrMoreHero and J.HasEnoughDPSForRoshan(aliveHeroesList)) then
+            return Clamp(nRoshanDesire, 0, 0.95)
+        end
+    end
+
+    return BOT_ACTION_DESIRE_NONE
+end
