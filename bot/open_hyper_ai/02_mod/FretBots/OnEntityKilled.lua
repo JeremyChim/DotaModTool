@@ -31,7 +31,7 @@ local TeamKillsTrackingTable = {
 }
 local TauntModifierTimers = {}
 local TauntTime = 4
-local GoldPenaltyNetworthDiffThreshold = 2000
+local GoldPenaltyNetworthDiffThreshold = 99999
 local GoldPenaltyPercentageMax = 0.85
 local GoldPenaltyAmountMax = -5000
 local GoldPenaltyAmountMin = -50
