@@ -31,7 +31,7 @@ local TeamKillsTrackingTable = {
 }
 local TauntModifierTimers = {}
 local TauntTime = 4
-local GoldPenaltyNetworthDiffThreshold = 99999
+local GoldPenaltyNetworthDiffThreshold = 200
 local GoldPenaltyPercentageMax = 0.85
 local GoldPenaltyAmountMax = -5000
 local GoldPenaltyAmountMin = -50
@@ -201,7 +201,7 @@ function EntityKilled:GoldTracking()
 	end
 	if canClearRadiantTracking then GameRules:SendCustomMessage(killerAwardAnnounce, 0, 0); TeamKillsTrackingTable[RADIANT] = 0 end
 	if canClearDireTracking then GameRules:SendCustomMessage(killerAwardAnnounce, 0, 0); TeamKillsTrackingTable[DIRE] = 0 end
-	return 0.3
+	return 99999
 end
 
 -- Registers Event Listener
