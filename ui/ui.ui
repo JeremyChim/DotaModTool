@@ -79,7 +79,7 @@
           <item>
            <widget class="QTabWidget" name="view_tabWidget">
             <property name="currentIndex">
-             <number>6</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="line_tab">
              <property name="enabled">
@@ -164,7 +164,9 @@
 
 bot脚本指令1：sv_cheats 1; script_reload_code bots/Buff/buff
 
-bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
+bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots
+
+bot脚本指令3：sv_cheats 1; script_reload_code bots/fretbots; script_reload_code bots/Buff/buff</string>
                 </property>
                </widget>
               </item>
@@ -315,7 +317,7 @@ bot脚本指令2：sv_cheats 1; script_reload_code bots/fretbots</string>
       <rect>
        <x>464</x>
        <y>176</y>
-       <width>121</width>
+       <width>147</width>
        <height>202</height>
       </rect>
      </property>

@@ -327,7 +327,7 @@ class Ui_MainWindow(object):
         self.menu_5.setObjectName(u"menu_5")
         self.menu_6 = QMenu(self.menu_3)
         self.menu_6.setObjectName(u"menu_6")
-        self.menu_6.setGeometry(QRect(464, 176, 121, 202))
+        self.menu_6.setGeometry(QRect(464, 176, 147, 202))
         self.menu_7 = QMenu(self.menubar)
         self.menu_7.setObjectName(u"menu_7")
         self.menu_9 = QMenu(self.menu_7)
@@ -433,7 +433,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.view_tabWidget.setCurrentIndex(6)
+        self.view_tabWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -702,7 +702,9 @@ class Ui_MainWindow(object):
 "\n"
 "bot\u811a\u672c\u6307\u4ee41\uff1asv_cheats 1; script_reload_code bots/Buff/buff\n"
 "\n"
-"bot\u811a\u672c\u6307\u4ee42\uff1asv_cheats 1; script_reload_code bots/fretbots", None))
+"bot\u811a\u672c\u6307\u4ee42\uff1asv_cheats 1; script_reload_code bots/fretbots\n"
+"\n"
+"bot\u811a\u672c\u6307\u4ee43\uff1asv_cheats 1; script_reload_code bots/fretbots; script_reload_code bots/Buff/buff", None))
         self.view_tabWidget.setTabText(self.view_tabWidget.indexOf(self.cmd_tab), QCoreApplication.translate("MainWindow", u"\u5e38\u7528\u6307\u4ee4", None))
 #if QT_CONFIG(tooltip)
         self.config_plainTextEdit.setToolTip("")
