@@ -1376,13 +1376,14 @@ class Win(QMainWindow, Ui_MainWindow):
 
     def reload_file(self):
         """重新加载文件内容"""
+        row = self._row_after_reload()
         path = os.path.join(HERO_DIR2, self.current_file)
         if not os.path.exists(path):
             path = os.path.join(HERO_DIR, self.current_file)
         self._show_content(path)
         self._change_title(path)
         self._refresh_files()
-        self._go_to_row()
+        self._go_to_row(row)
         self._print(f'重载文件：{path}')
 
     def change_selected_item(self):
@@ -1405,7 +1406,6 @@ class Win(QMainWindow, Ui_MainWindow):
             for item in self._selected_items():
                 new_text = self._change_text(item.text(), action_value, action_value) # 修改文本
                 self._set_item_text(item, new_text) # 写回修改后的文本
-                self.addrows.append(len(new_text.split('\n')) - 1 ) # 记录新增行数
             # 记录动作次数
             if self.config.get('shortcut_count') is None:
                 self.config['shortcut_count'] = {}
@@ -1858,12 +1858,24 @@ class Win(QMainWindow, Ui_MainWindow):
         """content_listWidget 单击时记忆行号"""
         self.selected_row = self.content_listWidget.row(item)
 
-    def _go_to_row(self):
-        """跳转到记忆行"""
-        row = self.selected_row + sum(self.addrows)
+    def _row_after_reload(self):
+        """计算当前项写入文件并重载后所在的物理行号。"""
+        row = self.content_listWidget.currentRow()
+        if row < 0:
+            row = self.selected_row
+        return sum(
+            self.content_listWidget.item(i).text().count('\n') + 1
+            for i in range(row)
+        )
+
+    def _go_to_row(self, row=None):
+        """跳转到记忆行或指定行。"""
+        if row is None:
+            row = self.selected_row
         if row < 0 or row >= self.content_listWidget.count():
             return
-        item = self.content_listWidget.item(self.selected_row)
+        self.selected_row = row
+        item = self.content_listWidget.item(row)
         self.content_listWidget.setCurrentItem(item)
         self.content_listWidget.scrollToItem(item, QListWidget.PositionAtCenter)
 
