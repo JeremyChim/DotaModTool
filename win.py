@@ -1009,6 +1009,18 @@ class Win(QMainWindow, Ui_MainWindow):
         filename = item.data(Qt.UserRole)
         return str(filename) if filename else item.text()
 
+    def _hero_content_path(self, filename, for_save=False):
+        """返回英雄文件当前状态对应的内容路径。"""
+        enabled_path = os.path.join(HERO_DIR2, filename)
+        disabled_path = f'{enabled_path}1'
+        if os.path.isfile(enabled_path):
+            return enabled_path
+        if os.path.isfile(disabled_path):
+            return disabled_path
+        if for_save:
+            return enabled_path
+        return os.path.join(HERO_DIR, filename)
+
     def set_selected_file_enabled(self, enabled):
         """从文件列表启用或禁用选中英雄的覆盖文件。"""
         items = self.heroFiles_listWidget.selectedItems()
@@ -1278,9 +1290,7 @@ class Win(QMainWindow, Ui_MainWindow):
         """打开文件"""
         try:
             self.save_file_line()
-            path = os.path.join(HERO_DIR2, self.current_file)
-            if not os.path.exists(path):
-                path = os.path.join(HERO_DIR, self.current_file)
+            path = self._hero_content_path(self.current_file)
             self._show_content(path)
             self._change_title(path)
 
@@ -1311,9 +1321,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def click_and_show(self, item):
         """点击文件名，展示文件内容"""
         self.current_file = self._hero_filename_from_item(item)
-        path = os.path.join(HERO_DIR2, self.current_file)
-        if not os.path.exists(path):
-            path = os.path.join(HERO_DIR, self.current_file)
+        path = self._hero_content_path(self.current_file)
         self._show_content(path)
         self._change_title(path)
         self.config['current_file'] = self.current_file
@@ -1323,9 +1331,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def show_content_when_start(self):
         """启动时，加载展示最近一次的文件内容"""
         self.current_file = self.config.get("current_file")
-        path = os.path.join(HERO_DIR2, self.current_file)
-        if not os.path.exists(path):
-            path = os.path.join(HERO_DIR, self.current_file)
+        path = self._hero_content_path(self.current_file)
         self._show_content(path)
         self._change_title(path)
         self._print(f'加载文件：{path}')
@@ -1349,7 +1355,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def save_file_line(self):
         """把行视图的文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
         os.makedirs(HERO_DIR2, exist_ok=True)
-        path = os.path.join(HERO_DIR2, self.current_file)
+        path = self._hero_content_path(self.current_file, for_save=True)
         with open(path, "w", encoding="utf-8") as fh:
             lines = [self.content_listWidget.item(i).text() for i in range(self.content_listWidget.count())]
             fh.write("\n".join(lines))
@@ -1363,7 +1369,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def save_file_text(self):
         """把文本视图的文件内容保存到VPK_DIR目录里，NPC_DIR的文件内容不动"""
         os.makedirs(HERO_DIR2, exist_ok=True)
-        path = os.path.join(HERO_DIR2, self.current_file)
+        path = self._hero_content_path(self.current_file, for_save=True)
         with open(path, "w", encoding="utf-8") as fh:
             text = self.content_plainTextEdit.toPlainText()
             fh.write(text)
@@ -1377,9 +1383,7 @@ class Win(QMainWindow, Ui_MainWindow):
     def reload_file(self):
         """重新加载文件内容"""
         row = self._row_after_reload()
-        path = os.path.join(HERO_DIR2, self.current_file)
-        if not os.path.exists(path):
-            path = os.path.join(HERO_DIR, self.current_file)
+        path = self._hero_content_path(self.current_file)
         self._show_content(path)
         self._change_title(path)
         self._refresh_files()
