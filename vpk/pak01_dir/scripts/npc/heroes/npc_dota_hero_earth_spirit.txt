@@ -418,8 +418,8 @@
 				"value"		"7"
 				"special_bonus_shard"		"+10"
 				"special_bonus_scepter"		"+10"
-				"hero_levelup"					"+1"
-				"levelup_interval"				"4"
+				"hero_levelup"			"+1"
+				"levelup_interval"			"4"
 			}
 			"rolling_offset_distance"
 			{
@@ -429,11 +429,11 @@
 			}
 			"AbilityManaCost"
 			{
-				"value"							"0"
+				"value"		"0"
 			}
 			"AbilityCooldown"
 			{
-				"value"							"0.0"
+				"value"		"0.0"
 			}
 			"AbilityChargeRestoreTime"
 			{
@@ -443,7 +443,9 @@
 			}
 			"is_stepping_stone"
 			{
-				"value"							"=0"
+				"value"		"=0"
+				"special_bonus_shard"		"=1"
+				"special_bonus_scepter"		"=1"
 			}
 			"attack_damage_per_stone"
 			{
@@ -460,6 +462,8 @@
 			"buff_duration"
 			{
 				"value"		"10"
+				"special_bonus_shard"		"+50%"
+				"special_bonus_scepter"		"+50%"
 			}
 		}
 	}
@@ -671,7 +675,12 @@
 				"special_bonus_scepter"		"+1000"
 				"affected_by_aoe_increase"	"1"		
 			}
-			"damage_interval"			"1.0"
+			"damage_interval"
+			{
+				"value"		"1.0"
+				"special_bonus_shard"		"-0.25"
+				"special_bonus_scepter"		"-0.25"
+			}
 			"rock_explosion_delay"			"8.0"
 			"silence_duration"
 			{
@@ -687,15 +696,15 @@
 			}
 			"magnetized_rocks_buff_self"
 			{
-				"value"									"0"
+				"value"				"0"
 			}
 			"magnetized_rocks_buff_self_duration"
 			{
-				"value"									"0"
+				"value"				"0"
 			}
 			"magnetized_rocks_bonus_self_damage"
 			{
-				"value"									"0"
+				"value"				"0"
 			}
 			"magnetize_self"		
 			{
