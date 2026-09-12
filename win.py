@@ -574,11 +574,29 @@ class Win(QMainWindow, Ui_MainWindow):
                 return
             # 配置
             if units is None or units_enable is None:
-                self._print('配置文件 | 没有 units 配置项 | 创建一个 units = ["npc_dota_goodguys_tower4|StatusHealthRegen|100"...]')
-                self.config['units'] = ["npc_dota_goodguys_tower4|StatusHealthRegen|100",
-                                        "npc_dota_badguys_tower4|StatusHealthRegen|100",
-                                        "npc_dota_goodguys_fort|StatusHealthRegen|200",
-                                        "npc_dota_badguys_fort|StatusHealthRegen|200"]
+                self._print('配置文件 | 没有 units 配置项 | 创建一个 units = ["npc_dota_goodguys_tower4|StatusHealthRegen|1"...]')
+                self.config['units'] = ["npc_dota_goodguys_tower3_top|StatusHealthRegen|1",
+                                        "npc_dota_goodguys_tower3_mid|StatusHealthRegen|1",
+                                        "npc_dota_goodguys_tower3_bot|StatusHealthRegen|1",
+                                        "npc_dota_badguys_tower3_top|StatusHealthRegen|1",
+                                        "npc_dota_badguys_tower3_mid|StatusHealthRegen|1",
+                                        "npc_dota_badguys_tower3_bot|StatusHealthRegen|1",
+                                        "npc_dota_goodguys_melee_rax_top|StatusHealthRegen|2",
+                                        "npc_dota_goodguys_melee_rax_mid|StatusHealthRegen|2",
+                                        "npc_dota_goodguys_melee_rax_bot|StatusHealthRegen|2",
+                                        "npc_dota_badguys_melee_rax_top|StatusHealthRegen|2",
+                                        "npc_dota_badguys_melee_rax_mid|StatusHealthRegen|2",
+                                        "npc_dota_badguys_melee_rax_bot|StatusHealthRegen|2",
+                                        "npc_dota_goodguys_range_rax_top|StatusHealthRegen|2",
+                                        "npc_dota_goodguys_range_rax_mid|StatusHealthRegen|2",
+                                        "npc_dota_goodguys_range_rax_bot|StatusHealthRegen|2",
+                                        "npc_dota_badguys_range_rax_top|StatusHealthRegen|2",
+                                        "npc_dota_badguys_range_rax_mid|StatusHealthRegen|2",
+                                        "npc_dota_badguys_range_rax_bot|StatusHealthRegen|2",
+                                        "npc_dota_goodguys_tower4|StatusHealthRegen|200",
+                                        "npc_dota_badguys_tower4|StatusHealthRegen|200",
+                                        "npc_dota_goodguys_fort|StatusHealthRegen|300",
+                                        "npc_dota_badguys_fort|StatusHealthRegen|300"]
                 self.config['units_enable'] = True
                 self._save_config()
                 return
