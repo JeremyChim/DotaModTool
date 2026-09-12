@@ -33,7 +33,29 @@ Customize.Localization = "zh"
 -- Please note that it is not 100% guaranteed that the banned hero will not be picked; for example if you banned too many heroes 
 -- like near 100% of the heroes, bots will need to randomly pick heroes regardless of the ban list to continue the game.
 Customize.Ban = {
-    'example_npc_dota_hero_internal_name_to_ban',
+    'npc_dota_hero_chen',
+    'npc_dota_hero_keeper_of_the_light',
+    'npc_dota_hero_winter_wyvern',
+    'npc_dota_hero_ancient_apparition',
+    'npc_dota_hero_phoenix',
+    'npc_dota_hero_tinker',
+    'npc_dota_hero_pangolier',
+    'npc_dota_hero_tusk',
+    'npc_dota_hero_morphling',
+    'npc_dota_hero_visage',
+    'npc_dota_hero_void_spirit',
+    'npc_dota_hero_pudge',
+    'npc_dota_hero_ember_spirit',
+    'npc_dota_hero_muerta',
+    'npc_dota_hero_marci',
+    'npc_dota_hero_lone_druid',
+    'npc_dota_hero_primal_beast',
+    'npc_dota_hero_dark_willow',
+    'npc_dota_hero_elder_titan',
+    'npc_dota_hero_hoodwink',
+    'npc_dota_hero_wisp',
+    'npc_dota_hero_naga_siren',
+    'npc_dota_hero_phantom_lancer',
 }
 
 --[[
@@ -63,7 +85,7 @@ Customize.Dire_Heros = {
 Customize.Allow_Repeated_Heroes = false
 
 -- The max number of weak heroes allowed in a team the bots can pick.
-Customize.Weak_Hero_Cap = 1
+Customize.Weak_Hero_Cap = 0
 
 -- The weak penalty curve for bots picking weak heroes:
 --   { type="linear", k=0.25 }         ->  penalty = max(0, 1 - k * (weakPicked/cap))
@@ -92,11 +114,15 @@ Customize.Radiant_Names = {
 
 -- Same notes as above for setting the bots' names but for the Dire side.
 Customize.Dire_Names = {
-    'Random',
+    "npc_dota_hero_arc_warden",
+    'npc_dota_hero_invoker',
+    "npc_dota_hero_enigma",
+    "npc_dota_hero_nyx_assassin",
+    "npc_dota_hero_zuus",
 }
 
 -- Set to true to show team name tags in bot names (e.g. "LQD.miCKe.OHA"), or false to hide them (e.g. "miCKe.OHA").
-Customize.Show_Team_Names = false
+Customize.Show_Team_Names = true
 
 -- Set custom team name tags for each side. Leave as '' to use a random pro team name.
 -- Examples: "TEAM1", "OG", "NAVI", etc.
@@ -106,11 +132,11 @@ Customize.Dire_Team_Name = 'OG'
 -- The desire level that the bots will group up and push the same lane. 
 -- 1 is mild meaning bots will group up only when convenient; 3 is bots will almost always try to push together.
 -- Group pushing may increase the difficulty but can reduce the game experience. 
-Customize.Force_Group_Push_Level = 3
+Customize.Force_Group_Push_Level = 2
 
 -- Set how frequently you want the bots to push. 
 -- 1 is default, bot may choose to farm more in game. 2 is balanced for push vs farm. 3 is almost no farm, all push.
-Customize.Push_Frequency = 3
+Customize.Push_Frequency = 2
 
 -- The Enhanced Fretbots mode settings:
 -- For more about Fretbots mode: https://github.com/forest0xia/dota2bot-OpenHyperAI/discussions/68
@@ -126,7 +152,7 @@ Customize.Fretbots = {
     Allow_To_Vote = false,
 
     -- Set to false disables all sounds from Fretbots mode
-    Play_Sounds = false,
+    Play_Sounds = true,
 
     -- Set to play chatwheel taunt sounds when human player died
     Player_Death_Sound = false,
@@ -136,7 +162,7 @@ Customize.Fretbots = {
 -- Bots can become slow or dumb in reaction and decision making if you set this value to a higher number.
 -- When doing Local Host, you can potentially improve PC performance (FPS) by setting this to 1 to 10, which sacrifices some bot IQ/performance.
 -- This won't be very effective for FPS improvement because Valve has a lot of compute on their side that your PC have to handle for Local Hosting.
-Customize.ThinkLess = 1;
+Customize.ThinkLess = 2;
 
 return Customize
 
