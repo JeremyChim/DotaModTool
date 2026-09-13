@@ -450,14 +450,14 @@
 			"attack_damage_per_stone"
 			{
 				"value"		"3.0"
-				"special_bonus_shard"		"+5"
-				"special_bonus_scepter"		"+5"
+				"special_bonus_shard"		"+10"
+				"special_bonus_scepter"		"+10"
 			}
 			"attack_damage_per_stone_used"
 			{
 				"value"		"7.5"
-				"special_bonus_shard"		"+5"
-				"special_bonus_scepter"		"+5"
+				"special_bonus_shard"		"+10"
+				"special_bonus_scepter"		"+10"
 			}
 			"buff_duration"
 			{
