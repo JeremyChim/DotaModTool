@@ -116,8 +116,8 @@ local bBuffFlags = {
         dire    = false, -- Set to 'false' to disable Dire towers buff.
     },
     neutrals = {
-        radiant = true, -- Set to 'false' to disable Radiant bots receiving neutral items.
-        dire    = true, -- Set to 'false' to disable Dire bots receiving neutral items.
+        radiant = false, -- Set to 'false' to disable Radiant bots receiving neutral items.
+        dire    = false, -- Set to 'false' to disable Dire bots receiving neutral items.
     },
     manga_regen = {
         radiant = false, -- Set to 'false' to disable aiding Radiant bots' receiving added mana regen.
@@ -208,21 +208,21 @@ function Buff:Init()
             end
 
             -- Towers
-            T.HandleTowerBuff(DOTA_TEAM_GOODGUYS, bBuffFlags.towers.radiant)
-            T.HandleTowerBuff(DOTA_TEAM_BADGUYS, bBuffFlags.towers.dire)
+            -- T.HandleTowerBuff(DOTA_TEAM_GOODGUYS, bBuffFlags.towers.radiant)
+            -- T.HandleTowerBuff(DOTA_TEAM_BADGUYS, bBuffFlags.towers.dire)
 
             hHeroList = {}
             -- Neutral Items
-            if bBuffFlags.neutrals.radiant then
-                for _, h in pairs(TeamRadiant) do
-                    table.insert(hHeroList, h)
-                end
-            end
-            if bBuffFlags.neutrals.dire then
-                for _, h in pairs(TeamDire) do
-                    table.insert(hHeroList, h)
-                end
-            end
+            -- if bBuffFlags.neutrals.radiant then
+            --     for _, h in pairs(TeamRadiant) do
+            --         table.insert(hHeroList, h)
+            --     end
+            -- end
+            -- if bBuffFlags.neutrals.dire then
+            --     for _, h in pairs(TeamDire) do
+            --         table.insert(hHeroList, h)
+            --     end
+            -- end
 
             NeutralItems.GiveNeutralItems(hHeroList)
 
