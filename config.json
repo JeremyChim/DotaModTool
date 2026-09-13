@@ -11,10 +11,10 @@
   "xp_gold_mul": 1.0,
   "units_enable": true,
   "units": [
-    "npc_dota_goodguys_tower4|StatusHealthRegen|200",
-    "npc_dota_badguys_tower4|StatusHealthRegen|200",
-    "npc_dota_goodguys_fort|StatusHealthRegen|300",
-    "npc_dota_badguys_fort|StatusHealthRegen|300"
+    "npc_dota_goodguys_tower4|StatusHealthRegen|250",
+    "npc_dota_badguys_tower4|StatusHealthRegen|250",
+    "npc_dota_goodguys_fort|StatusHealthRegen|500",
+    "npc_dota_badguys_fort|StatusHealthRegen|500"
   ],
   "units_bak": [
     "npc_dota_goodguys_tower3_top|StatusHealthRegen|1",
@@ -80,7 +80,7 @@
   "cooldown_action": "-25%",
   "shortcut_count": {
     "shortcut_7_action": 31,
-    "shortcut_ctrl_6_action": 10,
+    "shortcut_ctrl_6_action": 11,
     "cooldown_action": 25,
     "shortcut_5_action": 9,
     "shortcut_1_action": 19,
