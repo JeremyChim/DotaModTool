@@ -1,8 +1,8 @@
 {
-  "steam_dir": "D:\\APP\\Steam",
+  "steam_dir": "E:\\GAME",
   "current_file": "npc_dota_hero_drow_ranger.txt",
   "font": "JetBrains Mono",
-  "font_size": 12,
+  "font_size": 10,
   "theme": "dark",
   "win_size": "1920x1009",
   "win_position": "0,23",
@@ -43,7 +43,9 @@
     "20:00",
     "25:00"
   ],
-  "items": [],
+  "items": [
+    "item_aghanims_shard|ItemInitialStockTime|690.0"
+  ],
   "items_bak": [
     "item_aghanims_shard|ItemInitialStockTime|690.0",
     "item_aghanims_shard|ItemInitialStockTimeTurbo|0.0"
@@ -74,19 +76,19 @@
   "shortcut_ctrl_0_action": "=0",
   "cooldown_action": "-25%",
   "shortcut_count": {
-    "shortcut_7_action": 51,
+    "shortcut_7_action": 52,
     "shortcut_ctrl_6_action": 19,
-    "cooldown_action": 29,
-    "shortcut_5_action": 31,
+    "cooldown_action": 34,
+    "shortcut_5_action": 33,
     "shortcut_1_action": 30,
     "shortcut_ctrl_2_action": 6,
     "shortcut_ctrl_3_action": 7,
-    "shortcut_3_action": 23,
-    "shortcut_6_action": 52,
-    "shortcut_ctrl_5_action": 13,
-    "shortcut_4_action": 5,
+    "shortcut_3_action": 28,
+    "shortcut_6_action": 53,
+    "shortcut_ctrl_5_action": 14,
+    "shortcut_4_action": 6,
     "shortcut_9_action": 5,
-    "shortcut_0_action": 17,
+    "shortcut_0_action": 19,
     "shortcut_ctrl_4_action": 10,
     "shortcut_2_action": 10,
     "shortcut_ctrl_1_action": 1,
