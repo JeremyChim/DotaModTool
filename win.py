@@ -24,7 +24,7 @@ STEAM_DIRS = ['C:\\Program Files (x86)\\Steam',
               'D:\\APP\\Steam',
               'E:\\GAME'] # 常用STEAM路径
 
-KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime']
+KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime', 'delay', 'interval']
 KEYSYMBOLS = ['+', '-', '=']
 
 # PyInstaller 单文件程序中的 __file__ 位于临时解压目录；外部数据文件则
@@ -1415,7 +1415,7 @@ class Win(QMainWindow, Ui_MainWindow):
             sa_value, sp_value, sa_value2, sp_value2 = self.config.get("sa_value"), self.config.get("sp_value"), self.config.get("sa_value2"), self.config.get("sp_value2")
             for item in self._selected_items():
                 ab_text = item.text()
-                sa, sp = (sa_value2, sp_value2) if any(k in ab_text for k in KEYWORDS) else (sa_value, sp_value)
+                sa, sp = (sa_value2, sp_value2) if any(k.lower() in ab_text.lower() for k in KEYWORDS) else (sa_value, sp_value)
                 self._set_item_text(item, self._change_text(ab_text, sa, sp))
         except Exception as e:
             self._print(f'异常：{str(e)}')
