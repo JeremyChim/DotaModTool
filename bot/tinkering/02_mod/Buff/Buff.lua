@@ -116,8 +116,8 @@ local bBuffFlags = {
         dire    = false, -- Set to 'false' to disable Dire towers buff.
     },
     neutrals = {
-        radiant = false, -- Set to 'false' to disable Radiant bots receiving neutral items.
-        dire    = false, -- Set to 'false' to disable Dire bots receiving neutral items.
+        radiant = true, -- Set to 'false' to disable Radiant bots receiving neutral items.
+        dire    = true, -- Set to 'false' to disable Dire bots receiving neutral items.
     },
     manga_regen = {
         radiant = false, -- Set to 'false' to disable aiding Radiant bots' receiving added mana regen.
@@ -213,23 +213,23 @@ function Buff:Init()
 
             hHeroList = {}
             -- Neutral Items
-            -- if bBuffFlags.neutrals.radiant then
-            --     for _, h in pairs(TeamRadiant) do
-            --         table.insert(hHeroList, h)
-            --     end
-            -- end
-            -- if bBuffFlags.neutrals.dire then
-            --     for _, h in pairs(TeamDire) do
-            --         table.insert(hHeroList, h)
-            --     end
-            -- end
+            if bBuffFlags.neutrals.radiant then
+                for _, h in pairs(TeamRadiant) do
+                    table.insert(hHeroList, h)
+                end
+            end
+            if bBuffFlags.neutrals.dire then
+                for _, h in pairs(TeamDire) do
+                    table.insert(hHeroList, h)
+                end
+            end
 
             NeutralItems.GiveNeutralItems(hHeroList)
 
             -- Gold and Experience For Player
             local me = PlayerResource:GetPlayer(0):GetAssignedHero()
-            GPM.UpdateBotGold(me, 5)
-            XP.UpdateXP(me, 5)
+            GPM.UpdateBotGold(me, 4)
+            XP.UpdateXP(me, 4)
             -- GPM.UpdateGoldWhenDeath(me, 500)
             -- XP.UpdateXPWhenDeath(me, 500)
             --Attributes.UpdateAttrWhenDeath(me, 20, 20)
@@ -239,8 +239,8 @@ function Buff:Init()
                 -- if bBuffFlags.gpm.radiant then
                 --     GPM.UpdateBotGold(h, TeamRadiant)
                 -- end
-                GPM.UpdateBotGold(h, 5)
-				XP.UpdateXP(h, 5)
+                GPM.UpdateBotGold(h, 4)
+				XP.UpdateXP(h, 4)
                 -- GPM.UpdateGoldWhenDeath(h, 500)
                 -- XP.UpdateXPWhenDeath(h, 500)
                 --Attributes.UpdateAttrWhenDeath(h, 20, 20)
@@ -250,8 +250,8 @@ function Buff:Init()
                 -- if bBuffFlags.gpm.dire then
                 --     GPM.UpdateBotGold(h, TeamDire)
                 -- end
-                GPM.UpdateBotGold(h, 10)
-				XP.UpdateXP(h, 10)
+                GPM.UpdateBotGold(h, 8)
+				XP.UpdateXP(h, 8)
                 -- GPM.UpdateGoldWhenDeath(h, 750)
                 -- XP.UpdateXPWhenDeath(h, 750)
                 --Attributes.UpdateAttrWhenDeath(h, 20, 20)
