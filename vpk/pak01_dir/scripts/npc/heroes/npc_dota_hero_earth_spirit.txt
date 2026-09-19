@@ -652,8 +652,8 @@
 					"AbilityCastRange"
 					{
 						"value"		"1100"
-						"special_bonus_shard"		"+50%"
-						"special_bonus_scepter"		"+50%"
+						"special_bonus_shard"		"=99999"
+						"special_bonus_scepter"		"=99999"
 					}
 					"duration"
 					{

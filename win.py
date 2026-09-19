@@ -1817,7 +1817,7 @@ class Win(QMainWindow, Ui_MainWindow):
         elif ab_name == 'special_bonus_shard' or ab_name == 'special_bonus_scepter':
             if '+' not in ab_value:  ab_value = '+' + ab_value
             new_text = MOD3.replace("[TAB]", tab).replace("[AB_VALUE]", ab_value)
-        elif 'special_bonus_unique' in ab_name:
+        elif 'special_bonus_' in ab_name:
             if '+' not in ab_value:  ab_value = '+' + ab_value
             new_text = MOD4.replace("[TAB]", tab).replace("[AB_NAME]", ab_name).replace("[AB_VALUE]", ab_value)
         else:
