@@ -24,7 +24,7 @@ STEAM_DIRS = ['C:\\Program Files (x86)\\Steam',
               'D:\\APP\\Steam',
               'E:\\GAME'] # 常用STEAM路径
 
-KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime', 'delay', 'interval']
+KEYWORDS = ['CastPoint', 'Cooldown', 'ManaCost', 'RestoreTime', 'delay', 'interval', 'rate']
 KEYSYMBOLS = ['+', '-', '=']
 
 # PyInstaller 单文件程序中的 __file__ 位于临时解压目录；外部数据文件则
