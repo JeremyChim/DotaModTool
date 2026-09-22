@@ -899,12 +899,15 @@ class Win(QMainWindow, Ui_MainWindow):
         self.addrows = self.addrows[:-1]
 
     def cut(self):
-        """剪切"""
-        text = self._get_selected_item()
-        tab_text = self._tab_text(text)
-        self.cuts.append(tab_text)
-        self._write_selected_item('')
-        self._print(f'剪切：{len(self.cuts)}')
+        """按文件中的行号顺序剪切所有选中行。"""
+        items = self._selected_items()
+        if not items:
+            return
+
+        for item in items:
+            self.cuts.append(self._tab_text(item.text()))
+            self._set_item_text(item, '')
+        self._print(f'剪切：{len(items)} 行，待粘贴：{len(self.cuts)} 行')
 
     def paste(self):
         """粘贴"""
