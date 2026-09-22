@@ -859,18 +859,42 @@
 
 				// Casting
 				//-------------------------------------------------------------------------------------------------------------
-				"AbilityCastRange"				"600"
-				"AbilityCastPoint"				"0.25"
+
+
 		
 				// Time		
 				//-------------------------------------------------------------------------------------------------------------
-				"AbilityCooldown"				"60"
+
 
 				// Cost
 				//-------------------------------------------------------------------------------------------------------------
-				"AbilityManaCost"				"200"
+
 				"AbilityValues"
 				{
+					"AbilityCastRange"
+					{
+						"value"		"600"
+						"special_bonus_shard"		"=99999"
+						"special_bonus_scepter"		"=99999"
+					}
+					"AbilityCastPoint"
+					{
+						"value"		"0.25"
+						"special_bonus_shard"		"-25%"
+						"special_bonus_scepter"		"-25%"
+					}
+					"AbilityCooldown"
+					{
+						"value"		"60"
+						"special_bonus_shard"		"-25%"
+						"special_bonus_scepter"		"-25%"
+					}
+					"AbilityManaCost"
+					{
+						"value"		"200"
+						"special_bonus_shard"		"-25%"
+						"special_bonus_scepter"		"-25%"
+					}
 					"illusion_damage_out_pct"
 					{
 						"value" "-50 -50 -50"
@@ -878,12 +902,16 @@
 					}
 					"tooltip_illusion_damage_out_pct"
 					{
-						"value" "50 50 50"
+						"value"		"50 50 50"
+						"special_bonus_shard"		"+50%"
+						"special_bonus_scepter"		"+50%"
 						"CalculateSpellDamageTooltip" "0"
 					}
 					"illusion_incoming_dmg_pct_tooltip"
 					{
-						"value" "100 100 100"
+						"value"		"100 100 100"
+						"special_bonus_shard"		"+50%"
+						"special_bonus_scepter"		"+50%"
 					}
 					"illusion_damage_in_pct"
 					{
@@ -892,12 +920,16 @@
 					}
 					"illusion_damage_out_pct_scepter"
 					{
-						"value" "-20"
+						"value"		"-20"
+						"special_bonus_shard"		"+50%"
+						"special_bonus_scepter"		"+50%"
 						"CalculateSpellDamageTooltip" "0"
 					}
 					"duration"
 					{
-						"value" "20"
+						"value"		"20"
+						"special_bonus_shard"		"+50%"
+						"special_bonus_scepter"		"+50%"
 					}
 				}
 			}
