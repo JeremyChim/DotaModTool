@@ -1630,6 +1630,7 @@ class Win(QMainWindow, Ui_MainWindow):
             "  background-color: #ffffff; color: #353b44;"
             "}"
         )
+        self._set_title_bar_theme(False)
         self.theme = 'light'
         self.config['theme'] = 'light'
         self._save_config()
@@ -1773,12 +1774,45 @@ class Win(QMainWindow, Ui_MainWindow):
             "QScrollBar::add-page, QScrollBar::sub-page { background: transparent; }"
             "QAbstractScrollArea::corner { background: #20242a; }"
         )
+        self._set_title_bar_theme(True)
         self.theme = 'dark'
         self.config['theme'] = 'dark'
         self._save_config()
         self._refresh_files()
         self.refresh_enable_list()
         self._print('设置主题为暗色', show_in_bar=False)
+
+    def _set_title_bar_theme(self, dark):
+        """让 Windows 原生标题栏的颜色与当前应用主题保持一致。"""
+        if sys.platform != 'win32':
+            return
+
+        try:
+            import ctypes
+
+            set_window_attribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
+            set_window_attribute.argtypes = (
+                ctypes.c_void_p,
+                ctypes.c_uint,
+                ctypes.c_void_p,
+                ctypes.c_uint,
+            )
+            set_window_attribute.restype = ctypes.c_long
+            hwnd = ctypes.c_void_p(int(self.winId()))
+
+            dark_mode = ctypes.c_int(1 if dark else 0)
+            result = set_window_attribute(hwnd, 20, ctypes.byref(dark_mode), ctypes.sizeof(dark_mode))
+            if result != 0:  # 兼容较早的 Windows 10 版本
+                set_window_attribute(hwnd, 19, ctypes.byref(dark_mode), ctypes.sizeof(dark_mode))
+
+            # COLORREF 的字节顺序为 0x00BBGGRR。
+            caption_color = ctypes.c_uint(0x002B2521 if dark else 0x00FCFAF8)
+            text_color = ctypes.c_uint(0x00E2DCD7 if dark else 0x00443B35)
+            set_window_attribute(hwnd, 35, ctypes.byref(caption_color), ctypes.sizeof(caption_color))
+            set_window_attribute(hwnd, 36, ctypes.byref(text_color), ctypes.sizeof(text_color))
+        except (AttributeError, OSError):
+            # 不支持这些 DWM 属性的系统继续使用系统默认标题栏。
+            pass
 
     def _tab_text(self, text):
         """加缩进"""
