@@ -140,6 +140,16 @@ class PreserveForegroundDelegate(QStyledItemDelegate):
             option.palette.setBrush(QPalette.HighlightedText, foreground)
 
 
+class ContentEditDelegate(QStyledItemDelegate):
+    """让行内编辑器始终使用行视图当前的字体。"""
+
+    def createEditor(self, parent, option, index):
+        editor = super().createEditor(parent, option, index)
+        if editor is not None:
+            editor.setFont(self.parent().font())
+        return editor
+
+
 class Win(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -259,6 +269,7 @@ class Win(QMainWindow, Ui_MainWindow):
         self.undo_action.triggered.connect(self.undo)
         self.expand_sidebar_action.triggered.connect(self.expand_sidebar)
         self.collapse_sidebar_action.triggered.connect(self.collapse_sidebar)
+        self.content_listWidget.setItemDelegate(ContentEditDelegate(self.content_listWidget))
         self.content_listWidget.setEditTriggers(QListWidget.DoubleClicked) # 行编辑器双击编辑
         self.content_listWidget.setSelectionMode(QListWidget.ExtendedSelection) # 行视图支持多选
         self.content_plainTextEdit.installEventFilter(self) # 文本编辑器的TAB/Shift+TAB缩进
