@@ -1453,14 +1453,14 @@ class Win(QMainWindow, Ui_MainWindow):
             self._print(f'异常：{str(e)}')
 
     def enlarge_font_size(self):
-        """放大 content_listWidget 和 content_plainTextEdit 的字体"""
+        """放大各内容视图的字体"""
         font = self.content_listWidget.font()
         size = font.pointSize() + 1
         self._set_font_size(size)
         self._print(f'设置字体大小为 {size}')
 
     def reduce_font_size(self):
-        """缩小 content_listWidget 和 content_plainTextEdit 的字体"""
+        """缩小各内容视图的字体"""
         font = self.content_listWidget.font()
         size = font.pointSize() - 1
         self._set_font_size(size)
@@ -1838,13 +1838,22 @@ class Win(QMainWindow, Ui_MainWindow):
         self.search(text)
 
     def _set_font_size(self, font_size):
-        """设置字体大小"""
+        """统一设置各内容视图的字体大小。"""
         font_size = int(font_size)
         if font_size < 1: font_size = 1
-        font = self.content_listWidget.font()
-        font.setPointSize(font_size)
-        self.content_listWidget.setFont(font)
-        self.content_plainTextEdit.setFont(font)
+        content_widgets = (
+            self.content_listWidget,
+            self.content_plainTextEdit,
+            self.log_plainTextEdit,
+            self.cmd_plainTextEdit,
+            self.config_plainTextEdit,
+            self.cn_name_plainTextEdit,
+            self.enable_listWidget,
+        )
+        for widget in content_widgets:
+            font = widget.font()
+            font.setPointSize(font_size)
+            widget.setFont(font)
         self.config['font_size'] = font_size
         self._save_config()
 
