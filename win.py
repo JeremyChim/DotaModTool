@@ -7,7 +7,7 @@ import shutil
 from datetime import datetime
 
 from PySide6.QtCore import QEvent, Qt
-from PySide6.QtGui import QColor, QFont, QPalette, QTextCursor
+from PySide6.QtGui import QColor, QPalette, QTextCursor
 from PySide6.QtWidgets import QListWidget, QListWidgetItem, QStyledItemDelegate
 
 from ui.ui import *
@@ -1837,11 +1837,9 @@ class Win(QMainWindow, Ui_MainWindow):
         text = self.search_lineEdit.text()
         self.search(text)
 
-    def _set_font_size(self, font_size):
-        """统一设置各内容视图的字体大小。"""
-        font_size = int(font_size)
-        if font_size < 1: font_size = 1
-        content_widgets = (
+    def _content_widgets(self):
+        """返回需要保持字体和字号一致的内容视图。"""
+        return (
             self.content_listWidget,
             self.content_plainTextEdit,
             self.log_plainTextEdit,
@@ -1850,7 +1848,12 @@ class Win(QMainWindow, Ui_MainWindow):
             self.cn_name_plainTextEdit,
             self.enable_listWidget,
         )
-        for widget in content_widgets:
+
+    def _set_font_size(self, font_size):
+        """统一设置各内容视图的字体大小。"""
+        font_size = int(font_size)
+        if font_size < 1: font_size = 1
+        for widget in self._content_widgets():
             font = widget.font()
             font.setPointSize(font_size)
             widget.setFont(font)
@@ -1858,11 +1861,12 @@ class Win(QMainWindow, Ui_MainWindow):
         self._save_config()
 
     def _set_font(self, font_type):
-        """设置字体"""
+        """统一设置各内容视图的字体，并保留当前字号。"""
         font_type = str(font_type)
-        font = QFont(font_type)
-        self.content_listWidget.setFont(font)
-        self.content_plainTextEdit.setFont(font)
+        for widget in self._content_widgets():
+            font = widget.font()
+            font.setFamily(font_type)
+            widget.setFont(font)
         self.config['font'] = font_type
         self._save_config()
 
