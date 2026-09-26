@@ -174,8 +174,8 @@ function Buff:Init()
             end
 
             -- Towers
-            T.HandleTowerBuff(DOTA_TEAM_GOODGUYS, bBuffFlags.towers.radiant)
-            T.HandleTowerBuff(DOTA_TEAM_BADGUYS, bBuffFlags.towers.dire)
+            -- T.HandleTowerBuff(DOTA_TEAM_GOODGUYS, bBuffFlags.towers.radiant)
+            -- T.HandleTowerBuff(DOTA_TEAM_BADGUYS, bBuffFlags.towers.dire)
 
             -- Neutral Items
             local hHeroList = {}
@@ -220,8 +220,8 @@ function Buff:Init()
                     elseif bBuffFlags.gpm.dire
                         and nTeam == DOTA_TEAM_BADGUYS
                     then
-                        GPM.UpdateBotGold(hero, 7) -- 夜魇金钱
-                        XP.UpdateXP(hero, 7)       -- 夜魇经验
+                        GPM.UpdateBotGold(hero, 8) -- 夜魇金钱
+                        XP.UpdateXP(hero, 8)       -- 夜魇经验
                     end
                 end
             end
