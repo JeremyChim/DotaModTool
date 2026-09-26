@@ -200,34 +200,28 @@ function Buff:Init()
 
                     -- 真人账号大于 0，机器人通常为 0
                     if playerID >= 0 and steamAccountID > 0 then
-                        GPM.UpdateBotGold(hero, 100)
-                        XP.UpdateXP(hero, 100)
+                        GPM.UpdateBotGold(hero, 3) -- 玩家金钱
+                        XP.UpdateXP(hero, 3)       -- 玩家经验
                     end
                 end
             end
 
-            -- Gold
+            -- Gold and Experience
             for _, hero in pairs(nBotHeroes) do
                 if hero then
                     local nTeam = hero:GetTeam()
-                    if (bBuffFlags.gpm.radiant and nTeam == DOTA_TEAM_GOODGUYS)
-                    or (bBuffFlags.gpm.dire and nTeam == DOTA_TEAM_BADGUYS)
-                    then
-                        GPM.UpdateBotGold(hero, 500)
-                    end
-                end
-            end
 
-            -- Experience
-            if not Helper.IsTurboMode() then
-                for _, hero in pairs(nBotHeroes) do
-                    if hero then
-                        local nTeam = hero:GetTeam()
-                        if (bBuffFlags.xpm.radiant and nTeam == DOTA_TEAM_GOODGUYS)
-                        or (bBuffFlags.xpm.dire and nTeam == DOTA_TEAM_BADGUYS)
-                        then
-                            XP.UpdateXP(hero, 1000)
-                        end
+                    if bBuffFlags.gpm.radiant
+                        and nTeam == DOTA_TEAM_GOODGUYS
+                    then
+                        GPM.UpdateBotGold(hero, 4) -- 天辉金钱
+                        XP.UpdateXP(hero, 4)       -- 天辉经验
+
+                    elseif bBuffFlags.gpm.dire
+                        and nTeam == DOTA_TEAM_BADGUYS
+                    then
+                        GPM.UpdateBotGold(hero, 7) -- 夜魇金钱
+                        XP.UpdateXP(hero, 7)       -- 夜魇经验
                     end
                 end
             end
