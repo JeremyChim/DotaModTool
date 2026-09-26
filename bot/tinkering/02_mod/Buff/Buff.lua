@@ -192,10 +192,19 @@ function Buff:Init()
 
             NeutralItems.GiveNeutralItems(hHeroList)
 
-            -- Gold and Experience For Player
-            local me = PlayerResource:GetPlayer(0):GetAssignedHero()
-            GPM.UpdateBotGold(me, 100)
-            XP.UpdateXP(me, 100)
+            -- Gold and Experience For Human Players
+            for _, hero in pairs(nAllHeroes) do
+                if hero then
+                    local playerID = hero:GetPlayerOwnerID()
+                    local steamAccountID = PlayerResource:GetSteamAccountID(playerID)
+
+                    -- 真人账号大于 0，机器人通常为 0
+                    if playerID >= 0 and steamAccountID > 0 then
+                        GPM.UpdateBotGold(hero, 100)
+                        XP.UpdateXP(hero, 100)
+                    end
+                end
+            end
 
             -- Gold
             for _, hero in pairs(nBotHeroes) do
