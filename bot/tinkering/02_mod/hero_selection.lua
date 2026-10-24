@@ -11,6 +11,9 @@ local bUserMode = false
 local bLaneAssignActive = true
 local bLineupReserve = false
 
+-- 自动选人只使用 quality 不低于此值的英雄；固定阵容不受此限制。
+ local nMinAutoPickQuality = 1.3
+
 -- 固定阵容配置：下标 1~5 分别代表 1~5 号位。
 -- 填写完整的英雄内部名即可固定该位置；保留空字符串则继续使用原来的自动选人逻辑。
 -- 如果你在天辉，TEAM_RADIANT 是友方、TEAM_DIRE 是敌方；在夜魇时则相反。
@@ -24,8 +27,8 @@ local tFixedHeroList = {
 		[5] = '', -- 5号位
 	},
 	[TEAM_DIRE] = {
-		[1] = '', -- 1号位
-		[2] = '', -- 2号位
+		[1] = 'npc_dota_hero_nevermore', -- 1号位
+		[2] = 'npc_dota_hero_zuus', -- 2号位
 		[3] = '', -- 3号位
 		[4] = '', -- 4号位
 		[5] = '', -- 5号位
@@ -187,7 +190,7 @@ local function GetHeroList(pos)
 	local heroList = {}
 
 	for _, hero in pairs(sHeroList) do
-		if hero and hero.role[pos] > 0 then
+		if hero and hero.role[pos] > 0 and (hero.quality or 1.0) >= nMinAutoPickQuality then
 			table.insert(heroList, hero.name)
 		end
 	end
