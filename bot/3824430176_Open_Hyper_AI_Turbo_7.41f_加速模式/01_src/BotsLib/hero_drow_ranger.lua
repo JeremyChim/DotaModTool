@@ -1,0 +1,754 @@
+local X = {}
+local bot = GetBot()
+
+local Fu = require( GetScriptDirectory()..'/FuncLib/func_utils' )
+local AbilityCtx = require(GetScriptDirectory()..'/FuncLib/systems/ability_context')
+local Minion = require( GetScriptDirectory()..'/FuncLib/hero/minion' )
+local sTalentList = Fu.Skill.GetTalentList( bot )
+local sAbilityList = Fu.Skill.GetAbilityList( bot )
+local sRole = Fu.Item.GetRoleItemsBuyList( bot )
+
+local tTalentTreeList = {
+						['t25'] = {0, 10},
+						['t20'] = {0, 10},
+						['t15'] = {10, 0},
+						['t10'] = {10, 0},
+}
+
+local tAllAbilityBuildList = {
+						{1,3,1,2,3,6,3,3,1,1,6,2,2,2,6},--pos1
+}
+
+local nAbilityBuildList = Fu.Skill.GetRandomBuild( tAllAbilityBuildList )
+
+local nTalentBuildList = Fu.Skill.GetTalentBuild( tTalentTreeList )
+local RandomItem = RandomInt(1, 2) == 1 and "item_black_king_bar" or "item_sphere"
+
+local sRoleItemsBuyList = {}
+
+sRoleItemsBuyList['pos_1'] = {
+	"item_tango",
+	"item_double_branches",
+	"item_slippers",
+	"item_circlet",
+	"item_magic_wand",
+
+	"item_wraith_band",
+	"item_power_treads",
+	"item_dragon_lance",
+	"item_yasha",
+	"item_manta",
+	"item_ultimate_scepter",
+    "item_force_staff",
+	"item_hurricane_pike",--
+	RandomItem,--
+	"item_butterfly",--
+	"item_hydras_breath",--
+	"item_aghanims_shard",
+	"item_greater_crit",--
+	"item_moon_shard",
+	"item_satanic",--
+	"item_ultimate_scepter_2",
+	"item_travel_boots",
+	"item_travel_boots_2",--
+}
+
+sRoleItemsBuyList['pos_2'] = sRoleItemsBuyList['pos_1']
+
+sRoleItemsBuyList['pos_4'] = sRoleItemsBuyList['pos_1']
+
+sRoleItemsBuyList['pos_5'] = sRoleItemsBuyList['pos_1']
+
+sRoleItemsBuyList['pos_3'] = sRoleItemsBuyList['pos_1']
+
+X['sBuyList'] = sRoleItemsBuyList[sRole]
+
+X['sSellList'] = {
+	"item_satanic",
+	"item_magic_wand",
+}
+
+if Fu.Role.IsPvNMode() or Fu.Role.IsAllShadow() then X['sBuyList'], X['sSellList'] = { 'PvN_ranged_carry' }, {} end
+
+nAbilityBuildList, nTalentBuildList, X['sBuyList'], X['sSellList'] = Fu.SetUserHeroInit( nAbilityBuildList, nTalentBuildList, X['sBuyList'], X['sSellList'] )
+
+X['sSkillList'] = Fu.Skill.GetSkillList( sAbilityList, nAbilityBuildList, sTalentList, nTalentBuildList )
+
+X['bDeafaultAbility'] = false
+X['bDeafaultItem'] = false
+
+function X.MinionThink(hMinionUnit)
+	Minion.MinionThink(hMinionUnit)
+end
+
+--[[
+
+npc_dota_hero_drow_ranger
+
+"Ability1"		"drow_ranger_frost_arrows"
+"Ability2"		"drow_ranger_wave_of_silence"
+"Ability3"		"drow_ranger_trueshot"
+"Ability4"		"generic_hidden"
+"Ability5"		"generic_hidden"
+"Ability6"		"drow_ranger_marksmanship"
+"Ability10"		"special_bonus_movement_speed_20"
+"Ability11"		"special_bonus_all_stats_5"
+"Ability12"		"special_bonus_agility_10"
+"Ability13"		"special_bonus_unique_drow_ranger_2"
+"Ability14"		"special_bonus_evasion_25"
+"Ability15"		"special_bonus_unique_drow_ranger_4"
+"Ability16"		"special_bonus_unique_drow_ranger_1"
+"Ability17"		"special_bonus_cooldown_reduction_50"
+
+modifier_drow_ranger_frost_arrows
+modifier_drow_ranger_frost_arrows_slow
+modifier_drowranger_wave_of_silence_knockback
+modifier_drow_ranger_trueshot
+modifier_drow_ranger_trueshot_global
+modifier_drow_ranger_trueshot_aura
+modifier_drow_ranger_marksmanship
+modifier_drow_ranger_marksmanship_reduction
+
+--]]
+
+local abilityQ = SafeAbility(bot:GetAbilityByName(sAbilityList[1]), 'sAbilityList[1]', 'drow_ranger')
+local abilityW = SafeAbility(bot:GetAbilityByName(sAbilityList[2]), 'sAbilityList[2]', 'drow_ranger')
+local abilityE = SafeAbility(bot:GetAbilityByName(sAbilityList[3]), 'sAbilityList[3]', 'drow_ranger')
+local Glacier 	= SafeAbility(bot:GetAbilityByName('drow_ranger_glacier'), 'drow_ranger_glacier', 'drow_ranger')
+local abilityM = nil
+
+local castQDesire, castQTarget
+local castWDesire, castWLocation
+local castEDesire, castELocation
+local GlacierDesire
+local castMDesire
+local castWMDesire, castWMLocation
+
+
+local nLV, nKeepMana, nMP, nHP, hEnemyList, hAllyList
+
+function X.SkillsComplement()
+
+	Fu.ConsiderForMkbDisassembleMask( bot )
+
+	if Fu.CanNotUseAbility( bot ) or bot:IsInvisible() then return end
+
+	local ctx = AbilityCtx.Build(bot)
+	nKeepMana = 90
+	aetherRange = ctx.aetherRange
+	nLV = ctx.level
+	nMP = ctx.mp
+	nHP = ctx.hp
+	botTarget = ctx.target
+	hEnemyList = ctx.enemies
+	hAllyList = ctx.allies
+	abilityM = Fu.IsItemAvailable( "item_mask_of_madness" )
+
+	castWDesire, castWLocation = X.ConsiderW()
+	if castWDesire > 0
+	then
+
+		Fu.SetQueuePtToINT( bot, true )
+
+		bot:ActionQueue_UseAbilityOnLocation( abilityW , castWLocation )
+		return
+	end
+
+	GlacierDesire = X.ConsiderGlacier()
+	if GlacierDesire > 0
+	then
+		Fu.SetQueuePtToINT(bot, true)
+
+		bot:ActionQueue_UseAbility(Glacier)
+		return
+	end
+
+	castEDesire, castELocation = X.ConsiderE()
+	if castEDesire > 0
+	then
+		Fu.SetQueuePtToINT( bot, true )
+
+		bot:ActionQueue_UseAbilityOnLocation( abilityE , castELocation )
+		return
+	end
+
+	castMDesire = X.ConsiderM()
+	if castMDesire > 0
+	then
+		Fu.SetQueuePtToINT( bot, true )
+
+		bot:ActionQueue_UseAbility( abilityM )
+		return
+	end
+
+	castQDesire, castQTarget = X.ConsiderQ()
+	if castQDesire > 0
+	then
+
+		bot:Action_ClearActions( false )
+
+		bot:ActionQueue_UseAbilityOnEntity( abilityQ , castQTarget )
+		return
+
+	end
+
+end
+
+function X.ConsiderE()
+
+	if not abilityE:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE
+	end
+
+	local nCastRange = 850
+	local nRadius = 200
+	local nDamage = 0
+	local nCastPoint = abilityE:GetCastPoint()
+	local nSkillLV = abilityE:GetLevel()
+	local nManaCost = abilityE:GetManaCost()
+	local nTargetLocation = nil
+
+	local nEnemyHeroes = Fu.GetNearbyHeroes(bot, nCastRange + 100, true, BOT_MODE_NONE )
+
+
+	if Fu.IsGoingOnSomeone( bot )
+	then
+		local npcTarget = Fu.GetProperTarget( bot )
+		if Fu.IsValidHero( npcTarget )
+			and Fu.CanCastOnNonMagicImmune( npcTarget )
+			and Fu.IsInRange( npcTarget, bot, nCastRange )
+			and ( npcTarget:IsFacingLocation( bot:GetLocation(), 120 )
+				  or npcTarget:GetAttackTarget() ~= nil )
+		then
+			nTargetLocation = npcTarget:GetExtrapolatedLocation( nCastPoint )
+			return BOT_ACTION_DESIRE_HIGH, nTargetLocation
+		end
+
+		local locationAoE = bot:FindAoELocation( true, true, bot:GetLocation(), 780, nRadius, nCastPoint, 0 )
+		if ( locationAoE.count >= 2 )
+		then
+			nTargetLocation = locationAoE.targetloc
+			return BOT_ACTION_DESIRE_HIGH, nTargetLocation
+		end
+
+	end
+
+
+	--推线
+	if ( Fu.IsPushing( bot ) or Fu.IsDefending( bot ) or Fu.IsFarming( bot ) )
+		and Fu.IsAllowedToSpam( bot, 90 )
+		and DotaTime() > 8 * 60
+		and #hAllyList <= 2 and #hEnemyList == 0
+	then
+		local laneCreepList = bot:GetNearbyLaneCreeps( 1400, true )
+		if #laneCreepList >= 4
+			and Fu.IsValid( laneCreepList[1] )
+			and not laneCreepList[1]:HasModifier( "modifier_fountain_glyph" )
+		then
+			local locationAoEHurt = bot:FindAoELocation( true, false, bot:GetLocation(), 700, nRadius + 50, 0, 0 )
+			if locationAoEHurt.count >= 3
+			then
+				nTargetLocation = locationAoEHurt.targetloc
+				return BOT_ACTION_DESIRE_HIGH, nTargetLocation, "E-带线"..locationAoEHurt.count
+			end
+		end
+	end
+
+	--打野
+	if Fu.IsFarming( bot )
+		and Fu.IsAllowedToSpam( bot, nManaCost )
+	then
+		if Fu.IsValid( botTarget )
+			and botTarget:GetTeam() == TEAM_NEUTRAL
+			and Fu.IsInRange( bot, botTarget, 1000 )
+		then
+			local nShouldHurtCount = nMP > 0.6 and 2 or 3
+			local locationAoE = bot:FindAoELocation( true, false, bot:GetLocation(), 750, 300, 0, 0 )
+			if ( locationAoE.count >= nShouldHurtCount )
+			then
+				nTargetLocation = locationAoE.targetloc
+				return BOT_ACTION_DESIRE_HIGH, nTargetLocation, "E-打钱"..locationAoE.count
+			end
+		end
+	end
+
+	return BOT_ACTION_DESIRE_NONE
+end
+
+
+function X.ConsiderWM()
+
+	if nLV < 15
+		or abilityM == nil
+		or not abilityM:IsFullyCastable()
+		or not abilityW:IsFullyCastable()
+		or not abilityQ:GetAutoCastState()
+	then
+		return BOT_ACTION_DESIRE_NONE
+	end
+
+	local abilityWCost = abilityW:GetManaCost()
+	local abilityMCost = abilityM:GetManaCost()
+
+	if abilityMCost + abilityWCost > bot:GetMana() then return 0 end
+
+	local nCastRange = abilityW:GetCastRange()
+	local nCastPoint = abilityW:GetCastPoint()
+	local nRadius = abilityW:GetAOERadius()
+
+	local nEnemysHeroesInView = hEnemyList
+	local nEnemysHeroesNearBy = Fu.GetNearbyHeroes(bot, 500, true, BOT_MODE_NONE )
+
+	local npcTarget = Fu.GetProperTarget( bot )
+
+	if Fu.IsGoingOnSomeone( bot )
+		and #nEnemysHeroesNearBy == 0
+		and not Fu.IsEnemyTargetUnit( bot, 1600 )
+		and Fu.GetAllyCount( bot, 1000 ) >= 3
+	then
+
+		if Fu.IsValidHero( npcTarget )
+			and not npcTarget:IsSilenced()
+			and not Fu.IsDisabled( npcTarget )
+			and Fu.CanCastOnNonMagicImmune( npcTarget )
+			and Fu.IsInRange( npcTarget, bot, nCastRange )
+			and npcTarget:IsFacingLocation( bot:GetLocation(), 150 )
+			and Fu.IsAllyHeroBetweenAllyAndEnemy( bot, npcTarget, npcTarget:GetLocation(), 500 )
+		then
+			nTargetLocation = npcTarget:GetExtrapolatedLocation( nCastPoint )
+			return BOT_ACTION_DESIRE_HIGH, nTargetLocation
+		end
+
+		local locationAoE = bot:FindAoELocation( true, true, bot:GetLocation(), nCastRange, nRadius, nCastPoint, 0 )
+		if ( locationAoE.count >= 2 )
+		then
+			nTargetLocation = locationAoE.targetloc
+			return BOT_ACTION_DESIRE_HIGH, nTargetLocation
+		end
+
+	end
+
+
+	return BOT_ACTION_DESIRE_NONE
+
+end
+
+
+function X.ConsiderW()
+
+	if not abilityW:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE
+	end
+
+	local nCastRange = abilityW:GetCastRange()
+	local nRadius = abilityW:GetAOERadius()
+	local nDamage = 0
+	local nCastPoint = abilityW:GetCastPoint()
+	local nTargetLocation = nil
+
+	local nEnemyHeroes = Fu.GetNearbyHeroes(bot, nCastRange + 100, true, BOT_MODE_NONE )
+
+
+	for _, npcEnemy in pairs( nEnemyHeroes )
+	do
+		if Fu.IsValid( npcEnemy )
+			and npcEnemy:IsChanneling()
+			and not npcEnemy:HasModifier( "modifier_teleporting" )
+			--and not npcEnemy:HasModifier( "modifier_boots_of_travel_incoming" )
+		then
+			nTargetLocation = npcEnemy:GetLocation()
+			return BOT_ACTION_DESIRE_HIGH, nTargetLocation
+		end
+	end
+
+
+	if Fu.IsRetreating( bot ) and not bot:IsInvisible()
+	then
+		for _, npcEnemy in pairs( nEnemyHeroes )
+		do
+			if Fu.IsValidHero( npcEnemy )
+				and Fu.CanBeAttacked( npcEnemy )
+				and Fu.IsInRange( bot, npcEnemy, nCastRange )
+				and Fu.CanCastOnNonMagicImmune( npcEnemy )
+				and not Fu.IsDisabled( npcEnemy )
+				and not npcEnemy:IsDisarmed()
+				and not npcEnemy:IsSilenced()
+				and bot:WasRecentlyDamagedByHero( npcEnemy, 2.0 )
+			then
+				nTargetLocation = npcEnemy:GetLocation()
+				return BOT_ACTION_DESIRE_HIGH, nTargetLocation
+			end
+		end
+	end
+
+
+	if Fu.IsGoingOnSomeone( bot )
+	then
+		local npcTarget = Fu.GetProperTarget( bot )
+		if Fu.IsValidHero( npcTarget )
+			and Fu.CanBeAttacked( npcTarget )
+			and Fu.IsInRange( npcTarget, bot, nCastRange )
+			and Fu.CanCastOnNonMagicImmune( npcTarget )
+			and not Fu.IsDisabled( npcTarget )
+			and not npcTarget:IsSilenced()
+		then
+			nTargetLocation = npcTarget:GetLocation()
+			return BOT_ACTION_DESIRE_HIGH, nTargetLocation
+		end
+	end
+
+	return BOT_ACTION_DESIRE_NONE, nil
+end
+
+
+function X.ConsiderM()
+
+	if abilityM == nil or not abilityM:IsFullyCastable() then return BOT_ACTION_DESIRE_NONE end
+
+	local nCastRange = bot:GetAttackRange()
+	local nAttackDamage = bot:GetAttackDamage()
+	local nDamage = nAttackDamage
+	local nDamageType = DAMAGE_TYPE_PHYSICAL
+	local npcTarget = Fu.GetProperTarget( bot )
+
+
+	if Fu.IsGoingOnSomeone( bot )
+		and #hEnemyList == 1
+	then
+		if Fu.IsValidHero( npcTarget )
+			and Fu.CanBeAttacked( npcTarget )
+			and Fu.CanCastOnNonMagicImmune( npcTarget )
+			and not Fu.IsInRange( npcTarget, bot, 400 )
+			and Fu.IsInRange( npcTarget, bot, nCastRange + 300 )
+			and bot:IsFacingLocation( npcTarget:GetLocation(), 30 )
+			and not npcTarget:IsFacingLocation( bot:GetLocation(), 30 )
+			and abilityQ:GetAutoCastState() == true
+			and abilityW:GetCooldownTimeRemaining() > 5.0
+		then
+			return BOT_ACTION_DESIRE_HIGH
+		end
+	end
+
+	
+	if Fu.IsRunning( bot ) or #hEnemyList > 0 then return BOT_ACTION_DESIRE_NONE end
+
+	if ( bot:GetActiveMode() == BOT_MODE_ROSHAN )
+	then
+		if Fu.IsRoshan( npcTarget )
+			and Fu.IsInRange( npcTarget, bot, nCastRange + 99 )
+		then
+			return BOT_ACTION_DESIRE_LOW
+		end
+	end
+
+	if Fu.IsValidBuilding( npcTarget )
+		and Fu.IsInRange( npcTarget, bot, nCastRange + 199 )
+	then
+		return BOT_ACTION_DESIRE_LOW
+	end
+
+	if ( Fu.IsPushing( bot ) or Fu.IsDefending( bot ) or Fu.IsFarming( bot ) )
+	then
+		local nCreeps = bot:GetNearbyCreeps( 800, true )
+		if Fu.IsValid( npcTarget )
+			and Fu.IsInRange( npcTarget, bot, nCastRange + 99 )
+			and ( #nCreeps >= 2 or npcTarget:GetHealth() > nAttackDamage * 2.28 )
+		then
+			return BOT_ACTION_DESIRE_HIGH
+		end
+	end
+
+	return BOT_ACTION_DESIRE_NONE
+
+end
+
+
+local lastAutoTime = 0
+function X.ConsiderQ()
+
+	if not abilityQ:IsFullyCastable()
+		or bot:IsDisarmed()
+		or Fu.GetDistanceFromEnemyFountain( bot ) < 800
+	then
+		return BOT_ACTION_DESIRE_NONE, nil
+	end
+
+	local nAttackRange = bot:GetAttackRange() + 40
+	local nAttackDamage = bot:GetAttackDamage() + abilityQ:GetSpecialValueInt( "damage" )
+	local nDamageType = DAMAGE_TYPE_PHYSICAL
+	local nTowers = bot:GetNearbyTowers( 900, true )
+	local nEnemysLaneCreepsInRange = bot:GetNearbyLaneCreeps( nAttackRange + 30, true )
+	local nEnemysLaneCreepsNearby = bot:GetNearbyLaneCreeps( 400, true )
+	local nEnemysWeakestLaneCreepsInRange = Fu.GetAttackableWeakestUnit( bot, nAttackRange + 30, false, true )
+	local nEnemysWeakestLaneCreepsInRangeHealth = 10000
+	if( nEnemysWeakestLaneCreepsInRange ~= nil )
+	then
+		nEnemysWeakestLaneCreepsInRangeHealth = nEnemysWeakestLaneCreepsInRange:GetHealth()
+	end
+
+	local nEnemysHeroesInAttackRange = Fu.GetNearbyHeroes(bot, nAttackRange, true, BOT_MODE_NONE )
+	local nInAttackRangeWeakestEnemyHero = Fu.GetAttackableWeakestUnit( bot, nAttackRange, true, true )
+	local nInViewWeakestEnemyHero = Fu.GetAttackableWeakestUnit( bot, 800, true, true )
+
+	local nAllyLaneCreeps = bot:GetNearbyLaneCreeps( 330, false )
+	local npcTarget = Fu.GetProperTarget( bot )
+	local nTargetUint = nil
+	local npcMode = bot:GetActiveMode()
+
+
+	if nLV >= 8
+	then
+		if ( hEnemyList[1] ~= nil or nMP > 0.76 )
+			and not abilityQ:GetAutoCastState()
+		then
+			lastAutoTime = DotaTime()
+			abilityQ:ToggleAutoCast()
+		elseif ( hEnemyList[1] == nil and nMP < 0.7 )
+				and lastAutoTime + 3.0 < DotaTime()
+				and abilityQ:GetAutoCastState()
+			then
+				abilityQ:ToggleAutoCast()
+		end
+	else
+		if abilityQ:GetAutoCastState()
+		then
+			abilityQ:ToggleAutoCast()
+		end
+	end
+
+	if nLV <= 7 and nHP > 0.55
+		and Fu.IsValidHero( npcTarget )
+		and ( not Fu.IsRunning( bot ) or Fu.IsInRange( bot, npcTarget, nAttackRange + 18 ) )
+	then
+		if not npcTarget:IsAttackImmune()
+			and Fu.IsInRange( bot, npcTarget, nAttackRange + 99 )
+		then
+			nTargetUint = npcTarget
+			return BOT_ACTION_DESIRE_HIGH, nTargetUint
+		end
+	end
+
+
+	if npcMode == BOT_MODE_LANING
+		and #nTowers == 0
+	then
+
+		if Fu.IsValid( nInAttackRangeWeakestEnemyHero )
+		then
+			if nEnemysWeakestLaneCreepsInRangeHealth > 130
+				and nHP >= 0.6
+				and #nEnemysLaneCreepsNearby <= 3
+				and #nAllyLaneCreeps >= 2
+				and not bot:WasRecentlyDamagedByCreep( 1.5 )
+				and not bot:WasRecentlyDamagedByAnyHero( 1.5 )
+			then
+				nTargetUint = nInAttackRangeWeakestEnemyHero
+				return BOT_ACTION_DESIRE_HIGH, nTargetUint
+			end
+		end
+
+
+		if Fu.IsValid( nInViewWeakestEnemyHero )
+		then
+			if nEnemysWeakestLaneCreepsInRangeHealth > 180
+				and nHP >= 0.7
+				and #nEnemysLaneCreepsNearby <= 2
+				and #nAllyLaneCreeps >= 3
+				and not bot:WasRecentlyDamagedByCreep( 1.5 )
+				and not bot:WasRecentlyDamagedByAnyHero( 1.5 )
+				and not bot:WasRecentlyDamagedByTower( 1.5 )
+			then
+				nTargetUint = nInViewWeakestEnemyHero
+				return BOT_ACTION_DESIRE_HIGH, nTargetUint
+			end
+
+			if Fu.GetUnitAllyCountAroundEnemyTarget( nInViewWeakestEnemyHero , 500 ) >= 4
+				and not bot:WasRecentlyDamagedByCreep( 1.5 )
+				and not bot:WasRecentlyDamagedByAnyHero( 1.5 )
+				and not bot:WasRecentlyDamagedByTower( 1.5 )
+				and nHP >= 0.6
+			then
+				nTargetUint = nInViewWeakestEnemyHero
+				return BOT_ACTION_DESIRE_HIGH, nTargetUint
+			end
+		end
+
+		if Fu.IsWithoutTarget( bot )
+			and not Fu.IsAttacking( bot )
+		then
+			local nLaneCreepList = bot:GetNearbyLaneCreeps( 1100, true )
+			for _, creep in pairs( nLaneCreepList )
+			do
+				if Fu.IsValid( creep )
+					and not creep:HasModifier( "modifier_fountain_glyph" )
+					and creep:GetHealth() < nAttackDamage + 180
+					and not Fu.IsAllysTarget( creep )
+				then
+					local nAttackProDelayTime = Fu.GetAttackProDelayTime( bot, creep ) * 1.08 + 0.08
+					local nAD = nAttackDamage * 1.0
+					if Fu.WillKillTarget( creep, nAD, nDamageType, nAttackProDelayTime )
+					then
+						return BOT_ACTION_DESIRE_HIGH, creep
+					end
+				end
+			end
+
+		end
+	end
+
+
+	if npcTarget ~= nil
+		and npcTarget:IsHero()
+		and GetUnitToUnitDistance( npcTarget, bot ) > nAttackRange + 160
+		and Fu.IsValid( nInAttackRangeWeakestEnemyHero )
+		and not nInAttackRangeWeakestEnemyHero:IsAttackImmune()
+	then
+		nTargetUint = nInAttackRangeWeakestEnemyHero
+		bot:SetTarget( nTargetUint )
+		return BOT_ACTION_DESIRE_HIGH, nTargetUint
+	end
+
+
+	if bot:HasModifier( "modifier_item_hurricane_pike_range" )
+		and Fu.IsValid( npcTarget )
+	then
+		nTargetUint = npcTarget
+		return BOT_ACTION_DESIRE_HIGH, nTargetUint
+	end
+
+
+	if bot:GetAttackTarget() == nil
+		and  bot:GetTarget() == nil
+		and  #hEnemyList == 0
+		and  npcMode ~= BOT_MODE_RETREAT
+		and  npcMode ~= BOT_MODE_ATTACK
+		and  npcMode ~= BOT_MODE_ASSEMBLE
+		and  npcMode ~= BOT_MODE_FARM
+		and  npcMode ~= BOT_MODE_TEAM_ROAM
+		and  Fu.GetTeamFightAlliesCount( bot ) < 3
+		and  bot:GetMana() >= 180
+		and  not bot:WasRecentlyDamagedByAnyHero( 3.0 )
+	then
+
+		if bot:HasScepter()
+		then
+			local nEnemysCreeps = bot:GetNearbyCreeps( 1600, true )
+			if Fu.IsValid( nEnemysCreeps[1] )
+			then
+				nTargetUint = nEnemysCreeps[1]
+				return BOT_ACTION_DESIRE_HIGH, nTargetUint
+			end
+		end
+
+		local nNeutralCreeps = bot:GetNearbyNeutralCreeps( 1600 )
+		if npcMode ~= BOT_MODE_LANING
+			and nLV >= 6
+			and nHP > 0.25
+			and Fu.IsValid( nNeutralCreeps[1] )
+			and not Fu.IsRoshan( nNeutralCreeps[1] )
+			and ( nNeutralCreeps[1]:IsAncientCreep() == false or nLV >= 12 )
+		then
+			nTargetUint = nNeutralCreeps[1]
+			return BOT_ACTION_DESIRE_HIGH, nTargetUint
+		end
+
+
+		local nLaneCreeps = bot:GetNearbyLaneCreeps( 1600, true )
+		if npcMode ~= BOT_MODE_LANING
+			and nLV >= 6
+			and nHP > 0.25
+			and Fu.IsValid( nLaneCreeps[1] )
+			and bot:GetAttackDamage() > 130
+		then
+			nTargetUint = nLaneCreeps[1]
+			return BOT_ACTION_DESIRE_HIGH, nTargetUint
+		end
+	end
+
+
+	if npcMode == BOT_MODE_RETREAT
+	then
+
+		nDistance = 999
+		local nTargetUint = nil
+		for _, npcEnemy in pairs( nEnemysHeroesInAttackRange )
+		do
+			if Fu.IsValid( npcEnemy )
+				and npcEnemy:HasModifier( "modifier_drowranger_wave_of_silence_knockback" )
+				and GetUnitToUnitDistance( npcEnemy, bot ) < nDistance
+			then
+				nTargetUint = npcEnemy
+				nDistance = GetUnitToUnitDistance( npcEnemy, bot )
+			end
+		end
+
+		if nTargetUint ~= nil
+			and not nTargetUint:HasModifier( "modifier_drow_ranger_frost_arrows_slow" )
+		then
+			return BOT_ACTION_DESIRE_HIGH, nTargetUint
+		end
+	end
+
+	if Fu.IsFarming( bot )
+		and nMP > 0.55
+		and not abilityQ:GetAutoCastState()
+	then
+		if Fu.IsValid( botTarget )
+			and botTarget:GetTeam() == TEAM_NEUTRAL
+			and Fu.IsInRange( bot, botTarget, 1000 )
+			and botTarget:GetHealth() > nAttackDamage
+		then
+			return BOT_ACTION_DESIRE_LOW, botTarget, "Q-打野"
+		end
+	end
+
+	return BOT_ACTION_DESIRE_NONE, nil
+end
+
+function X.ConsiderGlacier()
+	if not Glacier:IsTrained()
+	or not Glacier:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE
+	end
+
+	local nAttackRange = bot:GetAttackRange()
+	local nEnemyHeroes = Fu.GetNearbyHeroes(bot,nAttackRange, true, BOT_MODE_NONE)
+	local nAllyHeroes = Fu.GetNearbyHeroes(bot,nAttackRange, true, BOT_MODE_ATTACK)
+	botTarget = Fu.GetProperTarget(bot)
+
+	local alliesAroundLoc = Fu.GetAlliesNearLoc(bot:GetLocation(), 500)
+
+	if #alliesAroundLoc > 1
+	then
+		return BOT_ACTION_DESIRE_LOW
+	end
+
+	if Fu.IsRetreating(bot)
+	and ((#nEnemyHeroes ~= nil and #nEnemyHeroes >= 2) or Fu.GetHP(bot) < 0.3)
+	then
+		if nAllyHeroes ~= nil
+		and #nAllyHeroes >= 1
+		then
+			return BOT_ACTION_DESIRE_LOW
+		end
+
+		return BOT_ACTION_DESIRE_HIGH
+	end
+
+	if Fu.IsGoingOnSomeone(bot)
+	then
+		if Fu.IsValidTarget(botTarget)
+		and (abilityE:IsFullyCastable() and Fu.CanCastOnNonMagicImmune(botTarget))
+		and Fu.IsInRange(bot, botTarget, abilityE:GetCastRange() + 200)
+		then
+			return BOT_ACTION_DESIRE_HIGH
+		end
+	end
+
+	return BOT_ACTION_DESIRE_NONE
+end
+
+return X

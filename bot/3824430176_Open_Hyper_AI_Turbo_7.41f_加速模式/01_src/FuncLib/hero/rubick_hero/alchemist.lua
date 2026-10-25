@@ -1,0 +1,584 @@
+local bot
+local X = {}
+local Fu = require(GetScriptDirectory()..'/FuncLib/func_utils')
+
+local botTarget
+
+local AcidSpray
+local UnstableConcoction
+local UnstableConcoctionThrow
+local ChemicalRage
+local BerserkPotion
+
+local defDuration = 2
+local offDuration = 4.25
+local ConcoctionThrowTime = 0
+
+function X.ConsiderStolenSpell(ability)
+    bot = GetBot()
+
+    if Fu.CanNotUseAbility(bot) then return end
+
+    botTarget = Fu.GetProperTarget(bot)
+    local abilityName = ability:GetName()
+
+    if abilityName == 'alchemist_chemical_rage'
+    then
+        ChemicalRage = ability
+        ChemicalRageDesire = X.ConsiderChemicalRage()
+        if ChemicalRageDesire > 0
+        then
+            bot:Action_UseAbility(ChemicalRage)
+            return
+        end
+    end
+
+    if abilityName == 'alchemist_unstable_concoction_throw'
+    then
+        UnstableConcoctionThrow = ability
+        UnstableConcoctionThrowDesire, UnstableConcoctionThrowTarget = X.ConsiderUnstableConcoctionThrow()
+        if UnstableConcoctionThrowDesire > 0
+        then
+            bot:Action_UseAbilityOnEntity(UnstableConcoctionThrow, UnstableConcoctionThrowTarget)
+            return
+        end
+    end
+
+    if abilityName == 'alchemist_unstable_concoction'
+    then
+        UnstableConcoction = ability
+        UnstableConcoctionDesire = X.ConsiderUnstableConcoction()
+        if UnstableConcoctionDesire > 0
+        then
+            bot:Action_UseAbility(UnstableConcoction)
+            ConcoctionThrowTime = DotaTime()
+            return
+        end
+    end
+
+    if abilityName == 'alchemist_acid_spray'
+    then
+        AcidSpray = ability
+        AcidSprayDesire, AcidSprayLocation = X.ConsiderAcidSpray()
+        if AcidSprayDesire > 0
+        then
+            Fu.SetQueuePtToINT(bot, false)
+            bot:Action_UseAbilityOnLocation(AcidSpray, AcidSprayLocation)
+            return
+        end
+    end
+
+    if abilityName == 'alchemist_berserk_potion'
+    then
+        BerserkPotion = ability
+        BerserkPotionDesire, BerserkPotionTarget = X.ConsiderBerserkPotion()
+        if BerserkPotionDesire > 0
+        then
+            bot:Action_UseAbilityOnEntity(BerserkPotion, BerserkPotionTarget)
+            return
+        end
+    end
+end
+
+function X.ConsiderAcidSpray()
+	if not AcidSpray:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE, 0
+	end
+
+	local nCastRange = Fu.GetProperCastRange(false, bot, AcidSpray:GetCastRange())
+	local nCastPoint = AcidSpray:GetCastPoint()
+	local nRadius = AcidSpray:GetSpecialValueInt('radius')
+
+	if Fu.IsInTeamFight(bot, 1200)
+	then
+		local nLocationAoE = bot:FindAoELocation(true, true, bot:GetLocation(), nCastRange, nRadius, nCastPoint, 0)
+		if nLocationAoE.count >= 2
+		then
+			local realEnemyCount = Fu.GetEnemiesNearLoc(nLocationAoE.targetloc, nRadius)
+            if realEnemyCount ~= nil and #realEnemyCount >= 2
+            then
+                return BOT_ACTION_DESIRE_HIGH, nLocationAoE.targetloc
+            end
+		end
+	end
+
+	if Fu.IsGoingOnSomeone(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,900, false, BOT_MODE_NONE)
+
+		if Fu.IsValidTarget(botTarget)
+		and Fu.CanCastOnNonMagicImmune(botTarget)
+		and Fu.IsInRange(bot, botTarget, nCastRange)
+		and Fu.IsAttacking(botTarget)
+		and botTarget:IsFacingLocation(bot:GetLocation(), 45)
+		and not Fu.IsSuspiciousIllusion(botTarget)
+		and not botTarget:HasModifier('modifier_abaddon_borrowed_time')
+		and not botTarget:HasModifier('modifier_dazzle_shallow_grave')
+		and nInRangeAlly ~= nil and nInRangeEnemy ~= nil
+		and #nInRangeAlly >= #nInRangeEnemy
+		then
+			local nTargetInRangeAlly = Fu.GetNearbyHeroes(botTarget, 900, false, BOT_MODE_NONE)
+
+            if nInRangeAlly ~= nil and nTargetInRangeAlly ~= nil
+            and #nInRangeAlly >= #nTargetInRangeAlly
+            then
+                return BOT_ACTION_DESIRE_HIGH, botTarget:GetLocation()
+            end
+		end
+	end
+
+	if Fu.IsRetreating(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,1000, false, BOT_MODE_NONE)
+        local nInRangeEnemy = Fu.GetNearbyHeroes(bot,1000, true, BOT_MODE_NONE)
+
+        if nInRangeAlly ~= nil and nInRangeEnemy
+        and Fu.IsValidHero(nInRangeEnemy[1])
+        and Fu.CanCastOnNonMagicImmune(nInRangeEnemy[1])
+        and Fu.IsInRange(bot, nInRangeEnemy[1], 600)
+        and Fu.IsRunning(nInRangeEnemy[1])
+        and nInRangeEnemy[1]:IsFacingLocation(bot:GetLocation(), 30)
+        and not Fu.IsSuspiciousIllusion(nInRangeEnemy[1])
+		and not Fu.IsDisabled(nInRangeEnemy[1])
+        then
+            local nTargetInRangeAlly = Fu.GetNearbyHeroes(nInRangeEnemy[1], 800, false, BOT_MODE_NONE)
+
+            if nTargetInRangeAlly ~= nil
+            and ((#nTargetInRangeAlly > #nInRangeAlly)
+                or (Fu.GetHP(bot) < 0.45 and bot:WasRecentlyDamagedByAnyHero(2.5)))
+            then
+                return BOT_ACTION_DESIRE_HIGH, bot:GetLocation()
+            end
+        end
+	end
+
+	if (Fu.IsDefending(bot) or Fu.IsPushing(bot))
+	then
+		local nEnemyLaneCreeps = bot:GetNearbyLaneCreeps(nCastRange, true)
+		local nLocationAoE = bot:FindAoELocation(true, false, bot:GetLocation(), nCastRange, nRadius, 0, 0)
+		local nTeamLaneFrontLoc = GetLaneFrontLocation(GetTeam(), bot:GetAssignedLane(), 0)
+		local nEnemyLaneFrontLoc = GetLaneFrontLocation(GetOpposingTeam(), bot:GetAssignedLane(), 0)
+
+		if nEnemyLaneCreeps ~= nil and #nEnemyLaneCreeps >= 5
+		and nLocationAoE.count >= 5
+		and Fu.GetLocationToLocationDistance(nTeamLaneFrontLoc, nEnemyLaneFrontLoc) < 150
+		then
+			return BOT_ACTION_DESIRE_MODERATE, nLocationAoE.targetloc
+		end
+	end
+
+	if Fu.IsFarming(bot)
+	then
+		local nLocationAoE = bot:FindAoELocation(true, false, bot:GetLocation(), nCastRange, nRadius, 0, 0)
+		local nNeutralCreeps = bot:GetNearbyNeutralCreeps(600)
+		local nEnemyLaneCreeps = bot:GetNearbyLaneCreeps(600, true)
+
+		if Fu.IsAttacking(bot)
+		and Fu.GetMP(bot) > 0.33
+		then
+			if nNeutralCreeps ~= nil
+			and ((#nNeutralCreeps >= 3 and nLocationAoE.count >= 3)
+				or (#nNeutralCreeps >= 2 and nLocationAoE.count >= 2 and nNeutralCreeps[1]:IsAncientCreep()))
+			then
+				return BOT_ACTION_DESIRE_HIGH, nLocationAoE.targetloc
+			end
+
+			if nEnemyLaneCreeps ~= nil and #nEnemyLaneCreeps >= 4
+			and nLocationAoE.count >= 4
+			then
+				return BOT_ACTION_DESIRE_HIGH, nLocationAoE.targetloc
+			end
+		end
+	end
+
+	if Fu.IsLaning(bot)
+	then
+		local nEnemyLaneCreeps = bot:GetNearbyLaneCreeps(600, true)
+		local nLocationAoE = bot:FindAoELocation(true, false, bot:GetLocation(), nCastRange, nRadius, 0, 0)
+
+		if Fu.IsAttacking(bot)
+		and Fu.GetMP(bot) > 0.65
+		then
+			if nEnemyLaneCreeps ~= nil and #nEnemyLaneCreeps >= 4
+			and nLocationAoE.count >= 4
+			then
+				return BOT_ACTION_DESIRE_HIGH, nLocationAoE.targetloc
+			end
+		end
+	end
+
+    if Fu.IsDoingRoshan(bot)
+    then
+        if Fu.IsRoshan(botTarget)
+        and Fu.CanCastOnNonMagicImmune(botTarget)
+        and Fu.IsInRange(bot, botTarget, 500)
+        and Fu.IsAttacking(bot)
+        then
+            return BOT_ACTION_DESIRE_HIGH, botTarget:GetLocation()
+        end
+    end
+
+    if Fu.IsDoingTormentor(bot)
+    then
+        if Fu.IsTormentor(botTarget)
+        and Fu.IsInRange(bot, botTarget, 400)
+        and Fu.IsAttacking(bot)
+        then
+            return BOT_ACTION_DESIRE_HIGH, botTarget:GetLocation()
+        end
+    end
+
+	return BOT_ACTION_DESIRE_NONE, 0
+end
+
+function X.ConsiderUnstableConcoction()
+	if not UnstableConcoction:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE
+	end
+
+	local nCastRange = Fu.GetProperCastRange(false, bot, UnstableConcoction:GetCastRange())
+	local nDamage = UnstableConcoction:GetSpecialValueInt('max_damage')
+
+	local nEnemyHeroes = Fu.GetNearbyHeroes(bot,nCastRange, true, BOT_MODE_NONE)
+	for _, enemyHero in pairs(nEnemyHeroes)
+	do
+		if Fu.IsValidHero(enemyHero)
+		and Fu.CanCastOnNonMagicImmune(enemyHero)
+		and Fu.IsInRange(bot, enemyHero, nCastRange - 200)
+		and not Fu.IsSuspiciousIllusion(enemyHero)
+		then
+			if enemyHero:IsChanneling()
+			then
+				return BOT_ACTION_DESIRE_HIGH
+			end
+
+			if Fu.CanKillTarget(enemyHero, nDamage, DAMAGE_TYPE_PHYSICAL)
+			and not enemyHero:HasModifier('modifier_abaddon_borrowed_time')
+			and not enemyHero:HasModifier('modifier_abaddon_aphotic_shield')
+			and not enemyHero:HasModifier('modifier_dazzle_shallow_grave')
+			and not enemyHero:HasModifier('modifier_enigma_black_hole_pull')
+			and not enemyHero:HasModifier('modifier_faceless_void_chronosphere_freeze')
+			and not enemyHero:HasModifier('modifier_oracle_false_promise_timer')
+			and not enemyHero:HasModifier('modifier_item_solar_crest_armor_addition')
+			then
+				return BOT_ACTION_DESIRE_HIGH
+			end
+		end
+	end
+
+	if Fu.IsGoingOnSomeone(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,1000, false, BOT_MODE_NONE)
+		local nInRangeEnemy = Fu.GetNearbyHeroes(bot,nCastRange - 175, true, BOT_MODE_NONE)
+
+		for _, enemyHero in pairs(nInRangeEnemy)
+		do
+			if Fu.IsValidTarget(enemyHero)
+			and Fu.CanCastOnNonMagicImmune(enemyHero)
+			and not Fu.IsSuspiciousIllusion(enemyHero)
+			and not Fu.IsDisabled(enemyHero)
+			and not enemyHero:HasModifier('modifier_enigma_black_hole_pull')
+			and not enemyHero:HasModifier('modifier_faceless_void_chronosphere_freeze')
+			and not enemyHero:HasModifier('modifier_legion_commander_duel')
+			and not enemyHero:HasModifier('modifier_necrolyte_reapers_scythe')
+			then
+				local nTargetInRangeAlly = Fu.GetNearbyHeroes(enemyHero, 1000, false, BOT_MODE_NONE)
+
+				if nInRangeAlly ~= nil and nTargetInRangeAlly ~= nil
+				and #nInRangeAlly >= #nTargetInRangeAlly
+				then
+					return BOT_ACTION_DESIRE_HIGH, enemyHero
+				end
+			end
+		end
+	end
+
+	if Fu.IsRetreating(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,nCastRange + 175, false, BOT_MODE_NONE)
+		local nInRangeEnemy = Fu.GetNearbyHeroes(bot,nCastRange, true, BOT_MODE_NONE)
+
+		if nInRangeAlly ~= nil and nInRangeEnemy ~= nil
+		and Fu.IsValidHero(nInRangeEnemy[1])
+		and Fu.CanCastOnNonMagicImmune(nInRangeEnemy[1])
+		and Fu.IsInRange(bot, nInRangeEnemy[1], nCastRange - 175)
+		and Fu.IsRunning(nInRangeEnemy[1])
+        and nInRangeEnemy[1]:IsFacingLocation(bot:GetLocation(), 30)
+		and not Fu.IsSuspiciousIllusion(nInRangeEnemy[1])
+		and not Fu.IsDisabled(nInRangeEnemy[1])
+		and not nInRangeEnemy[1]:HasModifier('modifier_enigma_black_hole_pull')
+		and not nInRangeEnemy[1]:HasModifier('modifier_faceless_void_chronosphere_freeze')
+		and not nInRangeEnemy[1]:HasModifier('modifier_necrolyte_reapers_scythe')
+		then
+			local nTargetInRangeAlly = Fu.GetNearbyHeroes(nInRangeEnemy[1], 800, false, BOT_MODE_NONE)
+
+            if nTargetInRangeAlly ~= nil
+            and ((#nTargetInRangeAlly > #nInRangeAlly)
+                or (Fu.GetHP(bot) < 0.6 and bot:WasRecentlyDamagedByAnyHero(2.2)))
+            then
+                return BOT_ACTION_DESIRE_HIGH
+            end
+		end
+	end
+
+	return BOT_ACTION_DESIRE_NONE
+end
+
+function X.ConsiderUnstableConcoctionThrow()
+	if UnstableConcoctionThrow:IsHidden()
+	or not UnstableConcoctionThrow:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE, nil
+	end
+
+	local nCastRange = Fu.GetProperCastRange(false, bot, UnstableConcoctionThrow:GetCastRange())
+	local nDamage = UnstableConcoction:GetSpecialValueInt("max_damage")
+
+	local nEnemyHeroes = Fu.GetNearbyHeroes(bot,nCastRange, true, BOT_MODE_NONE)
+	for _, enemyHero in pairs(nEnemyHeroes)
+	do
+		if Fu.IsValidHero(enemyHero)
+		and Fu.CanCastOnNonMagicImmune(enemyHero)
+		and not Fu.IsSuspiciousIllusion(enemyHero)
+		and DotaTime() >= ConcoctionThrowTime + offDuration
+		then
+			if enemyHero:IsChanneling()
+			then
+				return BOT_ACTION_DESIRE_HIGH, enemyHero
+			end
+
+			if Fu.CanKillTarget(enemyHero, nDamage, DAMAGE_TYPE_PHYSICAL)
+			and not enemyHero:HasModifier('modifier_abaddon_borrowed_time')
+			and not enemyHero:HasModifier('modifier_abaddon_aphotic_shield')
+			and not enemyHero:HasModifier('modifier_dazzle_shallow_grave')
+			and not enemyHero:HasModifier('modifier_enigma_black_hole_pull')
+			and not enemyHero:HasModifier('modifier_faceless_void_chronosphere_freeze')
+			and not enemyHero:HasModifier('modifier_oracle_false_promise_timer')
+			and not enemyHero:HasModifier('modifier_item_solar_crest_armor_addition')
+			then
+				return BOT_ACTION_DESIRE_HIGH, enemyHero
+			end
+		end
+	end
+
+	if Fu.IsGoingOnSomeone(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,1000, false, BOT_MODE_NONE)
+		local nInRangeEnemy = Fu.GetNearbyHeroes(bot,nCastRange - 175, true, BOT_MODE_NONE)
+
+		for _, enemyHero in pairs(nInRangeEnemy)
+		do
+			if Fu.IsValidTarget(enemyHero)
+			and Fu.CanCastOnNonMagicImmune(enemyHero)
+			and not Fu.IsSuspiciousIllusion(enemyHero)
+			and not Fu.IsDisabled(enemyHero)
+			and not enemyHero:HasModifier('modifier_enigma_black_hole_pull')
+			and not enemyHero:HasModifier('modifier_faceless_void_chronosphere_freeze')
+			and not enemyHero:HasModifier('modifier_legion_commander_duel')
+			and not enemyHero:HasModifier('modifier_necrolyte_reapers_scythe')
+			and DotaTime() >= ConcoctionThrowTime + offDuration
+			then
+				local nTargetInRangeAlly = Fu.GetNearbyHeroes(enemyHero, 1000, false, BOT_MODE_NONE)
+
+				if nInRangeAlly ~= nil and nTargetInRangeAlly ~= nil
+				and #nInRangeAlly >= #nTargetInRangeAlly
+				then
+					return BOT_ACTION_DESIRE_HIGH, enemyHero
+				end
+			end
+		end
+	end
+
+	if Fu.IsRetreating(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,800, false, BOT_MODE_NONE)
+		local nInRangeEnemy = Fu.GetNearbyHeroes(bot,1000, true, BOT_MODE_NONE)
+
+		if nInRangeAlly ~= nil and nInRangeEnemy ~= nil
+		and Fu.IsValidHero(nInRangeEnemy[1])
+		and Fu.CanCastOnNonMagicImmune(nInRangeEnemy[1])
+		and Fu.IsInRange(bot, nInRangeEnemy[1], nCastRange)
+		and not Fu.IsSuspiciousIllusion(nInRangeEnemy[1])
+		and not nInRangeEnemy[1]:HasModifier('modifier_enigma_black_hole_pull')
+		and not nInRangeEnemy[1]:HasModifier('modifier_faceless_void_chronosphere_freeze')
+		and not nInRangeEnemy[1]:HasModifier('modifier_necrolyte_reapers_scythe')
+		and DotaTime() >= ConcoctionThrowTime + defDuration
+		then
+			local nTargetInRangeAlly = Fu.GetNearbyHeroes(nInRangeEnemy[1], 800, false, BOT_MODE_NONE)
+
+            if nTargetInRangeAlly ~= nil
+            and ((#nTargetInRangeAlly > #nInRangeAlly)
+                or (Fu.GetHP(bot) < 0.6 and bot:WasRecentlyDamagedByAnyHero(2.2)))
+            then
+                return BOT_ACTION_DESIRE_HIGH, nInRangeEnemy[1]
+            end
+		end
+	end
+
+	if nEnemyHeroes ~= nil and #nEnemyHeroes >= 1
+	and DotaTime() >= ConcoctionThrowTime + defDuration
+	then
+		return BOT_ACTION_DESIRE_HIGH, nEnemyHeroes[1]
+	end
+
+	return BOT_ACTION_DESIRE_NONE, nil
+end
+
+function X.ConsiderChemicalRage()
+	if not ChemicalRage:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE
+	end
+
+	if Fu.IsInTeamFight(bot, 1200)
+	then
+		local nRealInRangeEnemy = Fu.GetEnemiesNearLoc(bot:GetLocation(), 700)
+		if nRealInRangeEnemy ~= nil and #nRealInRangeEnemy >= 2
+		then
+			return BOT_ACTION_DESIRE_HIGH
+		end
+	end
+
+	if Fu.IsGoingOnSomeone(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,1000, false, BOT_MODE_NONE)
+
+		if Fu.IsValidTarget(botTarget)
+		and Fu.IsInRange(bot, botTarget, 800)
+		and not Fu.IsSuspiciousIllusion(botTarget)
+		and not botTarget:HasModifier('modifier_enigma_black_hole_pull')
+		and not botTarget:HasModifier('modifier_faceless_void_chronosphere_freeze')
+		and not botTarget:HasModifier('modifier_necrolyte_reapers_scythe')
+		then
+            local nTargetInRangeAlly = Fu.GetNearbyHeroes(botTarget, 1000, false, BOT_MODE_NONE)
+
+            if nInRangeAlly ~= nil and nTargetInRangeAlly ~= nil
+            and #nInRangeAlly >= #nTargetInRangeAlly
+            then
+                return BOT_ACTION_DESIRE_HIGH
+            end
+		end
+	end
+
+	if Fu.IsRetreating(bot)
+	then
+		local nInRangeAlly = Fu.GetNearbyHeroes(bot,800, false, BOT_MODE_NONE)
+		local nInRangeEnemy = Fu.GetNearbyHeroes(bot,800, true, BOT_MODE_NONE)
+
+		if nInRangeAlly ~= nil and nInRangeEnemy ~= nil
+		and Fu.IsValidHero(nInRangeEnemy[1])
+		and Fu.IsRunning(nInRangeEnemy[1])
+        and nInRangeEnemy[1]:IsFacingLocation(bot:GetLocation(), 30)
+		and not Fu.IsSuspiciousIllusion(nInRangeEnemy[1])
+		and not Fu.IsDisabled(nInRangeEnemy[1])
+		and not nInRangeEnemy[1]:HasModifier('modifier_enigma_black_hole_pull')
+		and not nInRangeEnemy[1]:HasModifier('modifier_faceless_void_chronosphere_freeze')
+		and not nInRangeEnemy[1]:HasModifier('modifier_necrolyte_reapers_scythe')
+		then
+			local nTargetInRangeAlly = Fu.GetNearbyHeroes(nInRangeEnemy[1], 800, false, BOT_MODE_NONE)
+
+            if nTargetInRangeAlly ~= nil
+            and ((#nTargetInRangeAlly > #nInRangeAlly)
+                or (Fu.GetHP(bot) < 0.35 and bot:WasRecentlyDamagedByAnyHero(1.5)))
+            then
+                return BOT_ACTION_DESIRE_HIGH
+            end
+		end
+	end
+
+	if Fu.IsFarming(bot)
+	then
+		if Fu.IsAttacking(bot)
+		and Fu.IsValid(botTarget)
+		and botTarget:IsCreep()
+		and Fu.GetHP(bot) < 0.3
+		then
+			return BOT_ACTION_DESIRE_HIGH
+		end
+	end
+
+	if Fu.IsDoingRoshan(bot)
+    then
+        if Fu.IsRoshan(botTarget)
+        and Fu.IsInRange(bot, botTarget, 500)
+        and Fu.IsAttacking(bot)
+		and (Fu.IsModeTurbo() and DotaTime() < 15 * 60 or DotaTime() < 30 * 60)
+        then
+            return BOT_ACTION_DESIRE_HIGH
+        end
+    end
+
+    if Fu.IsDoingTormentor(bot)
+    then
+        if Fu.IsTormentor(botTarget)
+        and Fu.IsInRange(bot, botTarget, 400)
+        and Fu.IsAttacking(bot)
+		and (Fu.IsModeTurbo() and DotaTime() < 16 * 60 or DotaTime() < 32 * 60)
+        then
+            return BOT_ACTION_DESIRE_HIGH
+        end
+    end
+
+	return BOT_ACTION_DESIRE_NONE
+end
+
+function X.ConsiderBerserkPotion()
+	if not BerserkPotion:IsTrained()
+	or not BerserkPotion:IsFullyCastable()
+	then
+		return BOT_ACTION_DESIRE_NONE, nil
+	end
+
+	local nCastRange = Fu.GetProperCastRange(false, bot, BerserkPotion:GetCastRange())
+
+	local nAllyHeroes = Fu.GetNearbyHeroes(bot,nCastRange, false, BOT_MODE_NONE)
+	for _, allyHero in pairs(nAllyHeroes)
+	do
+		if Fu.IsValidHero(allyHero)
+		and Fu.IsInRange(bot, allyHero, nCastRange)
+		and not allyHero:HasModifier('modifier_legion_commander_press_the_attack')
+		and not allyHero:HasModifier('modifier_item_satanic_unholy')
+		and not allyHero:IsMagicImmune()
+		and not allyHero:IsInvulnerable()
+		and not allyHero:IsIllusion()
+		and allyHero:CanBeSeen()
+		then
+			if Fu.IsDisabled(allyHero)
+			then
+				return BOT_ACTION_DESIRE_HIGH, allyHero
+			end
+
+			if Fu.IsRetreating(allyHero)
+			and Fu.IsRunning(allyHero)
+			and Fu.GetHP(allyHero) < 0.6
+			and allyHero:WasRecentlyDamagedByAnyHero(2.5)
+			and allyHero:IsFacingLocation(GetAncient(GetTeam()):GetLocation(), 45)
+			then
+				return BOT_ACTION_DESIRE_HIGH, allyHero
+			end
+
+			if Fu.IsGoingOnSomeone(allyHero)
+			then
+				local allyTarget = Fu.GetProperTarget(allyHero)
+
+				if Fu.IsValidHero(allyTarget)
+				and allyHero:IsFacingLocation( allyTarget:GetLocation(), 20)
+				and Fu.IsInRange(allyHero, allyTarget, allyHero:GetAttackRange() + 100)
+				then
+					return BOT_ACTION_DESIRE_HIGH, allyHero
+				end
+
+				if Fu.GetHP(allyHero) < 0.33
+				then
+					return BOT_ACTION_DESIRE_HIGH, allyHero
+				end
+			end
+		end
+	end
+
+	return BOT_ACTION_DESIRE_NONE, nil
+end
+
+return X
