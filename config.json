@@ -78,6 +78,7 @@
   "sp_value": "+100%",
   "sa_value2": "-50%",
   "sp_value2": "-50%",
+  "cooldown_action": "-50%",
   "shortcut_1_action": "=1",
   "shortcut_2_action": "+25",
   "shortcut_3_action": "+50",
@@ -98,7 +99,6 @@
   "shortcut_ctrl_8_action": "+200%",
   "shortcut_ctrl_9_action": "=99999",
   "shortcut_ctrl_0_action": "=0",
-  "cooldown_action": "-50%",
   "shortcut_count": {
     "shortcut_7_action": 57,
     "shortcut_ctrl_6_action": 20,
